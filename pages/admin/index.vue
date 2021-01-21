@@ -8,7 +8,7 @@
       <h3>Projetos {{ projects.length }}</h3>
       <ul class="projects">
         <li v-for="project in projects" :key="project.id">
-          {{ project.name }}
+          {{ project.name }} <b-icon-lock-fill v-if="project.private" />
         </li>
       </ul>
     </div>
@@ -16,7 +16,7 @@
       <h3>Repositórios {{ repositories.length }}</h3>
       <ul class="repositories">
         <li v-for="repository in repositories" :key="repository.id">
-          {{ repository.name }}
+          {{ repository.name }} <b-icon-lock-fill v-if="repository.private" />
         </li>
       </ul>
     </div>
