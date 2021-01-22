@@ -1,11 +1,7 @@
 <template>
   <div class="container">
-    <div v-if="user">
-      {{ user.name }}
-    </div>
-    <a class="button--grey" @click="$auth.logout()"> Sair </a>
     <div v-if="projects">
-      <h3>Projetos {{ projects.length }}</h3>
+      <h3>Projetos</h3>
       <ul class="projects">
         <li v-for="project in projects" :key="project.id">
           {{ project.name }} <b-icon-lock-fill v-if="project.private" />
@@ -28,14 +24,6 @@
         </b-col>
       </b-row>
     </div>
-    <div v-if="events">
-      <h3>Atividades {{ events.length }}</h3>
-      <ul class="events">
-        <li v-for="event in events" :key="event.id">
-          {{ event.name }}
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
@@ -44,44 +32,30 @@ export default {
   layout: 'admin',
   data() {
     return {
-      user: null,
       repositories: null,
       projects: null,
       members: null,
     }
   },
   async created() {
-    const { Octokit } = require('@octokit/rest')
-
-    const octokit = new Octokit({
-      auth: this.$auth.strategy.token.get(),
-    })
-
-    this.user = (await octokit.request('/user')).data
-
     const org = 'terrakrya'
     this.repositories = (
-      await octokit.repos.listForOrg({
+      await this.octokit.repos.listForOrg({
         org,
       })
     ).data
 
     this.projects = (
-      await octokit.projects.listForOrg({
+      await this.octokit.projects.listForOrg({
         org,
       })
     ).data
 
     this.members = (
-      await octokit.orgs.listMembers({
+      await this.octokit.orgs.listMembers({
         org,
       })
     ).data
-    octokit.orgs.listMembers({
-      org,
-    })
-
-    // this.events = (await octokit.activity.listPublicEvents()).data
   },
 }
 </script>

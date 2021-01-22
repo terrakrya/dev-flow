@@ -4,7 +4,8 @@ export default {
   serverMiddleware: ['~/api/index.js'],
   // Global page headers (https://go.nuxtjs.dev/config-head)
   head: {
-    title: 'dev-flow',
+    title:
+      'DevFlow - Awesome tools that helps you to manage your software development flow',
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -14,10 +15,10 @@ export default {
   },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
-  css: [],
+  css: ['~/assets/css/custom.sass'],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: [],
+  plugins: ['~/plugins/global-mixin.js'],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,

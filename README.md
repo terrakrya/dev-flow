@@ -1,4 +1,6 @@
-# dev-flow
+# Dev Flow
+
+Awesome tools that helps you to manage your software development flow
 
 ## Build Setup
 
