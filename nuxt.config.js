@@ -55,7 +55,7 @@ export default {
       github: {
         clientId: process.env.GITHUB_ID,
         clientSecret: process.env.GITHUB_SECRET,
-        redirectUri: 'http://127.0.0.1:3000/admin',
+        redirectUri: process.env.GITHUB_CALLBACK,
       },
     },
   },
