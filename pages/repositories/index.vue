@@ -1,7 +1,7 @@
 <template>
   <b-container>
     <b-row>
-      <b-col md="8"> </b-col>
+      <b-col md="8"> Repositórios </b-col>
       <b-col md="4">
         <Sidebar />
       </b-col>

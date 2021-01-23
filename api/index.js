@@ -1,10 +1,13 @@
+import cors from 'cors'
 import express from 'express'
 import bodyParser from 'body-parser'
 import session from 'express-session'
+import routes from './routes'
 
 const app = express()
-const router = express.Router()
 const secret = process.env.SECRET || 'dev-flow'
+
+app.use(cors())
 
 app.use(
   session({
@@ -17,9 +20,7 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
-app.use(router)
-
-router.use('/auth', require('./routes/auth'))
+app.use(routes)
 
 module.exports = {
   path: '/api',

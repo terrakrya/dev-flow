@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container login">
     <div>
       <Logo />
       <h4><small>by</small> Terrakrya</h4>
@@ -15,15 +15,3 @@
 <script>
 export default {}
 </script>
-
-<style lang="sass" scoped>
-.container
-  margin: 0 auto
-  min-height: 100vh
-  display: flex
-  justify-content: center
-  align-items: center
-  text-align: center
-  .logo
-    max-height: 150px
-</style>

@@ -16,10 +16,10 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-      organization: null,
-    }
+  computed: {
+    organization() {
+      return this.$store.state.organization
+    },
   },
   created() {
     this.octokit.orgs
@@ -27,7 +27,7 @@ export default {
         org: this.org,
       })
       .then((res) => {
-        this.organization = res.data
+        this.$store.commit('setOrganization', res.data)
       })
   },
 }
