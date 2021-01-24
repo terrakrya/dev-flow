@@ -8,6 +8,9 @@
           <b-icon-github /> Entre com GitHub
         </a>
       </div>
+      <pre>
+        {{ process.env }}
+      </pre>
     </div>
   </div>
 </template>
