@@ -1,12 +1,12 @@
-name: Deploy Stage
+name: cd
 
 on:
   push:
     branches:
-      - stage
+      - dev
   pull_request:
     branches:
-      - stage
+      - dev
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,6 +15,6 @@ jobs:
         uses: garygrossgarten/github-action-ssh@release
         with:
           command: 'source ~/.nvm/nvm.sh; cd ~/server/; ./update.sh; ./deploy.sh cms; exit'
-          host: stage.terrakrya.com
+          host: dev.terrakrya.com
           username: root
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }}
