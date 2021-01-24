@@ -51,6 +51,12 @@ export default {
   content: {},
 
   auth: {
+    redirect: {
+      login: '/login',
+      logout: '/',
+      callback: '/admin',
+      home: '/admin',
+    },
     strategies: {
       github: {
         clientId: process.env.GITHUB_ID,
