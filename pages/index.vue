@@ -8,9 +8,6 @@
           <b-icon-github /> Entre com GitHub
         </a>
       </div>
-      <pre>
-        {{ process.env }}
-      </pre>
     </div>
   </div>
 </template>
@@ -19,7 +16,7 @@
 export default {
   methods: {
     login() {
-      console.log(process.env.GITHUB_ID)
+      console.log(process.env)
       console.log(this.$auth.strategies.github)
       // this.$auth.loginWith('github')
     },
