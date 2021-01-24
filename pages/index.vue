@@ -18,7 +18,7 @@ export default {
     login() {
       console.log(this.$auth)
       // this.$auth.loginWith('github')
-    }
-  }
+    },
+  },
 }
 </script>
