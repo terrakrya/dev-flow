@@ -61,7 +61,6 @@ export default {
       github: {
         clientId: process.env.GITHUB_ID,
         clientSecret: process.env.GITHUB_SECRET,
-        redirectUri: process.env.GITHUB_CALLBACK,
       },
     },
   },
