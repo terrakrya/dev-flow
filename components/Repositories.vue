@@ -2,7 +2,7 @@
   <b-card v-if="repositories" class="mb-3" no-body>
     <b-card-body>
       <b-card-title class="mb-0">
-        <span class="title">Repositórios</span>
+        <span class="title">Repositórios!</span>
       </b-card-title>
     </b-card-body>
 
