@@ -16,7 +16,8 @@
 export default {
   methods: {
     login() {
-      console.log(this.$auth)
+      console.log(process.env.GITHUB_ID)
+      console.log(this.$auth.strategies.github)
       // this.$auth.loginWith('github')
     },
   },
