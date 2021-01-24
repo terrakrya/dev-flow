@@ -61,8 +61,8 @@ export default {
     },
     strategies: {
       github: {
-        clientId: 'aaa',
-        clientSecret: 'bbb',
+        clientId: process.env.GITHUB_ID,
+        clientSecret: process.env.GITHUB_SECRET,
       },
     },
   },
