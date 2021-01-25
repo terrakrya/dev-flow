@@ -1,5 +1,3 @@
-console.log('process.env')
-console.log(process.env.GITHUB_ID)
 export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: true,

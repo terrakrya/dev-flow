@@ -3,7 +3,6 @@ const router = require('express').Router()
 router.get('/events', (req, res) => {
   const { Octokit } = require('@octokit/rest')
 
-  console.log(req.query.auth)
   const octokit = new Octokit({
     auth: req.query.auth,
   })

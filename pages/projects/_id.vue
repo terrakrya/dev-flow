@@ -47,7 +47,6 @@ export default {
         })
         .then((resp) => {
           const cards = resp.data
-          console.log(cards)
           cards.forEach((card) => {
             this.cards.push(card)
           })
