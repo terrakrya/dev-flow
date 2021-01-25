@@ -42,6 +42,7 @@ export default {
     // https://go.nuxtjs.dev/content
     '@nuxt/content',
     '@nuxtjs/auth-next',
+    '@nuxtjs/markdownit',
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
@@ -52,9 +53,6 @@ export default {
 
   auth: {
     redirect: {
-      login: '/login',
-      logout: '/',
-      callback: '/admin',
       home: '/admin',
     },
     strategies: {
@@ -67,7 +65,9 @@ export default {
   bootstrapVue: {
     icons: true,
   },
-
+  markdownit: {
+    runtime: true,
+  },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
 }

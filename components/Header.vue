@@ -8,7 +8,7 @@
         <b-navbar-toggle target="header-menu" />
         <b-collapse id="header-menu" is-nav>
           <b-navbar-nav />
-          <b-navbar-nav v-if="user" class="ml-auto">
+          <b-navbar-nav class="ml-auto">
             <b-nav-item-dropdown right>
               <!-- Using 'button-content' slot -->
               <template #button-content>

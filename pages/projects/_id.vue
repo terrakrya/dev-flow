@@ -1,20 +1,20 @@
 <template>
-  <b-container>
-    <b-row>
-      <b-col md="8">
-        <div v-if="project">
-          <h4>{{ project.name }}</h4>
-          <p v-if="project.body">{{ project.body }}</p>
-          <pre>{{ project }}</pre>
-          <pre>{{ columns }}</pre>
-          <pre>{{ cards }}</pre>
-        </div>
-      </b-col>
-      <b-col md="4">
-        <Sidebar />
-      </b-col>
-    </b-row>
-  </b-container>
+  <div>
+    <b-container>
+      <div v-if="project">
+        <h4>{{ project.name }}</h4>
+        <p v-if="project.body">{{ project.body }}</p>
+      </div>
+    </b-container>
+    <b-container fluid>
+      <div v-if="project">
+        <Kanban :columns="columns" />
+        <!-- <pre>{{ project }}</pre> -->
+        <pre>{{ columns }}</pre>
+        <!-- <pre>{{ cards }}</pre> -->
+      </div>
+    </b-container>
+  </div>
 </template>
 
 <script>
@@ -35,23 +35,22 @@ export default {
       .then((resp) => {
         this.project = resp.data
       })
-    this.columns = (
+    const columns = (
       await this.octokit.projects.listColumns({
         project_id: this.$route.params.id,
       })
     ).data
-    this.columns.forEach((column) => {
-      this.octokit.projects
-        .listCards({
-          column_id: column.id,
-        })
-        .then((resp) => {
-          const cards = resp.data
-          cards.forEach((card) => {
-            this.cards.push(card)
-          })
-        })
-    })
+    for (const column of columns) {
+      const resp = await this.octokit.projects.listCards({
+        column_id: column.id,
+      })
+      const cards = resp.data
+      column.cards = cards
+      cards.forEach((card) => {
+        this.cards.push(card)
+      })
+    }
+    this.columns = columns
   },
 }
 </script>

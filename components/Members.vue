@@ -9,7 +9,7 @@
         :key="member.id"
         :src="member.avatar_url"
         class="mr-1"
-      ></b-avatar>
+      />
     </div>
   </b-card>
 </template>
