@@ -61,8 +61,8 @@ export default {
     },
     strategies: {
       github: {
-        clientId: process.env.githubId,
-        clientSecret: process.env.githubSecret,
+        clientId: process.env.GITHUB_ID,
+        clientSecret: process.env.GITHUB_SECRET,
       },
     },
   },
@@ -72,8 +72,4 @@ export default {
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
-  env: {
-    githubId: process.env.GITHUB_ID,
-    githubSecret: process.env.GITHUB_SECRET,
-  },
 }
