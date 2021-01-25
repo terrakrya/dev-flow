@@ -1,5 +1,5 @@
-console.log('process.env.GITHUB_ID')
-console.log(process.env.GITHUB_ID)
+console.log('process.env')
+console.log(process.env)
 export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: true,
@@ -61,8 +61,8 @@ export default {
     },
     strategies: {
       github: {
-        clientId: process.env.GITHUB_ID,
-        clientSecret: process.env.GITHUB_SECRET,
+        clientId: process.env.githubId,
+        clientSecret: process.env.githubSecret,
       },
     },
   },
@@ -73,7 +73,7 @@ export default {
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
   env: {
-    GITHUB_ID: process.env.GITHUB_ID,
-    GITHUB_SECRET: process.env.GITHUB_SECRET,
+    githubId: process.env.GITHUB_ID,
+    githubSecret: process.env.GITHUB_SECRET,
   },
 }
