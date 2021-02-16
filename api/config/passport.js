@@ -8,7 +8,9 @@ passport.use(
       clientSecret: process.env.GITHUB_SECRET,
     },
     (accessToken, refreshToken, profile, cb) => {
-      return cb(null, profile)
+      const user = { token: accessToken, ...profile._json }
+      // user.refreshToken = refreshToken
+      return cb(null, user)
     }
   )
 )

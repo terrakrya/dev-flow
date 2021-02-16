@@ -46,7 +46,9 @@ export default {
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
-  axios: {},
+  axios: {
+    baseURL: process.env.BASE_URL || 'http://127.0.0.1:3000/',
+  },
 
   // Content module configuration (https://go.nuxtjs.dev/config-content)
   content: {},
@@ -59,6 +61,20 @@ export default {
       github: {
         clientId: process.env.GITHUB_ID,
         clientSecret: process.env.GITHUB_SECRET,
+      },
+      local: {
+        token: {
+          property: 'token',
+          type: 'Token',
+        },
+        user: {
+          property: false,
+        },
+        endpoints: {
+          login: { url: '/api/auth/login', method: 'post' },
+          logout: { url: '/api/auth/logout', method: 'get' },
+          user: { url: '/api/auth/me', method: 'get' },
+        },
       },
     },
   },

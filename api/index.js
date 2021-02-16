@@ -1,5 +1,6 @@
 import cors from 'cors'
 import express from 'express'
+import passport from 'passport'
 import bodyParser from 'body-parser'
 import session from 'express-session'
 import routes from './routes'
@@ -19,7 +20,8 @@ app.use(
 )
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
-
+app.use(passport.initialize())
+app.use(passport.session())
 app.use(routes)
 
 module.exports = {
