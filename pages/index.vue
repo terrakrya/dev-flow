@@ -4,10 +4,6 @@
       <Logo />
       <h4><small>by</small> Terrakrya</h4>
       <div class="mt-4">
-        {{ $auth.user }}
-        <a class="btn btn-primary" @click="login">
-          <b-icon-github /> Entre com GitHub
-        </a>
         <a class="btn btn-primary" href="/api/auth/github">
           <b-icon-github /> Entre com GitHub
         </a>
