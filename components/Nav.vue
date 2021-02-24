@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4 mb-4">
+  <b-container fluid class="mt-4 mb-4">
     <b-nav tabs>
       <b-nav-item to="/admin"> <b-icon-bar-chart /> Dashboard </b-nav-item>
       <b-nav-item v-if="projects" to="/projects" class="text-dark">
@@ -15,12 +15,12 @@
         Membros <b-badge> {{ members.length }} </b-badge>
       </b-nav-item>
     </b-nav>
-  </div>
+  </b-container>
 </template>
 
 <script>
 export default {
-  layout: 'admin',
+  
   computed: {
     repositories() {
       return this.$store.state.repositories

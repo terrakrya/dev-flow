@@ -1,5 +1,5 @@
 <template>
-  <b-container>
+  <b-container fluid>
     <b-row>
       <b-col md="8"> Repositórios </b-col>
       <b-col md="4">
@@ -11,6 +11,6 @@
 
 <script>
 export default {
-  layout: 'admin',
+  
 }
 </script>

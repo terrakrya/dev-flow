@@ -1,5 +1,5 @@
 <template>
-  <b-container v-if="organization">
+  <b-container v-if="organization" fluid>
     <div class="mt-4">
       <b-img
         left
@@ -20,15 +20,6 @@ export default {
     organization() {
       return this.$store.state.organization
     },
-  },
-  created() {
-    this.octokit.orgs
-      .get({
-        org: this.org,
-      })
-      .then((res) => {
-        this.$store.commit('setOrganization', res.data)
-      })
   },
 }
 </script>

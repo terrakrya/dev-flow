@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="d-flex justify-content-center">
-      <div class="min-h-screen d-flex overflow-x-scroll py-3">
+      <div class="min-h-screen d-flex overflow-x-scroll py-3 kanban">
         <div
           v-for="column in columns"
           :key="column.name"
-          class="bg-dark rounded-lg px-3 py-2 column-width mr-1"
+          class="bg-dark rounded-lg px-3 pt-2 pb-3 column-width mr-1 column"
         >
           <p
             class="text-gray-700 font-semibold font-sans tracking-wide text-sm"
@@ -18,6 +18,11 @@
             :animation="200"
             ghost-class="ghost-card"
             group="cards"
+            @change="
+              (item) => {
+                cardChanged(item, column.name)
+              }
+            "
           >
             <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
             <kanban-card
@@ -25,6 +30,7 @@
               :key="card.id"
               :card="card"
               class="mt-3 cursor-move"
+              :multiple="multiple"
             ></kanban-card>
             <!-- </transition-group> -->
           </draggable>
@@ -47,141 +53,41 @@ export default {
       type: Array,
       default: () => [],
     },
+    multiple: {
+      type: Boolean,
+      default: false,
+    },
   },
-  // data() {
-  //   return {
-  //     columns: [
-  //       {
-  //         title: 'Backlog',
-  //         cards: [
-  //           {
-  //             id: 1,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //           {
-  //             id: 2,
-  //             title: 'Provide documentation on integrations',
-  //             date: 'Sep 12',
-  //           },
-  //           {
-  //             id: 3,
-  //             title: 'Design shopping cart dropdown',
-  //             date: 'Sep 9',
-  //             type: 'Design',
-  //           },
-  //           {
-  //             id: 4,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //           {
-  //             id: 5,
-  //             title: 'Test checkout flow',
-  //             date: 'Sep 15',
-  //             type: 'QA',
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         title: 'In Progress',
-  //         cards: [
-  //           {
-  //             id: 6,
-  //             title: 'Design shopping cart dropdown',
-  //             date: 'Sep 9',
-  //             type: 'Design',
-  //           },
-  //           {
-  //             id: 7,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //           {
-  //             id: 8,
-  //             title: 'Provide documentation on integrations',
-  //             date: 'Sep 12',
-  //             type: 'Backend',
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         title: 'Review',
-  //         cards: [
-  //           {
-  //             id: 9,
-  //             title: 'Provide documentation on integrations',
-  //             date: 'Sep 12',
-  //           },
-  //           {
-  //             id: 10,
-  //             title: 'Design shopping cart dropdown',
-  //             date: 'Sep 9',
-  //             type: 'Design',
-  //           },
-  //           {
-  //             id: 11,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //           {
-  //             id: 12,
-  //             title: 'Design shopping cart dropdown',
-  //             date: 'Sep 9',
-  //             type: 'Design',
-  //           },
-  //           {
-  //             id: 13,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //         ],
-  //       },
-  //       {
-  //         title: 'Done',
-  //         cards: [
-  //           {
-  //             id: 14,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //           {
-  //             id: 15,
-  //             title: 'Design shopping cart dropdown',
-  //             date: 'Sep 9',
-  //             type: 'Design',
-  //           },
-  //           {
-  //             id: 16,
-  //             title: 'Add discount code to checkout page',
-  //             date: 'Sep 14',
-  //             type: 'Feature Request',
-  //           },
-  //         ],
-  //       },
-  //     ],
-  //   }
-  // },
+  methods: {
+    cardChanged(action, columnName) {
+      const card = action.added || action.moved
+      console.log(action);
+      // if (card) {
+      //   this.octokit.projects
+      //     .moveCard({
+      //       position:
+      //         card.newIndex === 0 ? 'top' : 'after:' + (card.newIndex - 1),
+      //       card_id: card.element.id,
+      //       column_id: card.element.column_id,
+      //     })
+      //     .then((resp) => {
+      //       this.$store.commit('loadProjects')
+      //     })
+      // }
+    },
+  },
 }
 </script>
 
-<style scoped>
-.column-width {
-  min-width: 320px;
-  width: 320px;
-}
-
-/* Unfortunately @apply cannot be setup in codesandbox, 
-but you'd use "@apply border opacity-50 border-blue-500 bg-gray-200" here */
-.ghost-card {
-  opacity: 0.5;
-  background: #f7fafc;
-  border: 1px solid #4299e1;
-}
+<style lang="sass" scoped>
+.column-width
+  min-width: 320px
+  width: 320px
+.ghost-card
+  opacity: 0.5
+  background: #f7fafc
+  border: 1px solid #4299e1
+.kanban
+  .column > div
+    min-height: calc(100% - 16px)
 </style>

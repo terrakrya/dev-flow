@@ -20,14 +20,5 @@ export default {
       return this.$store.state.members
     },
   },
-  created() {
-    this.octokit.orgs
-      .listMembers({
-        org: this.org,
-      })
-      .then((resp) => {
-        this.$store.commit('setMembers', resp.data)
-      })
-  },
 }
 </script>

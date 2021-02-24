@@ -14,23 +14,16 @@
 
 <script>
 export default {
+  layout: 'front',
   async created() {
     try {
-      const user = await this.$auth.loginWith('local', {
+      await this.$auth.loginWith('local', {
         user: 'user',
         pass: 'github',
       })
-      console.log(user)
-      console.log(this.$auth.loggedIn)
-      console.log(this.$auth.user)
     } catch (error) {
       console.log(error)
     }
-  },
-  methods: {
-    login() {
-      this.$auth.loginWith('github')
-    },
   },
 }
 </script>

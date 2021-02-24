@@ -24,14 +24,5 @@ export default {
       return this.$store.state.projects
     },
   },
-  created() {
-    this.octokit.projects
-      .listForOrg({
-        org: this.org,
-      })
-      .then((resp) => {
-        this.$store.commit('setProjects', resp.data.reverse())
-      })
-  },
 }
 </script>

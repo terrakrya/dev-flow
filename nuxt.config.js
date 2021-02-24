@@ -83,6 +83,7 @@ export default {
   },
   markdownit: {
     runtime: true,
+    use: [['markdown-it-task-lists', { enabled: true, label: true }]],
   },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},

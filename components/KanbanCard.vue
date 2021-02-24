@@ -10,21 +10,25 @@
       />
     </div>
     <div class="flex mt-4 justify-between items-center">
-      <span class="text-sm text-gray-600">{{ card.date }}</span>
-      <badge v-if="card.type" :color="badgeColor">{{ card.type }}</badge>
+      <span class="text-sm text-gray-600">{{ card.description }}</span>
+      <n-link :to="`/projects/${card.project_id}`">
+        <b-badge v-if="multiple" variant="secondary">{{
+          card.project_name
+        }}</b-badge>
+      </n-link>
     </div>
   </div>
 </template>
 <script>
-import Badge from './Badge.vue'
 export default {
-  components: {
-    Badge,
-  },
   props: {
     card: {
       type: Object,
       default: () => ({}),
+    },
+    multiple: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

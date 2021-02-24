@@ -5,7 +5,7 @@ if (!Vue.__my_mixin__) {
     computed: {
       octokit() {
         const { Octokit } = require('@octokit/rest')
-
+        console.log(this.$auth.strategy.token.get())
         return new Octokit({
           auth: this.$auth.strategy.token.get(),
         })

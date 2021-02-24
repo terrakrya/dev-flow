@@ -38,14 +38,5 @@ export default {
       return this.$store.state.repositories
     },
   },
-  created() {
-    this.octokit.repos
-      .listForOrg({
-        org: this.org,
-      })
-      .then((resp) => {
-        this.$store.commit('setRepositories', resp.data.reverse())
-      })
-  },
 }
 </script>

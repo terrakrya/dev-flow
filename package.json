@@ -35,6 +35,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "markdown-it-task-lists": "^2.1.1",
     "mongoose": "^5.11.13",
     "nuxt": "^2.14.6",
     "passport": "^0.4.1",
