@@ -1,7 +1,7 @@
 <template>
   <header>
     <b-navbar toggleable="md" variant="dark" type="dark">
-      <b-container fluid="lg">
+      <b-container fluid>
         <b-navbar-brand to="/">
           <Logo />
         </b-navbar-brand>

@@ -1,3 +1,5 @@
+import './database'
+
 import cors from 'cors'
 import express from 'express'
 import passport from 'passport'

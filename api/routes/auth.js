@@ -25,9 +25,4 @@ router.get('/logout', function (req, res) {
   res.redirect('/')
 })
 
-function isLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) return next()
-  res.status(401).send('User not logged in')
-}
-
 module.exports = router

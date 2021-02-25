@@ -10,7 +10,7 @@
           <p
             class="text-gray-700 font-semibold font-sans tracking-wide text-sm"
           >
-            <strong>{{ column.name }}</strong>
+            <strong>{{ column.name }} s{{ column.id }}</strong>
           </p>
           <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
           <draggable
@@ -61,19 +61,24 @@ export default {
   methods: {
     cardChanged(action, columnName) {
       const card = action.added || action.moved
-      console.log(action);
-      // if (card) {
-      //   this.octokit.projects
-      //     .moveCard({
-      //       position:
-      //         card.newIndex === 0 ? 'top' : 'after:' + (card.newIndex - 1),
-      //       card_id: card.element.id,
-      //       column_id: card.element.column_id,
-      //     })
-      //     .then((resp) => {
-      //       this.$store.commit('loadProjects')
-      //     })
-      // }
+      if (card) {
+        const column = this.columns.find((column) => {
+          return (
+            column.name === columnName &&
+            column.project_url.endsWith(card.element.project_id)
+          )
+        })
+        this.octokit.projects
+          .moveCard({
+            position:
+              card.newIndex === 0 ? 'top' : 'after:' + (card.newIndex - 1),
+            card_id: card.element.id,
+            column_id: column.id,
+          })
+          .then((resp) => {
+            // this.$store.dispatch('loadProjects')
+          })
+      }
     },
   },
 }

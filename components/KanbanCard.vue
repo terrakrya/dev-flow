@@ -10,7 +10,7 @@
       />
     </div>
     <div class="flex mt-4 justify-between items-center">
-      <span class="text-sm text-gray-600">{{ card.description }}</span>
+      <span class="text-sm text-gray-600">{{ card.id }} - {{ card.column_id }}</span>
       <n-link :to="`/projects/${card.project_id}`">
         <b-badge v-if="multiple" variant="secondary">{{
           card.project_name

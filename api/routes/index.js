@@ -21,5 +21,7 @@ router.get('/events', (req, res) => {
 })
 
 router.use('/auth', require('./auth'))
+router.use('/projects', require('./projects'))
+router.use('/cards', require('./cards'))
 
 export default router

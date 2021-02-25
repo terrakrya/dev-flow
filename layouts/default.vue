@@ -38,7 +38,7 @@ export default {
         .then((resp) => {
           this.$store.commit('setMembers', resp.data)
         })
-      this.$store.commit('loadProjects')
+      this.$store.dispatch('loadProjects')
     }
   },
   methods: {

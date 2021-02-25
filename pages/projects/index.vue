@@ -3,43 +3,37 @@
     <div v-if="projects">
       <b-button
         v-for="project in projects"
-        :key="project.id"
-        :to="`/projects/${project.id}`"
+        :key="project._id"
+        :to="`/projects/${project._id}`"
         >{{ project.name }}</b-button
       >
     </div>
-    <Kanban :columns="columns" :projects="projects" multiple />
-    <pre>{{ columns }}</pre>
+    <b-button @click="show_project_form = !show_project_form"
+      >Adicionar projeto</b-button
+    >
+    <b-modal v-model="show_project_form" title="Adicionar projeto" hide-footer>
+      <project-form @saved="show_project_form = false" />
+    </b-modal>
+    <!-- <Kanban :cards="cards" multiple /> -->
+    <pre>{{ cards }}</pre>
   </b-container>
 </template>
 
 <script>
 export default {
+  data() {
+    return {
+      show_project_form: false,
+      cards: [],
+    }
+  },
   computed: {
     projects() {
       return this.$store.state.projects
     },
-    columns() {
-      const columns = {}
-      if (this.projects) {
-        for (const project of this.projects) {
-          for (const column of project.columns) {
-            const cards = column.cards
-            if (columns[column.name]) {
-              columns[column.name] = [...columns[column.name], ...cards]
-            } else {
-              columns[column.name] = cards
-            }
-          }
-        }
-      }
-      return Object.keys(columns).map((columnName) => {
-        return {
-          name: columnName,
-          cards: columns[columnName],
-        }
-      })
-    },
+  },
+  async created() {
+    this.cards = await this.$axios.$get('/api/cards')
   },
 }
 </script>

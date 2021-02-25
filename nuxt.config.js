@@ -43,6 +43,13 @@ export default {
     '@nuxt/content',
     '@nuxtjs/auth-next',
     '@nuxtjs/markdownit',
+    '@nuxtjs/toast',
+    [
+      'nuxt-validate',
+      {
+        lang: 'pt_BR',
+      },
+    ],
   ],
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
@@ -84,6 +91,16 @@ export default {
   markdownit: {
     runtime: true,
     use: [['markdown-it-task-lists', { enabled: true, label: true }]],
+  },
+  toast: {
+    duration: 7000,
+    keepOnHover: true,
+    theme: 'bubble',
+  },
+  proxy: {
+    pathRewrite: {
+      '^/api/': '/',
+    },
   },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {},
