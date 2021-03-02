@@ -9,19 +9,15 @@ const CardSchema = mongoose.Schema(
     },
     project: {
       type: ObjectId,
-      ref: 'Card',
+      ref: 'Project',
       required: true,
     },
-    users: [
+    members: [
       {
         type: String,
         required: true,
       },
     ],
-    column: {
-      type: String,
-      required: true,
-    },
     status: {
       type: String,
       required: true,

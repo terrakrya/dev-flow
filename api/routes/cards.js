@@ -9,13 +9,16 @@ router.get('/', authenticated, (req, res) => {
   if (req.query.project) {
     query.project = req.query.project
   }
-  Card.find(query).exec((err, cards) => {
-    if (err) {
-      res.status(422).send(err.message)
-    } else {
-      res.json(cards)
-    }
-  })
+  console.log(req.query.populate)
+  Card.find(query)
+    .populate('project')
+    .exec((err, cards) => {
+      if (err) {
+        res.status(422).send(err.message)
+      } else {
+        res.json(cards)
+      }
+    })
 })
 
 router.get('/:id', authenticated, (req, res) => {

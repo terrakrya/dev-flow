@@ -1,8 +1,8 @@
 export const state = () => ({
   organization: null,
-  members: null,
+  members: [],
   projects: [],
-  repositories: null,
+  repositories: [],
 })
 
 export const mutations = {

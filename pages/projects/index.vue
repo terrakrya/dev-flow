@@ -1,20 +1,25 @@
 <template>
   <b-container fluid>
-    <div v-if="projects">
-      <b-button
-        v-for="project in projects"
-        :key="project._id"
-        :to="`/projects/${project._id}`"
-        >{{ project.name }}</b-button
-      >
+    <div>
+      <template v-if="projects">
+        <b-button
+          variant="dark"
+          v-for="project in projects"
+          :key="project._id"
+          :to="`/projects/${project._id}`"
+          class="mb-1"
+          >{{ project.name }}</b-button
+        >
+      </template>
+      <a @click="show_project_form = !show_project_form">
+        <b-icon-plus />
+        Adicionar projeto
+      </a>
     </div>
-    <b-button @click="show_project_form = !show_project_form"
-      >Adicionar projeto</b-button
-    >
     <b-modal v-model="show_project_form" title="Adicionar projeto" hide-footer>
-      <project-form @saved="show_project_form = false" />
+      <project-form @change="projectSaved" />
     </b-modal>
-    <!-- <Kanban :cards="cards" multiple /> -->
+    <Kanban :cards="cards" multiple />
     <pre>{{ cards }}</pre>
   </b-container>
 </template>
@@ -34,6 +39,12 @@ export default {
   },
   async created() {
     this.cards = await this.$axios.$get('/api/cards')
+  },
+  methods: {
+    projectSaved() {
+      this.show_project_form = false
+      this.$store.dispatch('loadProjects')
+    },
   },
 }
 </script>

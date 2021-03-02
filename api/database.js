@@ -19,5 +19,5 @@ if (isProduction) {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  // mongoose.set('debug', true)
+  mongoose.set('debug', true)
 }
