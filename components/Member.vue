@@ -3,7 +3,7 @@
   <n-link v-if="member" :to="'/members/' + member.id">
     <b-avatar
       :src="member.avatar_url"
-      class="ml-1"
+      class="mr-1"
       size="2rem"
       :alt="member.name"
     />

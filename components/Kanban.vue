@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-center">
       <div class="min-h-screen d-flex overflow-x-scroll py-3 kanban">
         <div
-          v-for="column in columns"
+          v-for="(column, column_id) in columnsWithCards"
           :key="column.name"
           class="bg-dark rounded-lg px-3 pt-2 pb-3 mr-1 column"
         >
@@ -14,35 +14,38 @@
           </p>
           <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
           <draggable
-            :list="columnCards(column)"
+            :id="column_id"
             :animation="200"
             ghost-class="ghost-card"
             group="cards"
-            @change="
-              (item) => {
-                cardChanged(item, column.name)
+            @end="
+              (event) => {
+                cardMoved(event)
               }
             "
           >
-            <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
             <kanban-card
-              v-for="card in columnCards(column)"
+              v-for="card in column.cards"
               :key="card.id"
               :card="card"
               class="mt-3 cursor-move"
               :multiple="multiple"
+              @change="cardChanged"
+              @nextstatus="nextStatus"
             ></kanban-card>
-            <!-- </transition-group> -->
           </draggable>
         </div>
       </div>
     </div>
+    <pre>{{ columnsWithCards }} </pre>
   </div>
 </template>
 
 <script>
 import draggable from 'vuedraggable'
+import columns from '@/content/columns.json'
 import KanbanCard from './KanbanCard.vue'
+
 export default {
   components: {
     KanbanCard,
@@ -60,99 +63,59 @@ export default {
   },
   data() {
     return {
-      columns: {
-        backlog: {
-          name: 'Fila',
-          status: [
-            {
-              id: 'waiting',
-              name: 'Aguardando',
-            },
-          ],
-        },
-        dev: {
-          name: 'Desenvolvimento',
-          status: [
-            {
-              id: 'ready_to_dev',
-              name: 'Pronto para desenvolver',
-            },
-            {
-              id: 'developing',
-              name: 'Em desenvolvimento',
-            },
-          ],
-        },
-        test: {
-          name: 'Teste',
-          status: [
-            {
-              id: 'ready_to_test',
-              name: 'Pronto para testar',
-            },
-            {
-              id: 'testing',
-              name: 'Testando',
-            },
-          ],
-        },
-        prod: {
-          name: 'Produção',
-          status: [
-            {
-              id: 'ready_to_prod',
-              name: 'Pronto para publicar',
-            },
-            {
-              id: 'published',
-              name: 'Em produção',
-            },
-          ],
-        },
-      },
+      columns,
     }
   },
-  methods: {
-    columnCards(column) {
-      return this.cards.filter((card) => {
-        return column.status.find((status) => status.id === card.status)
-      })
-    },
-    cardChanged(action, columnName) {
-      const card = action.added || action.moved
-      if (card) {
-        const column = this.columns.find((column) => {
-          return (
-            column.name === columnName &&
-            column.project_url.endsWith(card.element.project_id)
-          )
+  computed: {
+    statusList() {
+      const statusList = []
+      Object.keys(columns).forEach((cid) => {
+        columns[cid].status.forEach((status) => {
+          statusList.push(status.id)
         })
-        this.octokit.projects
-          .moveCard({
-            position:
-              card.newIndex === 0 ? 'top' : 'after:' + (card.newIndex - 1),
-            card_id: card.element.id,
-            column_id: column.id,
-          })
-          .then((resp) => {
-            // this.$store.dispatch('loadProjects')
-          })
+      })
+      return statusList
+    },
+    columnsWithCards() {
+      const cols = { ...columns }
+      for (const cid of Object.keys(cols)) {
+        cols[cid].cards = this.cards.filter((card) =>
+          cols[cid].status.find((status) => status.id === card.status)
+        )
       }
+      return cols
+    },
+  },
+  methods: {
+    cardChanged(card) {
+      this.$emit('change', card)
+    },
+    async cardMoved(event) {
+      let card = this.cards.find((c) => c.id === event.item.id)
+      if (
+        !columns[event.to.id].status.find((status) => status === card.status)
+      ) {
+        card = await this.$axios
+          .$put('/api/cards/' + card._id, {
+            status: columns[event.to.id].status[0].id,
+          })
+          .catch(this.showError)
+      }
+      this.$emit('change', card)
+    },
+    async nextStatus(card) {
+      console.log(card.status)
+      console.log(this.statusList)
+      const statusIndex = this.statusList.indexOf(card.status)
+      console.log(statusIndex)
+      console.log(this.statusList[statusIndex + 1])
+      await this.$axios
+        .$put('/api/cards/' + card._id, {
+          status: this.statusList[statusIndex + 1],
+        })
+        .catch(this.showError)
+      this.$emit('change', card)
     },
   },
 }
 </script>
-
-<style lang="sass" scoped>
-.ghost-card
-  opacity: 0.5
-  background: #f7fafc
-  border: 1px solid #4299e1
-.kanban
-  width: 100%
-  .column
-    min-width: 320px
-    width: 25%
-    & > div
-      min-height: calc(100% - 16px)
-</style>

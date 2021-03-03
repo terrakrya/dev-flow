@@ -27,10 +27,12 @@
         </b-form-select>
       </b-form-group>
       <div v-if="edit" class="text-right text-danger mb-4">
-        <a @click="archive">
-          <b-icon-trash />
-          Arquivar cartão
-        </a>
+        <small>
+          <a @click="archive">
+            <b-icon-trash />
+            Arquivar cartão
+          </a>
+        </small>
       </div>
       <b-button type="submit" variant="secondary" block :disabled="invalid">
         Salvar
@@ -65,7 +67,7 @@ export default {
         project: this.project.id,
         note: '',
         members: [this.$auth.user.id],
-        status: 'waiting',
+        status: 'backlog',
       },
     }
   },

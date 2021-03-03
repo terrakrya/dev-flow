@@ -1,0 +1,50 @@
+{
+  "backlog": {
+    "name": "Fila",
+    "status": [
+      {
+        "id": "backlog",
+        "name": "Aguardando na fila"
+      }
+    ]
+  },
+  "dev": {
+    "name": "Desenvolvimento",
+    "status": [
+      {
+        "id": "ready_to_dev",
+        "name": "Aguardando desenvolvimento"
+      },
+      {
+        "id": "developing",
+        "name": "Em desenvolvimento"
+      }
+    ]
+  },
+  "test": {
+    "name": "Teste",
+    "status": [
+      {
+        "id": "ready_to_test",
+        "name": "Aguardando teste"
+      },
+      {
+        "id": "testing",
+        "name": "Testando"
+      }
+    ]
+  },
+  "prod": {
+    "name": "Produção",
+    "status": [
+      {
+        "id": "ready_to_prod",
+        "name": "Aguardando publicação"
+      },
+      {
+        "id": "published",
+        "name": "Em produção"
+      }
+    ]
+  }
+}

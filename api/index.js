@@ -8,7 +8,7 @@ import session from 'express-session'
 import routes from './routes'
 
 const app = express()
-const secret = process.env.SECRET || 'dev-flow'
+const secret = process.env.SECRET || process.env.npm_package_name
 
 app.use(cors())
 

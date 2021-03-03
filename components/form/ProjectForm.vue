@@ -1,6 +1,16 @@
 <template>
   <ValidationObserver v-slot="{ validate, invalid }">
     <b-form @submit.prevent="validate().then(save)">
+      <b-form-group label="Repositório">
+        <b-form-select
+          v-model="form.repository"
+          :options="repositories"
+          value-field="id"
+          text-field="name"
+          @change="repositorySelected"
+        >
+        </b-form-select>
+      </b-form-group>
       <b-form-group label="Nome *">
         <validation-provider v-slot="{ errors }" name="nome" rules="required">
           <b-form-input v-model="form.name" name="name" />
@@ -9,15 +19,6 @@
       </b-form-group>
       <b-form-group label="Descrição">
         <b-form-textarea v-model="form.description" />
-      </b-form-group>
-      <b-form-group label="Repositório">
-        <b-form-select
-          v-model="form.repository"
-          :options="repositories"
-          value-field="id"
-          text-field="name"
-        >
-        </b-form-select>
       </b-form-group>
       <div class="text-right text-danger">
         <a @click="archive">
@@ -69,6 +70,15 @@ export default {
     }
   },
   methods: {
+    repositorySelected(id) {
+      const repository = this.repositories.find(
+        (repository) => repository.id === id
+      )
+      if (repository) {
+        this.form.name = repository.name.replaceAll('-', ' ')
+        this.form.description = repository.description
+      }
+    },
     async save() {
       if (this.edit) {
         const project = await this.$axios

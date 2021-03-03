@@ -9,7 +9,6 @@ router.get('/', authenticated, (req, res) => {
   if (req.query.project) {
     query.project = req.query.project
   }
-  console.log(req.query.populate)
   Card.find(query)
     .populate('project')
     .exec((err, cards) => {

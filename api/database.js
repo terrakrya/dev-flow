@@ -13,11 +13,13 @@ if (isProduction) {
     reconnectInterval: 1000,
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
 } else {
-  mongoose.connect('mongodb://localhost/dev-flow', {
+  mongoose.connect('mongodb://localhost/' + process.env.npm_package_name, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+    useCreateIndex: true,
   })
   mongoose.set('debug', true)
 }

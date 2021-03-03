@@ -3,9 +3,9 @@
     <div>
       <template v-if="projects">
         <b-button
-          variant="dark"
           v-for="project in projects"
           :key="project._id"
+          variant="dark"
           :to="`/projects/${project._id}`"
           class="mb-1"
           >{{ project.name }}</b-button
@@ -19,8 +19,7 @@
     <b-modal v-model="show_project_form" title="Adicionar projeto" hide-footer>
       <project-form @change="projectSaved" />
     </b-modal>
-    <Kanban :cards="cards" multiple />
-    <pre>{{ cards }}</pre>
+    <Kanban :cards="cards" multiple @change="loadCards" />
   </b-container>
 </template>
 
@@ -37,10 +36,13 @@ export default {
       return this.$store.state.projects
     },
   },
-  async created() {
-    this.cards = await this.$axios.$get('/api/cards')
+  created() {
+    this.loadCards()
   },
   methods: {
+    async loadCards() {
+      this.cards = await this.$axios.$get('/api/cards')
+    },
     projectSaved() {
       this.show_project_form = false
       this.$store.dispatch('loadProjects')

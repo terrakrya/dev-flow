@@ -14,7 +14,11 @@
             title="Editar projeto"
             hide-footer
           >
-            <project-form :edit="project" @change="projectSaved" v-on:archived="projectArchived" />
+            <project-form
+              :edit="project"
+              @change="projectSaved"
+              @archived="projectArchived"
+            />
           </b-modal>
         </b-col>
         <b-col class="text-right">
@@ -36,7 +40,7 @@
     </b-container>
     <b-container fluid>
       <div>
-        <Kanban :cards="cards" />
+        <Kanban :cards="cards" @change="cardSaved" />
       </div>
     </b-container>
   </div>
