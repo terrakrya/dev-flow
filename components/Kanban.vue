@@ -5,13 +5,14 @@
         <div
           v-for="(column, column_id) in columnsWithCards"
           :key="column.name"
-          class="bg-dark rounded-lg px-3 pt-2 pb-3 mr-1 column"
+          class="bg-dark rounded-lg p-3 mr-1 column"
         >
           <p
             class="text-gray-700 font-semibold font-sans tracking-wide text-sm"
           >
-            <strong>{{ column.name }}</strong>
+            <strong> {{ column.name }}</strong>
           </p>
+
           <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
           <draggable
             :id="column_id"
@@ -28,10 +29,9 @@
               v-for="card in column.cards"
               :key="card.id"
               :card="card"
-              class="mt-3 cursor-move"
+              class="mb-3 cursor-move"
               :multiple="multiple"
               @change="cardChanged"
-              @nextstatus="nextStatus"
             ></kanban-card>
           </draggable>
         </div>
@@ -67,15 +67,6 @@ export default {
     }
   },
   computed: {
-    statusList() {
-      const statusList = []
-      Object.keys(columns).forEach((cid) => {
-        columns[cid].status.forEach((status) => {
-          statusList.push(status.id)
-        })
-      })
-      return statusList
-    },
     columnsWithCards() {
       const cols = { ...columns }
       for (const cid of Object.keys(cols)) {
@@ -101,19 +92,6 @@ export default {
           })
           .catch(this.showError)
       }
-      this.$emit('change', card)
-    },
-    async nextStatus(card) {
-      console.log(card.status)
-      console.log(this.statusList)
-      const statusIndex = this.statusList.indexOf(card.status)
-      console.log(statusIndex)
-      console.log(this.statusList[statusIndex + 1])
-      await this.$axios
-        .$put('/api/cards/' + card._id, {
-          status: this.statusList[statusIndex + 1],
-        })
-        .catch(this.showError)
       this.$emit('change', card)
     },
   },

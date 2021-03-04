@@ -20,6 +20,23 @@ router.get('/', authenticated, (req, res) => {
     })
 })
 
+router.get('/my', authenticated, (req, res) => {
+  const query = {
+    archived: false,
+    members: req.user.id,
+    $and: [{ status: { $ne: 'backlog' } }, { status: { $ne: 'published' } }],
+  }
+  Card.find(query)
+    .populate('project')
+    .exec((err, cards) => {
+      if (err) {
+        res.status(422).send(err.message)
+      } else {
+        res.json(cards)
+      }
+    })
+})
+
 router.get('/:id', authenticated, (req, res) => {
   const query = { _id: req.params.id }
   Card.findOne(query).exec((err, card) => {

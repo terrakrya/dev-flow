@@ -8,10 +8,14 @@
           variant="dark"
           :to="`/projects/${project._id}`"
           class="mb-1"
+          :style="`background-color: ${project.color} !important`"
           >{{ project.name }}</b-button
         >
       </template>
-      <a @click="show_project_form = !show_project_form">
+      <a
+        class="btn btn-black mb-1"
+        @click="show_project_form = !show_project_form"
+      >
         <b-icon-plus />
         Adicionar projeto
       </a>

@@ -20,6 +20,9 @@
       <b-form-group label="Descrição">
         <b-form-textarea v-model="form.description" />
       </b-form-group>
+      <b-form-group label="Cor">
+        <b-form-input v-model="form.color" type="color" class="w-25" />
+      </b-form-group>
       <div class="text-right text-danger">
         <a @click="archive">
           <b-icon-trash />
@@ -53,9 +56,10 @@ export default {
     return {
       form: {
         organization: 'terrakrya',
+        repository: null,
         name: '',
         description: '',
-        repository: null,
+        color: '#161b22',
       },
     }
   },

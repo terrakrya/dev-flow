@@ -17,6 +17,16 @@
           <span class="text-danger">{{ errors[0] }}</span>
         </validation-provider>
       </b-form-group>
+      <b-form-group label="Status"> Status: {{ form.status }} </b-form-group>
+      <b-form-group label="Status">
+        <b-form-select
+          v-model="form.status"
+          :options="statusList"
+          value-field="id"
+          text-field="name"
+        >
+        </b-form-select>
+      </b-form-group>
       <b-form-group v-if="!project" label="Projeto">
         <b-form-select
           v-model="form.project"
@@ -44,6 +54,7 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import columns from '@/content/columns.json'
 import { apiDataToForm } from './utils'
 export default {
   components: {
@@ -74,6 +85,15 @@ export default {
   computed: {
     projects() {
       return this.$store.state.projects
+    },
+    statusList() {
+      const statusList = []
+      Object.keys(columns).forEach((cid) => {
+        columns[cid].status.forEach((status) => {
+          statusList.push(status)
+        })
+      })
+      return statusList
     },
   },
   created() {

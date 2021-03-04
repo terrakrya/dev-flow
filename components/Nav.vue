@@ -20,7 +20,6 @@
 
 <script>
 export default {
-  
   computed: {
     repositories() {
       return this.$store.state.repositories

@@ -21,6 +21,9 @@ const ProjectSchema = mongoose.Schema(
     description: {
       type: String,
     },
+    color: {
+      type: String,
+    },
     archived: {
       type: Boolean,
       default: false,

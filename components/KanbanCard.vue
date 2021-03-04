@@ -2,13 +2,17 @@
 <template>
   <div
     :id="card.id"
-    class="rounded px-3 pt-3 pb-2 border kanban-card"
+    class="rounded p-3 border kanban-card"
     @click.self="show_card_form = true"
     @dblclick="show_card_form = true"
   >
     <div>
       <n-link v-if="multiple" :to="`/projects/${card.project._id}`">
-        <b-badge variant="secondary">{{ card.project.name }}</b-badge>
+        <b-badge
+          variant="secondary"
+          :style="`background-color: ${card.project.color} !important`"
+          >{{ card.project.name }}</b-badge
+        >
       </n-link>
       <a
         v-if="card.note"
@@ -38,7 +42,7 @@
             ['developing', 'testing', 'ready_to_prod'].includes(card.status)
           "
           size="sm"
-          variant="outline"
+          variant="success"
           title="Finalizar"
           @click="nextStatus(card)"
         >
@@ -90,8 +94,16 @@ export default {
       this.show_card_form = false
       this.$emit('change', card)
     },
-    nextStatus(card) {
-      this.$emit('nextstatus', card)
+    async nextStatus(card) {
+      const statusIndex = this.statusList
+        .map((status) => status.id)
+        .indexOf(card.status)
+      await this.$axios
+        .$put('/api/cards/' + card._id, {
+          status: this.statusList[statusIndex + 1].id,
+        })
+        .catch(this.showError)
+      this.$emit('change', card)
     },
   },
 }
