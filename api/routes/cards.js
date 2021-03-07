@@ -69,6 +69,7 @@ router.put('/:id', authenticated, (req, res) => {
     },
     {
       upsert: true,
+      new: true,
     },
     (err, card) => {
       if (err) {

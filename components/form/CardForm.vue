@@ -1,6 +1,15 @@
 <template>
   <ValidationObserver v-slot="{ validate, invalid }">
     <b-form @submit.prevent="validate().then(save)">
+      <b-form-group v-if="!project" label="Projeto">
+        <b-form-select
+          v-model="form.project"
+          :options="projects"
+          value-field="id"
+          text-field="name"
+        >
+        </b-form-select>
+      </b-form-group>
       <b-form-group>
         <validation-provider
           v-slot="{ errors }"
@@ -17,19 +26,13 @@
           <span class="text-danger">{{ errors[0] }}</span>
         </validation-provider>
       </b-form-group>
+      <b-form-group label="Membros">
+        <MembersSelect v-model="form.members" />
+      </b-form-group>
       <b-form-group label="Status">
         <b-form-select
           v-model="form.status"
           :options="statusList"
-          value-field="id"
-          text-field="name"
-        >
-        </b-form-select>
-      </b-form-group>
-      <b-form-group v-if="!project" label="Projeto">
-        <b-form-select
-          v-model="form.project"
-          :options="projects"
           value-field="id"
           text-field="name"
         >

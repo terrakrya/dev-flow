@@ -7,13 +7,20 @@
     @dblclick="show_card_form = true"
   >
     <div>
-      <n-link v-if="multiple" :to="`/projects/${card.project._id}`">
-        <b-badge
-          variant="secondary"
-          :style="`background-color: ${card.project.color} !important`"
-          >{{ card.project.name }}</b-badge
-        >
-      </n-link>
+      <div class="d-flex justify-content-between items-center mb-3">
+        <div>
+          <Member v-for="member in card.members" :id="member" :key="member" />
+        </div>
+        <div>
+          <n-link v-if="multiple" :to="`/projects/${card.project._id}`">
+            <b-badge
+              variant="secondary"
+              :style="`background-color: ${card.project.color} !important`"
+              >{{ card.project.name }}</b-badge
+            >
+          </n-link>
+        </div>
+      </div>
       <a
         v-if="card.note"
         @click="show_card_form = true"
@@ -22,7 +29,14 @@
     </div>
     <div class="d-flex justify-content-between items-center">
       <div>
-        <Member v-for="member in card.members" :id="member" :key="member" />
+        <b-btn
+          variant="outline"
+          size="sm"
+          @click="show_comments = !show_comments"
+        >
+          <b-icon-chat />
+          <span v-if="comments.length">{{ comments.length }}</span>
+        </b-btn>
       </div>
       <div>
         <a @click="show_card_form = true">
@@ -49,14 +63,6 @@
           @click="nextStatus(card)"
         >
           <b-icon-check-circle />
-        </b-btn>
-        <b-btn
-          variant="outline"
-          size="sm"
-          @click="show_comments = !show_comments"
-        >
-          <b-icon-chat />
-          <span v-if="comments.length">{{ comments.length }}</span>
         </b-btn>
       </div>
     </div>
