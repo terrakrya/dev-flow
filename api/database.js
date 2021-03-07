@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 import './models/Project'
 import './models/Card'
+import './models/Comment'
 
 const isProduction = process.env.NODE_ENV === 'production'
 

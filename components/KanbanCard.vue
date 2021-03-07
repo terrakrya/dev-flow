@@ -26,7 +26,9 @@
       </div>
       <div>
         <a @click="show_card_form = true">
-          {{ statusList.find((status) => card.status == status.id).name }}
+          <small>{{
+            statusList.find((status) => card.status == status.id).name
+          }}</small>
         </a>
         <b-btn
           v-if="['ready_to_dev', 'ready_to_test'].includes(card.status)"
@@ -48,7 +50,18 @@
         >
           <b-icon-check-circle />
         </b-btn>
+        <b-btn
+          variant="outline"
+          size="sm"
+          @click="show_comments = !show_comments"
+        >
+          <b-icon-chat />
+          <span v-if="comments.length">{{ comments.length }}</span>
+        </b-btn>
       </div>
+    </div>
+    <div class="pt-1">
+      <Comments v-if="show_comments" :target="target" @change="commentSaved" />
     </div>
     <b-modal v-model="show_card_form" title="Editar cartão" hide-footer>
       <card-form :project="card.project" :edit="card" @change="cardChanged" />
@@ -57,9 +70,7 @@
 </template>
 <script>
 import columns from '@/content/columns.json'
-import Member from './Member.vue'
 export default {
-  components: { Member },
   props: {
     card: {
       type: Object,
@@ -72,7 +83,10 @@ export default {
   },
   data() {
     return {
+      target: `card-${this.card.id}`,
+      show_comments: false,
       show_card_form: false,
+      comments: [],
     }
   },
   computed: {
@@ -89,6 +103,11 @@ export default {
       return statusList
     },
   },
+  async created() {
+    this.comments = await this.$axios.$get('/api/comments', {
+      params: { target: this.target },
+    })
+  },
   methods: {
     cardChanged(card) {
       this.show_card_form = false
@@ -104,6 +123,9 @@ export default {
         })
         .catch(this.showError)
       this.$emit('change', card)
+    },
+    commentSaved(comment) {
+      this.comments.push(comment)
     },
   },
 }

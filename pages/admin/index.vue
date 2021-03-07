@@ -14,9 +14,8 @@
               :key="card.id"
               :card="card"
               class="mt-3 cursor-move"
-              :multiple="multiple"
+              multiple
               @change="loadCards"
-              @nextstatus="nextStatus"
             ></kanban-card>
           </div>
         </div>

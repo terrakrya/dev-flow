@@ -17,7 +17,6 @@
           <span class="text-danger">{{ errors[0] }}</span>
         </validation-provider>
       </b-form-group>
-      <b-form-group label="Status"> Status: {{ form.status }} </b-form-group>
       <b-form-group label="Status">
         <b-form-select
           v-model="form.status"
@@ -47,7 +46,6 @@
       <b-button type="submit" variant="secondary" block :disabled="invalid">
         Salvar
       </b-button>
-      <pre>{{ form }}</pre>
     </b-form>
   </ValidationObserver>
 </template>
