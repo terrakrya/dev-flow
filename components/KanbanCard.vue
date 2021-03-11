@@ -26,6 +26,13 @@
         @click="show_card_form = true"
         v-html="$md.render(card.note)"
       ></a>
+      <div v-if="card.test_instructions">
+        <strong><small>Instruções de teste:</small></strong>
+        <a
+          @click="show_card_form = true"
+          v-html="$md.render(card.test_instructions)"
+        ></a>
+      </div>
     </div>
     <div class="d-flex justify-content-between items-center">
       <div>
@@ -38,7 +45,15 @@
           <span v-if="comments.length">{{ comments.length }}</span>
         </b-btn>
       </div>
-      <div>
+      <div v-if="card.status === 'backlog'">
+        <div v-if="card.reviewed">
+          <b-badge variant="success">Revisado</b-badge>
+        </div>
+        <div v-else>
+          <small>Aguardando revisão</small>
+        </div>
+      </div>
+      <div v-else>
         <a @click="show_card_form = true">
           <small>{{
             statusList.find((status) => card.status == status.id).name
@@ -66,10 +81,23 @@
         </b-btn>
       </div>
     </div>
+    <div v-if="show_next_status && card.status === 'developing'" class="pt-3">
+      <b-form-group label="Como testar essa funcionalidade?">
+        <b-textarea v-model="test_instructions" rows="5"></b-textarea>
+      </b-form-group>
+      <b-btn variant="success" block @click="nextStatus(card)"
+        ><b-icon-check-circle /> Finalizar</b-btn
+      >
+    </div>
     <div class="pt-1">
       <Comments v-if="show_comments" :target="target" @change="commentSaved" />
     </div>
-    <b-modal v-model="show_card_form" title="Editar cartão" hide-footer>
+    <b-modal
+      v-model="show_card_form"
+      title="Editar cartão"
+      hide-footer
+      size="lg"
+    >
       <card-form :project="card.project" :edit="card" @change="cardChanged" />
     </b-modal>
   </div>
@@ -92,6 +120,8 @@ export default {
       target: `card-${this.card.id}`,
       show_comments: false,
       show_card_form: false,
+      show_next_status: false,
+      test_instructions: this.card.test_instructions,
       comments: [],
     }
   },
@@ -120,15 +150,32 @@ export default {
       this.$emit('change', card)
     },
     async nextStatus(card) {
-      const statusIndex = this.statusList
-        .map((status) => status.id)
-        .indexOf(card.status)
-      await this.$axios
-        .$put('/api/cards/' + card._id, {
-          status: this.statusList[statusIndex + 1].id,
-        })
-        .catch(this.showError)
-      this.$emit('change', card)
+      if (
+        card.status === 'developing' &&
+        !card.test_instructions &&
+        !this.show_next_status
+      ) {
+        this.show_next_status = true
+      } else {
+        const statusIndex = this.statusList
+          .map((status) => status.id)
+          .indexOf(card.status)
+        const members = card.members
+        if (
+          card.status.startsWith('ready_to_') &&
+          !members.find((member) => member === this.$auth.user.id.toString())
+        ) {
+          members.push(this.$auth.user.id.toString())
+        }
+        await this.$axios
+          .$put('/api/cards/' + card._id, {
+            status: this.statusList[statusIndex + 1].id,
+            test_instructions: this.test_instructions,
+            members,
+          })
+          .catch(this.showError)
+        this.$emit('change', card)
+      }
     },
     commentSaved(comment) {
       this.comments.push(comment)

@@ -10,45 +10,59 @@
         >
         </b-form-select>
       </b-form-group>
-      <b-form-group>
-        <validation-provider
-          v-slot="{ errors }"
-          name="conteúdo"
-          rules="required"
+      <div v-if="form.project">
+        <b-form-group>
+          <validation-provider
+            v-slot="{ errors }"
+            name="conteúdo"
+            rules="required"
+          >
+            <b-form-textarea
+              v-model="form.note"
+              rows="5"
+              placeholder="Detalhes do cartão"
+            />
+            <accept-markdown />
+            <span class="text-danger">{{ errors[0] }}</span>
+          </validation-provider>
+        </b-form-group>
+        <b-form-group
+          v-if="form.status !== 'backlog'"
+          label="Instruções de teste"
         >
-          <b-form-textarea v-model="form.note" rows="5" />
-          <small class="text-muted">
-            Este campo aceita
-            <a href="https://markdown-it.github.io/" target="_blank"
-              >markdown</a
-            >
-          </small>
+          <b-form-textarea v-model="form.test_instructions" rows="5" />
+          <accept-markdown />
           <span class="text-danger">{{ errors[0] }}</span>
-        </validation-provider>
-      </b-form-group>
-      <b-form-group label="Membros">
-        <MembersSelect v-model="form.members" />
-      </b-form-group>
-      <b-form-group label="Status">
-        <b-form-select
-          v-model="form.status"
-          :options="statusList"
-          value-field="id"
-          text-field="name"
-        >
-        </b-form-select>
-      </b-form-group>
-      <div v-if="edit" class="text-right text-danger mb-4">
-        <small>
-          <a @click="archive">
-            <b-icon-trash />
-            Arquivar cartão
-          </a>
-        </small>
+        </b-form-group>
+        <b-form-group label="Membros">
+          <MembersSelect v-model="form.members" />
+        </b-form-group>
+        <b-form-group label="Status">
+          <b-form-select
+            v-model="form.status"
+            :options="statusList"
+            value-field="id"
+            text-field="name"
+          >
+          </b-form-select>
+        </b-form-group>
+        <div v-if="form.status === 'backlog'">
+          <b-form-checkbox v-model="form.reviewed" name="check-button" switch>
+            {{ form.reviewed ? 'Revisado' : 'Aguardando revisão' }}
+          </b-form-checkbox>
+        </div>
+        <div v-if="edit" class="text-right text-danger mb-4">
+          <small>
+            <a @click="archive">
+              <b-icon-trash />
+              Arquivar cartão
+            </a>
+          </small>
+        </div>
+        <b-button type="submit" variant="secondary" block :disabled="invalid">
+          Salvar
+        </b-button>
       </div>
-      <b-button type="submit" variant="secondary" block :disabled="invalid">
-        Salvar
-      </b-button>
     </b-form>
   </ValidationObserver>
 </template>
@@ -76,10 +90,12 @@ export default {
     return {
       form: {
         organization: 'terrakrya',
-        project: this.project.id,
+        project: this.project ? this.project.id : null,
         note: '',
-        members: [this.$auth.user.id],
+        test_instructions: '',
+        members: [this.$auth.user.id.toString()],
         status: 'backlog',
+        reviewed: false,
       },
     }
   },

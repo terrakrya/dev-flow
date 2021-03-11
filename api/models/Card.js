@@ -26,7 +26,14 @@ const CardSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    test_instructions: {
+      type: String,
+    },
     archived: {
+      type: Boolean,
+      default: false,
+    },
+    reviewed: {
       type: Boolean,
       default: false,
     },
