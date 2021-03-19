@@ -37,7 +37,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "markdown-it-task-lists": "^2.1.1",
-    "mongoose": "^5.11.13",
+    "mongoose": "^5.12.1",
     "mongoose-unique-validator": "^2.0.3",
     "nuxt": "^2.14.6",
     "nuxt-validate": "^1.0.1",
