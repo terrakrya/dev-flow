@@ -104,6 +104,7 @@
 </template>
 <script>
 import columns from '@/content/columns.json'
+
 export default {
   props: {
     card: {

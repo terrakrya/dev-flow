@@ -1,3 +1,5 @@
+@import "./tooltip.css"
+
 $primary: #02d35f
 $secondary: #0d2c40
 $dark: #161b22
@@ -10,7 +12,6 @@ pre
   color: $gray3
 body
   background-color: $black
-
 a, a:hover, a:active, a:focus, a:visited
   text-decoration: none
   cursor: pointer
@@ -96,10 +97,17 @@ hr
     font-size: 14px
     .btn
       margin-right: 0
+
+.modal-backdrop
+  opacity: 0.9
+.modal-body
+  background-color: $dark
+  color: $gray3
+
 .modal-content
   border-radius: 7px
   .modal-header
-    background-color: $dark
+    background-color: $black
     color: $gray3
     .close
       color: $gray3
@@ -110,3 +118,10 @@ hr
     border: 2px solid $primary
     &.inactive
       filter: grayscale(1)
+
+.mention-item
+  padding: 5px 10px
+  border-radius: 4px
+
+.mention-selected
+  background: $secondary
