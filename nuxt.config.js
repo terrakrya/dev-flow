@@ -57,6 +57,9 @@ export default {
     baseURL: process.env.BASE_URL || 'http://127.0.0.1:3000/',
   },
 
+  server: {
+    host: '0.0.0.0',
+  },
   // Content module configuration (https://go.nuxtjs.dev/config-content)
   content: {},
 

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "dev:docker": "docker-compose -f docker/docker-compose.development.yml up --build",
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
