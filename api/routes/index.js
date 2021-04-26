@@ -24,5 +24,6 @@ router.use('/auth', require('./auth'))
 router.use('/projects', require('./projects'))
 router.use('/cards', require('./cards'))
 router.use('/comments', require('./comments'))
+router.use('/attachments', require('./attachments'))
 
 export default router

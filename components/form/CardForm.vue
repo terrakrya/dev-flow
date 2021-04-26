@@ -59,6 +59,9 @@
         <b-form-group label="Membros">
           <MembersSelect v-model="form.members" />
         </b-form-group>
+        <b-form-group label="Anexos">
+          <Attachment />
+        </b-form-group>
         <b-row>
           <b-col md="6">
             <b-form-group label="Status">
