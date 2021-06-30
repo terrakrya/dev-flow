@@ -33,6 +33,12 @@ const CardSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    documents: {
+      type: Array,
+    },
+    images: {
+      type: Array,
+    },
     reviewed: {
       type: Boolean,
       default: false,

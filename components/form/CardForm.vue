@@ -59,9 +59,12 @@
         <b-form-group label="Membros">
           <MembersSelect v-model="form.members" />
         </b-form-group>
-        <b-form-group label="Anexos">
-          <Attachment />
-        </b-form-group>
+        <Upload
+          v-model="form.documents"
+          type="documents"
+          label="Anexos Documentos"
+        />
+        <Upload v-model="form.images" type="images" label="Anexos Imagens" />
         <b-row>
           <b-col md="6">
             <b-form-group label="Status">
@@ -130,6 +133,8 @@ export default {
         members: [this.$auth.user.id.toString()],
         status: 'backlog',
         reviewed: false,
+        documents: [],
+        images: [],
       },
     }
   },
