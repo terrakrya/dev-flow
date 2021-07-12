@@ -101,7 +101,7 @@ router.post(
 
 const documentsPath = () => {
   let path = UPLOAD_PATH
-  path += 'documents/'
+  path += '/documents/'
   createPath(path)
   return path
 }
