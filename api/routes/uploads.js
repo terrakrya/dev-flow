@@ -11,7 +11,7 @@ const createPath = (path) => {
   !fs.existsSync(path) && fs.mkdirSync(path)
 }
 
-const UPLOAD_PATH = 'api/uploads/'
+const UPLOAD_PATH = '/api/uploads/'
 createPath(UPLOAD_PATH)
 
 const imagesPath = () => {
@@ -101,7 +101,7 @@ router.post(
 
 const documentsPath = () => {
   let path = UPLOAD_PATH
-  path += '/documents/'
+  path += 'documents/'
   createPath(path)
   return path
 }
