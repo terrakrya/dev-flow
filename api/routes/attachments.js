@@ -5,7 +5,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 const { authenticated } = require('../config/auth')
 
-const UPLOAD_PATH = 'api/uploads/'
+const UPLOAD_PATH = '/api/uploads/'
 const ATTACHMENTS_PATH = UPLOAD_PATH + 'attachments/'
 const THUMBS_PATH = UPLOAD_PATH + 'thumbs/'
 !fs.existsSync(UPLOAD_PATH) && fs.mkdirSync(UPLOAD_PATH)
