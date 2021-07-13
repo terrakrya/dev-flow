@@ -11,6 +11,13 @@
         </b-form-select>
       </b-form-group>
       <div v-if="form.project">
+        <b-form-group
+          ><b-form-textarea
+            v-model="form.title"
+            rows="5"
+            placeholder="Título do Cartão"
+          />
+        </b-form-group>
         <b-form-group>
           <validation-provider
             v-slot="{ errors }"
@@ -135,6 +142,7 @@ export default {
         reviewed: false,
         documents: [],
         images: [],
+        title: '',
       },
     }
   },

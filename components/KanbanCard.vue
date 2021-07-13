@@ -21,7 +21,7 @@
           </n-link>
         </div>
       </div>
-      <p v-if="card.note" v-linkify v-html="$md.render(card.note)"></p>
+      <p v-if="card.title" v-linkify v-html="$md.render(card.title)"></p>
       <div v-if="card.test_instructions">
         <small>Instruções de teste:</small>
         <p v-linkify v-html="$md.render(card.test_instructions)"></p>
