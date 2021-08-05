@@ -3,6 +3,8 @@ import mongoose from 'mongoose'
 import './models/Project'
 import './models/Card'
 import './models/Comment'
+import './models/Profile'
+import './models/Organization'
 
 const isProduction = process.env.NODE_ENV === 'production'
 
@@ -17,10 +19,13 @@ if (isProduction) {
     useCreateIndex: true,
   })
 } else {
-  mongoose.connect('mongodb://localhost/' + process.env.npm_package_name, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-  })
+  mongoose.connect(
+    'mongodb://127.0.0.1:27017/' + process.env.npm_package_name,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+    }
+  )
   mongoose.set('debug', true)
 }

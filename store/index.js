@@ -3,6 +3,10 @@ export const state = () => ({
   members: [],
   projects: [],
   repositories: [],
+  clientPrepared: false,
+  activeRoom: null,
+  activeRoomMessages: [],
+  chatList: [],
 })
 
 export const mutations = {
@@ -18,11 +22,25 @@ export const mutations = {
   setRepositories(state, repositories) {
     state.repositories = repositories
   },
+  // MATRIX
+  setActiveRoom(state, roomId) {
+    state.activeRoom = roomId
+  },
+  setMessages(state, messages) {
+    state.activeRoomMessages = messages
+  },
+  setClientPrepared(state, clientState) {
+    state.clientPrepared = clientState
+  },
 }
 
 export const actions = {
   async loadProjects({ commit, auth }) {
     const projects = await this.$axios.$get('/api/projects')
     commit('setProjects', projects)
+  },
+  async loadOrganization({ commit, auth }) {
+    const organization = await this.$axios.$get('/api/organizations/')
+    commit('setOrganization', organization)
   },
 }

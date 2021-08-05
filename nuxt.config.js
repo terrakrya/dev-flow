@@ -58,12 +58,13 @@ export default {
   },
 
   server: {
-    host: '0.0.0.0',
+    host: '127.0.0.1',
   },
   // Content module configuration (https://go.nuxtjs.dev/config-content)
   content: {},
 
   auth: {
+    plugins: ['~/plugins/services-mixin.js'],
     redirect: {
       home: '/admin',
     },

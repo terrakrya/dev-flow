@@ -14,6 +14,10 @@
         <b-icon-people />
         Membros <b-badge> {{ members.length }} </b-badge>
       </b-nav-item>
+      <b-nav-item to="/chat/!cWgrmUNWCEApdQUXVB:terrakrya.com">
+        <b-icon-people />
+        Chat
+      </b-nav-item>
     </b-nav>
   </b-container>
 </template>

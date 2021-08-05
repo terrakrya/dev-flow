@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev:docker": "docker-compose -f docker/docker-compose.development.yml up --build",
+    "dev:docker": "docker-compose -f docker-compose.development.yml up --build",
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
@@ -12,16 +12,7 @@
     "lint:style": "stylelint **/*.{vue,css} --ignore-path .gitignore",
     "lint": "yarn lint:style --fix && yarn lint:js --fix"
   },
-  "lint-staged": {
-    "*.{js,vue}": "eslint",
-    "*.{css,vue}": "stylelint"
-  },
-  "husky": {
-    "hooks": {
-      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
-      "pre-commit": "lint-staged"
-    }
-  },
+
   "dependencies": {
     "@nuxt/content": "^1.9.0",
     "@nuxtjs/auth-next": "5.0.0-1611071776.3646657",
@@ -38,6 +29,8 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "markdown-it-task-lists": "^2.1.1",
+    "matrix-js-sdk": "^9.9.0",
+    "uuid": "^8.3.2",
     "mongoose": "^5.11.13",
     "mongoose-unique-validator": "^2.0.3",
     "nuxt": "^2.14.6",
@@ -58,6 +51,7 @@
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-nuxt": "^2.0.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-vue": "^7.15.1",
     "fiber": "^1.0.4",
     "husky": "^4.3.8",
     "lint-staged": "^10.4.0",
