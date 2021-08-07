@@ -7,6 +7,7 @@ const ProfileSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    name: String,
     matrixId: String,
     matrixAccessToken: String,
   },

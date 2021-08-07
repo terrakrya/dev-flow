@@ -29,7 +29,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "markdown-it-task-lists": "^2.1.1",
-    "matrix-js-sdk": "^9.9.0",
+    "matrix-js-sdk": "^12.2.0",
     "uuid": "^8.3.2",
     "mongoose": "^5.11.13",
     "mongoose-unique-validator": "^2.0.3",

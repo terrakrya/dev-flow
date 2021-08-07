@@ -1,10 +1,12 @@
 <template>
-  <b-container fluid>
+  <b-container>
     <b-row v-if="chatReady">
       <b-col md="9">
-        <h2>{{ matrix.activeRoom.name }}</h2>
-        <Messages :messages="messages" />
-        <InputBox @submit="sendMessage" />
+        <div class="d-flex flex-column justify-content-center chat-ui">
+          <RoomHeader :room="activeRoom" />
+          <Messages :messages="messages" />
+          <InputBox @submit="sendMessage" />
+        </div>
       </b-col>
       <b-col md="3">
         <ChatList :chat-list="chatList" />
@@ -12,21 +14,26 @@
       </b-col>
     </b-row>
     <b-row v-else>
-      <b-button @click="activateChat"> Ativar chat </b-button>
+      <b-button block variant="primary" @click="activateChat(true)"
+        >Ativar chat
+      </b-button>
     </b-row>
   </b-container>
 </template>
 
 <script>
+// <b-button @click="getChatList">Buscar lista</b-button>
+
 export default {
   data() {
     return {
       showCreateRoom: false,
+      chatList: [],
     }
   },
   computed: {
     chatReady() {
-      return this.$store.state.activeRoom
+      return this.$store.state.clientPrepared
     },
     matrix() {
       return this.$matrix
@@ -34,37 +41,54 @@ export default {
     messages() {
       return this.$store.state.activeRoomMessages
     },
-    chatList() {
-      return this.$store.state.chatList
+
+    organizationId() {
+      return this.$store.state.organization.id
     },
-    organization() {
-      return this.$store.state.organization
+    activeRoom() {
+      return this.$matrix.client.getRoom(this.$route.params.id)
     },
   },
-  async created() {},
+  created() {
+    this.activateChat()
+  },
   methods: {
-    // async createOrganizationRoom({ name, topic }) {
-    //   const newRoom = await this.$matrix.createRoom({ name, topic })
-    //   this.$axios
-    //     .put(`/api/organizations/${this.organization.githubId}`, {
-    //       matrixRooms: [newRoom.room_id],
-    //     })
-    //     .then(this.$store.commit('setOrganization', response.data))
-    //     .catch((error) => this.$log.error)
-    // },
-    // async setOrganizationMainRoom() {
-    //   const activeRoomId = this.$store.state.activeRoomId
-    //   await this.$axios
-    //     .put(`/api/organizations/${this.organization.githubId}`, {
-    //       mainRoom: [activeRoomId],
-    //     })
-    //     .then(this.$store.commit('setOrganization', response.data))
-    //     .catch((error) => this.$log.error)
-    // },
+    async createRoom({ name, topic }) {
+      await this.$matrix.createRoom
+      this.$axios
+        .post(`/api/chat/${this.organizationId}/rooms`, { name, topic })
+        .then((response) => {
+          this.getChatList()
+        })
 
-    createRoom(data) {
-      console.log('data', data)
       // const roomId = this.$matrix.createRoom(data)
+    },
+    getChatList() {
+      // should be in store already
+      this.$log.info(this.$store.state.organization)
+
+      return this.$axios
+        .get(`/api/chat/${this.organizationId}/rooms`)
+        .then((response) => {
+          this.chatList = response.data.rooms.map((roomId) => {
+            const room = this.$matrix.client.getRoom(roomId)
+            console.log('roomID:', roomId)
+            console.log('room', room)
+            if (room) {
+              return room
+            } else {
+              return this.$matrix.client
+                .joinRoom(roomId)
+                .then((room) => {
+                  return room
+                })
+                .catch((err) => {
+                  console.log('aee', err)
+                  return false
+                })
+            }
+          })
+        })
     },
 
     async sendMessage(text) {
@@ -75,13 +99,10 @@ export default {
         await this.$matrix.sendTextMessage(text)
       }
     },
-    // async activateOrganizationChat() {
-    //   await this.getOrganizationChat()
-    //   await this.fetchCurrentRoom()
-    // },
-    async activateChat() {
-      await this.$matrix.init()
-      await this.$matrix.setActiveRoom(this.$route.params.id)
+    async activateChat(force) {
+      const initialized = await this.$matrix.init(force)
+      if (initialized) await this.$matrix.setActiveRoom(this.$route.params.id)
+      if (initialized) await this.getChatList()
     },
   },
 }
@@ -96,3 +117,9 @@ export default {
 // create room
 // direct messages
 </script>
+<style>
+.chat-ui {
+  max-height: 700px;
+  padding-bottom: 20px;
+}
+</style>

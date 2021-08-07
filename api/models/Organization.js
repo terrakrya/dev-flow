@@ -8,7 +8,7 @@ const OrganizationSchema = mongoose.Schema(
       required: true,
     },
     matrixRooms: [String],
-    mainRoom: [],
+    mainRoom: String,
   },
   {
     timestamps: true,

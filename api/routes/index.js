@@ -25,5 +25,6 @@ router.use('/projects', require('./projects'))
 router.use('/cards', require('./cards'))
 router.use('/comments', require('./comments'))
 router.use('/organizations', require('./organizations'))
+router.use('/chat', require('./chat'))
 
 export default router

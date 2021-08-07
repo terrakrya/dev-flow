@@ -1,13 +1,11 @@
 <template>
-  <b-form @submit="onClick">
-    <b-row>
-      <b-col>
-        <b-input v-model="message" />
-      </b-col>
-      <b-col>
+  <b-form class="input" @submit="onClick">
+    <b-input-group>
+      <b-input v-model="message" />
+      <template #append>
         <b-button @click="onClick">Enviar</b-button>
-      </b-col>
-    </b-row>
+      </template>
+    </b-input-group>
   </b-form>
 </template>
 
@@ -27,3 +25,9 @@ export default {
   },
 }
 </script>
+<style>
+.input {
+  width: 100%;
+  height: 100px;
+}
+</style>

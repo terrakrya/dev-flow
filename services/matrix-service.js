@@ -12,14 +12,6 @@ class MatrixService extends Service {
   //   constructor() {
   //     super()
   //   }
-  async init() {
-    if (!this.storeUser.matrixAccessToken) {
-      this.registerUser()
-    }
-    this.$log.info(this.storeUser)
-    if (!this.client) await this.createClient()
-    if (!this.clientPrepared) await this.startClient()
-  }
 
   // How should I call storeUser vs matrixUser?
   get storeUser() {
@@ -70,6 +62,18 @@ class MatrixService extends Service {
     return messageList
   }
 
+  async init(force = false) {
+    if (!this.storeUser.matrixAccessToken) {
+      if (force) {
+        this.registerUser()
+      } else return false
+    }
+
+    if (!this.client) await this.createClient()
+    if (!this.clientPrepared) await this.startClient()
+    return true
+  }
+
   async createClient() {
     if (!this.storeUser) {
       throw new Error('No user logged In')
@@ -78,7 +82,9 @@ class MatrixService extends Service {
     if (!this.storeUser.matrixId || !this.storeUser.matrixAccessToken) {
       // What to do? login or throw error?
       this.$log.info('eagoraaa?')
-      this.registerUser()
+      this.$log.info(this.$auth.user)
+
+      await this.registerUser()
     }
 
     let opts = {}
@@ -115,6 +121,9 @@ class MatrixService extends Service {
         if (state === 'PREPARED') {
           this.$store.commit('setClientPrepared', true)
           this.$log.info('PREPARED')
+          this.$log.info(this.$auth)
+
+          this.client.setDisplayName(this.storeUser.name)
         } else {
           this.$log.info(state)
         }
@@ -148,6 +157,7 @@ class MatrixService extends Service {
         'Tried to setActiveRoom before client was ready... Trying again in 2 seconds'
       )
       setTimeout(() => {
+        // TODO: implementar limite de tentativas
         this.setActiveRoom(roomId)
       }, 2000)
     }
@@ -192,17 +202,24 @@ class MatrixService extends Service {
     this.client.sendTextMessage(this.activeRoomId, txt)
   }
 
-  async createRoom({ name, topic = '' }) {
+  createRoom({ name, topic = '' }) {
     // slugify name as alias?
     // passo pro backend aqui ou la na sala?2
     // isso tinha que ser num application service
-    return await this.client.createRoom({ name, topic, visibility: 'private' })
+    axios
+      .post(`/api/chat/${this.storeUser.githubId}/rooms`, { name, topic })
+      .then((success) => {
+        return true
+      })
+      .catch((err) => {
+        throw err
+      })
   }
 
-  registerUser({ force = true }) {
-    if (!this.$storeUser.matrixAccessToken) {
-      const method = force === true ? axios.put : axios.post
-      return method(`/api/auth/${this.storeUser.githubId}/activateChat`)
+  registerUser() {
+    if (!this.storeUser.matrixAccessToken) {
+      const method = axios.post
+      return method(`/api/chat/${this.storeUser.githubId}/activateChat`)
         .then(({ data }) => {
           this.$auth.setUser(data)
           return data

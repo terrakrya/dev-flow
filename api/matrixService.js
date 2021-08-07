@@ -4,12 +4,12 @@ const uuidv4 = require('uuid').v4
 const DEFAULT_PASSWORD = 'tCDMiELuphq5Dr'
 
 export const registerMatrixUser = async () => {
-  console.log('start registration')
+  const username = `terrarakrya_${uuidv4()}`
+  console.log(`<<< Start Registration ${username} >>>`)
+
   const client = await sdk.createClient({
     baseUrl: process.env.MATRIX_HOMESERVER,
   })
-  const username = `terarakrya_${uuidv4()}`
-  console.log(`username`, username)
   try {
     await client.registerRequest({})
   } catch (error) {
@@ -36,5 +36,26 @@ export const registerMatrixUser = async () => {
       console.log('e', e)
       throw e
     }
+  }
+}
+
+export const createRoom = async ({ name, topic }) => {
+  const roomAlias = `terrarakrya_${uuidv4()}`
+  const client = await sdk.createClient({
+    baseUrl: process.env.MATRIX_HOMESERVER,
+    accessToken: 'syt_a3J5YWRtaW4_HmqwGKXoNWLyOvGfcJsa_0Fbrnf',
+    userId: '@kryadmin:terrakrya.com',
+  })
+  try {
+    const room = await client.createRoom({
+      name,
+      topic,
+      visibility: 'public',
+      room_alias_name: roomAlias,
+    })
+    return room
+  } catch (e) {
+    console.log(e)
+    throw e
   }
 }

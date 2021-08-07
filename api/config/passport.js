@@ -1,6 +1,5 @@
 import passport from 'passport'
 import { Strategy as GitHubStrategy } from 'passport-github'
-// const mongoose = require('mongoose')
 const Profile = require('../models/Profile')
 
 passport.use(
@@ -12,11 +11,12 @@ passport.use(
     (accessToken, refreshToken, ghProfile, cb) => {
       Profile.findOneAndUpdate(
         { githubId: ghProfile.id },
-        { githubId: ghProfile.id },
+        { githubId: ghProfile.id, name: ghProfile._json.name },
         { upsert: true, new: true, lean: true },
         (err, profile) => {
-          console.log('profile', profile, ghProfile)
           const user = { token: accessToken, ...ghProfile._json, ...profile }
+          console.log('user', user)
+
           return cb(err, user)
         }
       )
