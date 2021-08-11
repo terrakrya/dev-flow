@@ -1,10 +1,10 @@
 <template>
   <div class="chat-header">
-    <h2>{{ room.name }}</h2>
+    <h2>{{ roomName }}</h2>
   </div>
 </template>
 <script>
-export default { props: { room: { type: Object, default: () => {} } } }
+export default { props: { roomName: { type: String, default: () => 'Sala' } } }
 </script>
 
 <style>

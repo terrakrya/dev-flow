@@ -1,10 +1,13 @@
 <template>
   <b-container>
     <b-row v-if="chatReady">
+      <b-col md="12">
+        <RoomHeader :room-name="activeRoom && activeRoom.name" />
+      </b-col>
       <b-col md="9">
         <div class="d-flex flex-column justify-content-center chat-ui">
-          <RoomHeader :room="activeRoom" />
-          <Messages :messages="messages" />
+          <Messages v-if="!loading" :messages="messages" />
+          <b-spinner v-else label="Carregando..." />
           <InputBox @submit="sendMessage" />
         </div>
       </b-col>
@@ -27,8 +30,8 @@
 export default {
   data() {
     return {
-      showCreateRoom: false,
       chatList: [],
+      loading: false,
     }
   },
   computed: {
@@ -41,12 +44,25 @@ export default {
     messages() {
       return this.$store.state.activeRoomMessages
     },
-
     organizationId() {
       return this.$store.state.organization.id
     },
     activeRoom() {
-      return this.$matrix.client.getRoom(this.$route.params.id)
+      return this.chatReady
+        ? this.$matrix.client.getRoom(this.$store.state.activeRoom)
+        : null
+    },
+  },
+  watch: {
+    chatReady(current, old) {
+      if (current === true) this.fetchChatData()
+    },
+    activeRoom(current, old) {
+      if (current !== old) {
+        if (this.chatReady) {
+          this.fetchChatData()
+        }
+      }
     },
   },
   created() {
@@ -63,32 +79,30 @@ export default {
 
       // const roomId = this.$matrix.createRoom(data)
     },
-    getChatList() {
+    async getChatList() {
       // should be in store already
-      this.$log.info(this.$store.state.organization)
+      const response = await this.$axios.get(
+        `/api/chat/${this.organizationId}/rooms`
+      )
+      const organizationRoomsIds = response.data.rooms
+      let chatList = []
 
-      return this.$axios
-        .get(`/api/chat/${this.organizationId}/rooms`)
-        .then((response) => {
-          this.chatList = response.data.rooms.map((roomId) => {
-            const room = this.$matrix.client.getRoom(roomId)
-            console.log('roomID:', roomId)
-            console.log('room', room)
-            if (room) {
-              return room
-            } else {
-              return this.$matrix.client
-                .joinRoom(roomId)
-                .then((room) => {
-                  return room
-                })
-                .catch((err) => {
-                  console.log('aee', err)
-                  return false
-                })
-            }
-          })
-        })
+      for (const roomId of organizationRoomsIds) {
+        let room = this.$matrix.client.getRoom(roomId)
+        this.$log.info(roomId)
+
+        if (room) {
+          chatList = [...chatList, room]
+        } else {
+          room = await this.$matrix.client
+            .joinRoom(roomId)
+            .catch((error) => console.log(error))
+
+          if (room) chatList = [...chatList, room]
+        }
+      }
+
+      this.chatList = chatList
     },
 
     async sendMessage(text) {
@@ -100,9 +114,26 @@ export default {
       }
     },
     async activateChat(force) {
-      const initialized = await this.$matrix.init(force)
-      if (initialized) await this.$matrix.setActiveRoom(this.$route.params.id)
-      if (initialized) await this.getChatList()
+      if (!this.chatReady) {
+        await this.$matrix.init(force)
+      }
+      if (this.$store.state.isFirstMatrixUse) {
+        this.loading = true
+        setTimeout(async () => {
+          // TODO: remover esse timeout safado
+          await this.fetchChatData()
+          this.loading = false
+          this.$store.commit('setFirstMatrixUse', false)
+        }, 3000)
+      } else {
+        await this.fetchChatData()
+      }
+    },
+    async fetchChatData() {
+      if (this.chatReady) {
+        await this.$matrix.setActiveRoom(this.$route.params.id)
+        await this.getChatList()
+      }
     },
   },
 }
@@ -119,7 +150,7 @@ export default {
 </script>
 <style>
 .chat-ui {
-  max-height: 700px;
+  height: 700px;
   padding-bottom: 20px;
 }
 </style>

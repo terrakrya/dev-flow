@@ -12,8 +12,6 @@ router.get('/:organizationId/rooms', (req, res) => {
   // Por hora, esse é o id do github
   Organization.findOne({ githubId: req.params.organizationId }).exec(
     (err, organization) => {
-      console.log('organization', organization)
-
       if (err) {
         res.status(422).send(err.message)
       } else if (organization && organization.matrixRooms) {
@@ -31,10 +29,10 @@ router.post('/:organizationId/rooms', (req, res) => {
     { githubId: req.params.organizationId },
     { upsert: true },
     (err, organization) => {
+      console.log('tentou chegar o req', organization, req)
       if (err) {
         res.status(422).send(err.message)
       } else {
-        console.log('reqi', req.body)
         createRoom({ name: req.body.name, topic: req.body.topic })
           .then((room) => {
             organization.matrixRooms = [
@@ -69,7 +67,6 @@ router.post('/:githubId/activateChat', authenticated, function (req, res) {
       if (err) {
         res.status(422).send(err.message)
       } else if (profile.matrixAccessToken !== undefined) {
-        console.log('Já tinha', profile.matrixAccessToken)
         res.send(profile)
       } else {
         try {
@@ -96,7 +93,6 @@ router.put('/:githubId/activateChat', authenticated, function (req, res) {
       } else {
         try {
           const newMatrixUser = await registerMatrixUser()
-          console.log('criou um novo?', newMatrixUser)
           profile.matrixId = newMatrixUser.user_id
           profile.matrixAccessToken = newMatrixUser.access_token
           await profile.save()

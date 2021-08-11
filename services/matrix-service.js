@@ -34,38 +34,47 @@ class MatrixService extends Service {
     return this.client && this.client.getRooms()
   }
 
-  get activeRoomMessages() {
-    const messageList = this.activeRoom
-      .getLiveTimeline()
-      .getEvents()
-      .reduce((messages, event, index) => {
-        const content = event.getContent()
-        const sender = event.getSender()
-        const senderUser = this.client.getUser(sender)
-        const author =
-          this.storeUser.matrixId === senderUser.id
-            ? 'me'
-            : senderUser.displayName
-        if (!content.body) {
-          return messages
-        }
-        return [
-          ...messages,
-          {
-            type: 'text',
-            sender: author,
-            id: event.getId(),
-            content: content.body,
-          },
-        ]
-      }, [])
-    return messageList
+  async setActiveRoomMessages() {
+    await this.client.roomInitialSync(this.activeRoomId, 20)
+    const events = this.activeRoom.getLiveTimeline().getEvents()
+    // if (events.length === 0) {
+    //   const paginated = await this.client.paginateEventTimeline(
+    //     this.activeRoom.getLiveTimeline(),
+    //     { backwards: true }
+    //   )
+    //   console.log('pagianted', paginated)
+    // }
+
+    const messageList = events.reduce((messages, event, index) => {
+      const content = event.getContent()
+      const sender = event.getSender()
+      const senderUser = this.client.getUser(sender)
+      const author =
+        this.storeUser.matrixId === senderUser.id
+          ? 'me'
+          : senderUser.displayName
+      if (!content.body) {
+        return messages
+      }
+      return [
+        ...messages,
+        {
+          type: 'text',
+          sender: author,
+          id: event.getId(),
+          content: content.body,
+        },
+      ]
+    }, [])
+
+    this.$store.commit('setMessages', messageList)
   }
 
   async init(force = false) {
     if (!this.storeUser.matrixAccessToken) {
       if (force) {
         this.registerUser()
+        this.$store.commit('setFirstMatrixUse', true)
       } else return false
     }
 
@@ -80,10 +89,7 @@ class MatrixService extends Service {
     }
 
     if (!this.storeUser.matrixId || !this.storeUser.matrixAccessToken) {
-      // What to do? login or throw error?
-      this.$log.info('eagoraaa?')
       this.$log.info(this.$auth.user)
-
       await this.registerUser()
     }
 
@@ -111,18 +117,18 @@ class MatrixService extends Service {
       })
     } catch (error) {
       this.$log.error(error)
+      throw error
     }
   }
 
   async startClient() {
     if (this.client) {
       await this.client.startClient({ initialSyncLimit: 20 })
-      this.client.once('sync', (state, prevState, res) => {
+      await this.client.once('sync', (state, prevState, res) => {
         if (state === 'PREPARED') {
           this.$store.commit('setClientPrepared', true)
-          this.$log.info('PREPARED')
+          this.$log.info(state)
           this.$log.info(this.$auth)
-
           this.client.setDisplayName(this.storeUser.name)
         } else {
           this.$log.info(state)
@@ -144,8 +150,8 @@ class MatrixService extends Service {
       } else {
         this.client
           .joinRoom(roomId)
-          .then((room) => {
-            this.setupActiveRoom(room)
+          .then((joinedRoom) => {
+            this.setupActiveRoom(joinedRoom)
           })
           .catch((error) => {
             this.$log.error(error)
@@ -164,10 +170,12 @@ class MatrixService extends Service {
   }
 
   setupActiveRoom(room) {
+    if (!room) return
+
+    this.$store.commit('setActiveRoom', room.roomId)
     this.stopListeningRoomEvents()
     this.activeRoom = room
-    this.$store.commit('setMessages', this.activeRoomMessages)
-    this.$store.commit('setActiveRoom', room.roomId)
+    this.setActiveRoomMessages()
     this.startListeningRoomEvents()
   }
 
@@ -178,7 +186,7 @@ class MatrixService extends Service {
     ) {
       return
     }
-    this.$store.commit('setMessages', this.activeRoomMessages)
+    this.setActiveRoomMessages()
   }
 
   startListeningRoomEvents() {
@@ -189,8 +197,7 @@ class MatrixService extends Service {
       ) {
         return
       }
-
-      this.$store.commit('setMessages', this.activeRoomMessages)
+      this.setActiveRoomMessages()
     })
   }
 

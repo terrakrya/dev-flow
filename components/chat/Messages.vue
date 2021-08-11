@@ -1,13 +1,11 @@
 <template>
-  <div class="messages">
+  <div class="messages d-flex flex-column justify-content-end">
     <Message
       v-for="(msg, index) in messages"
       :key="index"
       :message="msg"
-      :first-from-sender="
-        index > 0
-          ? messages.sender != messages[index - 1].sender
-          : messages.sender
+      :is-continuation="
+        index > 0 ? msg.sender != messages[index - 1].sender : true
       "
     />
     <div id="dummy-bottom" />
@@ -43,6 +41,7 @@ export default {
 .messages {
   overflow-y: scroll;
   max-height: 70%;
+  min-height: 70%;
   padding: 10px 0;
   margin-bottom: 10px;
 }

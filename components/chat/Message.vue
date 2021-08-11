@@ -1,6 +1,6 @@
 <template>
   <div class="message">
-    <h5 v-if="firstFromSender">
+    <h5 v-if="isContinuation">
       {{ message.sender }}
     </h5>
     <p>
@@ -16,9 +16,10 @@ export default {
       type: Object,
       default: () => {},
     },
-    firstFromSender: {
+    isContinuation: {
       type: Boolean,
     },
   },
+  created() {},
 }
 </script>

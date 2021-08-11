@@ -1,8 +1,8 @@
 <template>
   <div>
     <b-button v-b-modal="'modal-form'">Criar Sala</b-button>
-    <b-modal id="modal-form" @ok="onSubmit">
-      <b-form title="Criar Sala">
+    <b-modal id="modal-form" ref="modal" @ok="onOk">
+      <b-form title="Criar Sala" @submit.stop.prevent="onSubmit">
         <!--
             <b-form-group v-if="!project" label="Projeto">
               <b-form-select
@@ -27,16 +27,22 @@
 export default {
   data() {
     return {
-      showCreateRoom: false,
       form: {
         name: '',
       },
     }
   },
   methods: {
+    onOk(event) {
+      // Prevent modal from closing
+      event.preventDefault()
+      // Trigger submit handler
+      this.onSubmit()
+    },
     onSubmit(event) {
       this.$emit('submit', { name: this.form.name })
       this.form.name = ''
+      this.$refs.modal.hide()
     },
   },
 }

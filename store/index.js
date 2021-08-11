@@ -7,6 +7,7 @@ export const state = () => ({
   activeRoom: null,
   activeRoomMessages: [],
   chatList: [],
+  isFirstMatrixUse: false,
 })
 
 export const mutations = {
@@ -31,6 +32,9 @@ export const mutations = {
   },
   setClientPrepared(state, clientState) {
     state.clientPrepared = clientState
+  },
+  setFirstMatrixUse(state, isFirstUse) {
+    state.isFirstMatrixUse = isFirstUse
   },
 }
 
