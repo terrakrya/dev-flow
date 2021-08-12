@@ -41,9 +41,10 @@ export const registerMatrixUser = async () => {
 
 export const createRoom = async ({ name, topic }) => {
   const roomAlias = `terrarakrya_${uuidv4()}`
+  // TODO: Pegar o access token automaticamente caso esse pare de funcionar
   const client = await sdk.createClient({
     baseUrl: process.env.MATRIX_HOMESERVER,
-    accessToken: 'syt_a3J5YWRtaW4_HmqwGKXoNWLyOvGfcJsa_0Fbrnf',
+    accessToken: 'syt_a3J5YWRtaW4_npweLVNgeoOGFuhZzELR_3x5x3q',
     userId: '@kryadmin:terrakrya.com',
   })
   try {
