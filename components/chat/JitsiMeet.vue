@@ -41,10 +41,10 @@ export default {
       return {
         roomName: this.$store.state.activeRoom.replace(/\W/g, ''),
         noSSL: false,
-        // userInfo: {
-        //   email: 'user@email.com',
-        //   displayName: '',
-        // },
+        userInfo: {
+          email: '',
+          displayName: this.$auth.user.name,
+        },
         configOverwrite: {
           enableNoisyMicDetection: false,
         },
@@ -86,7 +86,7 @@ export default {
   position: fixed;
   right: 0;
   bottom: 0;
-  z-index: 10000;
+  z-index: 1000000;
   border: 1px solid gray;
   background-color: rgba(40, 40, 40, 0.7);
 }
@@ -102,6 +102,6 @@ export default {
 .button {
   position: absolute;
   margin-bottom: -100px;
-  z-index: 100000;
+  z-index: 100000000;
 }
 </style>

@@ -9,7 +9,6 @@ import routes from './routes'
 
 const app = express()
 const secret = process.env.SECRET || process.env.npm_package_name
-console.log('EVNV', process.env.GITHUB_ID)
 
 app.use(cors())
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')))

@@ -25,5 +25,6 @@ export default {
 }
 .button {
   margin-bottom: 20px;
+  z-index: 20;
 }
 </style>

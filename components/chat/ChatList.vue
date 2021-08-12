@@ -3,7 +3,7 @@
     <b-list-group-item>
       <NuxtLink to="/chat/!wgWHBtEuZsOYCjtfaz:terrakrya.com">
         <b-avatar />
-        <span class="mr-auto">Geral</span>
+        <span class="mr-auto">Terra Krya</span>
         <b-badge>0</b-badge>
       </NuxtLink>
     </b-list-group-item>

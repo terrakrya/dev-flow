@@ -34,9 +34,6 @@ export default {
   },
   methods: {
     onOk(event) {
-      // Prevent modal from closing
-      // event.preventDefault()
-      // Trigger submit handler
       this.onSubmit()
       this.$refs.modal.hide()
     },

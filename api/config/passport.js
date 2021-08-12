@@ -15,8 +15,6 @@ passport.use(
         { upsert: true, new: true, lean: true },
         (err, profile) => {
           const user = { token: accessToken, ...ghProfile._json, ...profile }
-          console.log('user', user)
-
           return cb(err, user)
         }
       )

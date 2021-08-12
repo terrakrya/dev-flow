@@ -39,7 +39,7 @@ class MatrixService extends Service {
       this.activeRoom.getLiveTimeline(),
       { backwards: true, limit: 10 }
     )
-    console.log('pagianted', paginated)
+    return paginated
   }
 
   async setActiveRoomMessages() {
@@ -108,8 +108,8 @@ class MatrixService extends Service {
       await store.startup()
       opts = { store }
     } catch (e) {
-      // Change this to logg
-      console.log('IndexDB error:', e)
+      // Change this to log
+      this.$log.error('IndexDB error:', e)
     }
 
     try {

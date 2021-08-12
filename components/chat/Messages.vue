@@ -35,7 +35,6 @@ export default {
   watch: {
     messages() {
       if (this.isScrolledToBottom) this.scrollToBottom()
-      // console.log('messagesfirst', this.messages[0])
     },
   },
   created() {
