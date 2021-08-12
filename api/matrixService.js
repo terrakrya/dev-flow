@@ -4,7 +4,7 @@ const uuidv4 = require('uuid').v4
 const DEFAULT_PASSWORD = 'tCDMiELuphq5Dr'
 
 export const registerMatrixUser = async () => {
-  const username = `terrarakrya_${uuidv4()}`
+  const username = `terrakrya_${uuidv4()}`
   console.log(`<<< Start Registration ${username} >>>`)
 
   const client = await sdk.createClient({
