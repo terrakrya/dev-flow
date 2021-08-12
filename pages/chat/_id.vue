@@ -17,8 +17,14 @@
       </b-col>
     </b-row>
     <b-row v-else>
-      <b-button block variant="primary" @click="activateChat(true)"
-        >Ativar chat
+      <b-button
+        block
+        variant="primary"
+        :disabled="activating"
+        @click="activateChat(true)"
+      >
+        <b-spinner v-if="activating" />
+        <span v-else> Ativar chat </span>
       </b-button>
     </b-row>
   </b-container>
@@ -32,6 +38,7 @@ export default {
     return {
       chatList: [],
       loading: false,
+      activating: false,
       showVideoCall: false,
     }
   },
@@ -115,9 +122,12 @@ export default {
       }
     },
     async activateChat(force) {
+      this.activating = true
       if (!this.chatReady) {
         await this.$matrix.init(force)
       }
+      this.activating = false
+
       if (this.$store.state.isFirstMatrixUse) {
         this.loading = true
         setTimeout(async () => {
@@ -138,16 +148,6 @@ export default {
     },
   },
 }
-
-// createProjectRoom() {},
-// createClient() {},
-// change room
-// send message
-// get room list
-// get room messages
-// get more rom messages (get past history)
-// create room
-// direct messages
 </script>
 <style>
 .chat-ui {

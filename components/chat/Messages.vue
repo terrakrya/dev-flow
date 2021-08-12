@@ -1,7 +1,13 @@
 <template>
   <div class="messages d-flex flex-column">
-    <b-button v-if="canLoadMoreHistory" pill @click="fetchHistory"
-      >Carregar anteriores</b-button
+    <b-button
+      v-if="canLoadMoreHistory"
+      pill
+      :disabled="isFetchingHistory"
+      @click="fetchHistory"
+    >
+      <b-spinner v-if="isFetchingHistory" />
+      <span v-else> Carregar anteriores </span></b-button
     >
     <Message
       v-for="(msg, index) in messages"
@@ -30,6 +36,7 @@ export default {
     return {
       isScrolledToBottom: true,
       canLoadMoreHistory: true,
+      isFetchingHistory: false,
     }
   },
   watch: {
@@ -43,8 +50,10 @@ export default {
   methods: {
     async fetchHistory() {
       this.isScrolledToBottom = false
+      this.isFetchingHistory = true
       const response = await this.$matrix.fetchHistory()
       this.canLoadMoreHistory = !!response
+      this.isFetchingHistory = false
     },
 
     scrollToBottom() {
