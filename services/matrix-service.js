@@ -37,8 +37,10 @@ class MatrixService extends Service {
   async fetchHistory() {
     const paginated = await this.client.paginateEventTimeline(
       this.activeRoom.getLiveTimeline(),
-      { backwards: true, limit: 10 }
+      { backwards: true, limit: 20 }
     )
+    // const paginated = await this.client.scrollback(this.activeRoom, 30)
+    // TODO: qual é melhor?
     return paginated
   }
 
@@ -232,7 +234,7 @@ class MatrixService extends Service {
       const method = axios.post
       return method(`/api/chat/${this.storeUser.githubId}/activateChat`)
         .then(({ data }) => {
-          this.$auth.setUser(data)
+          this.$auth.setUser({ ...this.$auth.user, ...data })
           return data
         })
         .catch((error) => console.log(error))
