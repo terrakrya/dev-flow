@@ -61,13 +61,18 @@ export default {
     baseURL: process.env.BASE_URL || 'http://127.0.0.1:3000/',
   },
 
+  env: {
+    jitsiServerUrl: process.env.JITSI_SERVER_URL,
+  },
+
   server: {
-    host: '0.0.0.0',
+    host: '127.0.0.1',
   },
   // Content module configuration (https://go.nuxtjs.dev/config-content)
   content: {},
 
   auth: {
+    plugins: ['~/plugins/services-mixin.js'],
     redirect: {
       home: '/admin',
     },
@@ -111,5 +116,11 @@ export default {
     },
   },
   // Build Configuration (https://go.nuxtjs.dev/config-build)
-  build: {},
+  build: {
+    extend(config, ctx) {
+      if (ctx.isDev) {
+        config.devtool = ctx.isClient ? 'source-map' : 'inline-source-map'
+      }
+    },
+  },
 }

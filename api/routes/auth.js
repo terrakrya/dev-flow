@@ -1,6 +1,10 @@
 import '../config/passport'
 import passport from 'passport'
+
 const router = require('express').Router()
+
+// const mongoose = require('mongoose')
+// const Profile = mongoose.model('Profile')
 
 router.get('/github', passport.authenticate('github'))
 

@@ -41,7 +41,6 @@ router.post(
     const original = ATTACHMENTS_PATH + url
     const thumb = THUMBS_PATH + url
 
-    console.log(req.file)
     sharp(original)
       .resize({
         width: 200,

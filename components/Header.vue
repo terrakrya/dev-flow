@@ -19,7 +19,7 @@
                   :alt="user.name"
                   class="thumb-sm mr-1"
                 />
-                {{ $auth.user.name }}
+                {{ user.name }}
               </template>
               <b-dropdown-item to="/profile">Perfil</b-dropdown-item>
               <b-dropdown-item @click="$auth.logout()">Sair</b-dropdown-item>
