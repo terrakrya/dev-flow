@@ -21,17 +21,10 @@
           </n-link>
         </div>
       </div>
-      <a
-        v-if="card.note"
-        @click="show_card_form = true"
-        v-html="$md.render(card.note)"
-      ></a>
+      <p v-if="card.title" v-linkify v-html="$md.render(card.title)"></p>
       <div v-if="card.test_instructions">
-        <strong><small>Instruções de teste:</small></strong>
-        <a
-          @click="show_card_form = true"
-          v-html="$md.render(card.test_instructions)"
-        ></a>
+        <small>Instruções de teste:</small>
+        <p v-linkify v-html="$md.render(card.test_instructions)"></p>
       </div>
     </div>
     <div class="d-flex justify-content-between items-center">
@@ -104,6 +97,7 @@
 </template>
 <script>
 import columns from '@/content/columns.json'
+
 export default {
   props: {
     card: {

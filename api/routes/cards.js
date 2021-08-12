@@ -11,6 +11,7 @@ router.get('/', authenticated, (req, res) => {
   }
   Card.find(query)
     .populate('project')
+    .sort({ createdAt: 1 })
     .exec((err, cards) => {
       if (err) {
         res.status(422).send(err.message)

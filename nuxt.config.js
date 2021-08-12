@@ -18,7 +18,11 @@ export default {
   css: ['~/assets/css/custom.sass'],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
-  plugins: ['~/plugins/global-mixin.js'],
+  plugins: [
+    '~/plugins/global-mixin.js',
+    '~/plugins/v-tooltip.js',
+    '~/plugins/linkify.js',
+  ],
 
   // Auto import components (https://go.nuxtjs.dev/config-components)
   components: true,
@@ -94,6 +98,7 @@ export default {
   },
   markdownit: {
     runtime: true,
+    linkify: false,
     use: [['markdown-it-task-lists', { enabled: true, label: true }]],
   },
   toast: {

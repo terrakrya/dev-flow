@@ -11,17 +11,46 @@
         </b-form-select>
       </b-form-group>
       <div v-if="form.project">
+        <b-form-group
+          ><b-form-textarea
+            v-model="form.title"
+            rows="5"
+            placeholder="Título do Cartão"
+          />
+        </b-form-group>
         <b-form-group>
           <validation-provider
             v-slot="{ errors }"
             name="conteúdo"
             rules="required"
           >
-            <b-form-textarea
-              v-model="form.note"
-              rows="5"
-              placeholder="Detalhes do cartão"
-            />
+            <Mentionable
+              :keys="['@']"
+              :items="
+                members.map((member) => ({
+                  value: member.login,
+                  avatar_url: member.avatar_url,
+                }))
+              "
+              offset="6"
+            >
+              <b-form-textarea
+                v-model="form.note"
+                rows="5"
+                placeholder="Detalhes do cartão"
+              />
+              <template #item-@="{ item }">
+                <div class="user">
+                  <b-avatar
+                    :src="item.avatar_url"
+                    class="mr-1"
+                    size="2rem"
+                    :alt="item.value"
+                  />
+                  <span class="dim"> {{ item.value }} </span>
+                </div>
+              </template>
+            </Mentionable>
             <accept-markdown />
             <span class="text-danger">{{ errors[0] }}</span>
           </validation-provider>
@@ -37,20 +66,33 @@
         <b-form-group label="Membros">
           <MembersSelect v-model="form.members" />
         </b-form-group>
-        <b-form-group label="Status">
-          <b-form-select
-            v-model="form.status"
-            :options="statusList"
-            value-field="id"
-            text-field="name"
-          >
-          </b-form-select>
-        </b-form-group>
-        <div v-if="form.status === 'backlog'">
-          <b-form-checkbox v-model="form.reviewed" name="check-button" switch>
-            {{ form.reviewed ? 'Revisado' : 'Aguardando revisão' }}
-          </b-form-checkbox>
-        </div>
+        <Upload
+          v-model="form.documents"
+          type="documents"
+          label="Anexos Documentos"
+        />
+        <Upload v-model="form.images" type="images" label="Anexos Imagens" />
+        <b-row>
+          <b-col md="6">
+            <b-form-group label="Status">
+              <b-form-select
+                v-model="form.status"
+                :options="statusList"
+                value-field="id"
+                text-field="name"
+              >
+              </b-form-select>
+              <b-form-checkbox
+                v-if="form.status === 'backlog'"
+                v-model="form.reviewed"
+                name="check-button"
+                switch
+              >
+                {{ form.reviewed ? 'Revisado' : 'Aguardando revisão' }}
+              </b-form-checkbox>
+            </b-form-group>
+          </b-col>
+        </b-row>
         <div v-if="edit" class="text-right text-danger mb-4">
           <small>
             <a @click="archive">
@@ -69,12 +111,14 @@
 
 <script>
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
+import { Mentionable } from 'vue-mention'
 import columns from '@/content/columns.json'
 import { apiDataToForm } from './utils'
 export default {
   components: {
     ValidationObserver,
     ValidationProvider,
+    Mentionable,
   },
   props: {
     project: {
@@ -96,10 +140,16 @@ export default {
         members: [this.$auth.user.id.toString()],
         status: 'backlog',
         reviewed: false,
+        documents: [],
+        images: [],
+        title: '',
       },
     }
   },
   computed: {
+    members() {
+      return this.$store.state.members
+    },
     projects() {
       return this.$store.state.projects
     },

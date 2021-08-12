@@ -1,9 +1,9 @@
 import './database'
+import path from 'path'
 
 import cors from 'cors'
 import express from 'express'
 import passport from 'passport'
-import bodyParser from 'body-parser'
 import session from 'express-session'
 import routes from './routes'
 
@@ -12,6 +12,7 @@ const secret = process.env.SECRET || process.env.npm_package_name
 console.log('EVNV', process.env.GITHUB_ID)
 
 app.use(cors())
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')))
 
 app.use(
   session({
@@ -21,8 +22,8 @@ app.use(
     saveUninitialized: false,
   })
 )
-app.use(bodyParser.urlencoded({ extended: false }))
-app.use(bodyParser.json())
+app.use(express.urlencoded({ extended: false, limit: '100mb' }))
+app.use(express.json({ limit: '100mb' }))
 app.use(passport.initialize())
 app.use(passport.session())
 app.use(routes)
