@@ -34,16 +34,17 @@ class MatrixService extends Service {
     return this.client && this.client.getRooms()
   }
 
+  async fetchHistory() {
+    const paginated = await this.client.paginateEventTimeline(
+      this.activeRoom.getLiveTimeline(),
+      { backwards: true, limit: 10 }
+    )
+    console.log('pagianted', paginated)
+  }
+
   async setActiveRoomMessages() {
     await this.client.roomInitialSync(this.activeRoomId, 20)
     const events = this.activeRoom.getLiveTimeline().getEvents()
-    // if (events.length === 0) {
-    //   const paginated = await this.client.paginateEventTimeline(
-    //     this.activeRoom.getLiveTimeline(),
-    //     { backwards: true }
-    //   )
-    //   console.log('pagianted', paginated)
-    // }
 
     const messageList = events.reduce((messages, event, index) => {
       const content = event.getContent()
@@ -51,11 +52,13 @@ class MatrixService extends Service {
       const senderUser = this.client.getUser(sender)
       const author =
         this.storeUser.matrixId === senderUser.id
-          ? 'me'
+          ? 'Eu'
           : senderUser.displayName
+
       if (!content.body) {
         return messages
       }
+
       return [
         ...messages,
         {
@@ -63,6 +66,7 @@ class MatrixService extends Service {
           sender: author,
           id: event.getId(),
           content: content.body,
+          timestamp: event.localTimestamp,
         },
       ]
     }, [])

@@ -14,11 +14,12 @@
         <b-icon-people />
         Membros <b-badge> {{ members.length }} </b-badge>
       </b-nav-item>
-      <b-nav-item to="/chat/!idEFgMgKIeSobaPypm:terrakrya.com">
+      <b-nav-item to="/chat/!wgWHBtEuZsOYCjtfaz:terrakrya.com">
         <b-icon-people />
-        Chat
+        Chat (beta)
       </b-nav-item>
     </b-nav>
+    <JitsiMeet />
   </b-container>
 </template>
 

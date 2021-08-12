@@ -1,7 +1,7 @@
 <template>
   <b-list-group>
     <b-list-group-item>
-      <NuxtLink to="/chat/!idEFgMgKIeSobaPypm:terrakrya.com">
+      <NuxtLink to="/chat/!wgWHBtEuZsOYCjtfaz:terrakrya.com">
         <b-avatar />
         <span class="mr-auto">Geral</span>
         <b-badge>0</b-badge>

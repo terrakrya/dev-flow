@@ -2,7 +2,7 @@
   <div>
     <b-button v-b-modal="'modal-form'">Criar Sala</b-button>
     <b-modal id="modal-form" ref="modal" @ok="onOk">
-      <b-form title="Criar Sala" @submit.stop.prevent="onSubmit">
+      <b-form title="Criar Sala" @submit.prevent="onSubmit">
         <!--
             <b-form-group v-if="!project" label="Projeto">
               <b-form-select
@@ -35,9 +35,10 @@ export default {
   methods: {
     onOk(event) {
       // Prevent modal from closing
-      event.preventDefault()
+      // event.preventDefault()
       // Trigger submit handler
       this.onSubmit()
+      this.$refs.modal.hide()
     },
     onSubmit(event) {
       this.$emit('submit', { name: this.form.name })

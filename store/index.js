@@ -8,6 +8,7 @@ export const state = () => ({
   activeRoomMessages: [],
   chatList: [],
   isFirstMatrixUse: false,
+  showVideoCall: false,
 })
 
 export const mutations = {
@@ -35,6 +36,12 @@ export const mutations = {
   },
   setFirstMatrixUse(state, isFirstUse) {
     state.isFirstMatrixUse = isFirstUse
+  },
+  startVideoCall(state) {
+    state.showVideoCall = true
+  },
+  stopVideoCall(state) {
+    state.showVideoCall = false
   },
 }
 

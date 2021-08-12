@@ -5,7 +5,7 @@
         <RoomHeader :room-name="activeRoom && activeRoom.name" />
       </b-col>
       <b-col md="9">
-        <div class="d-flex flex-column justify-content-center chat-ui">
+        <div class="d-flex flex-column justify-content-end chat-ui">
           <Messages v-if="!loading" :messages="messages" />
           <b-spinner v-else label="Carregando..." />
           <InputBox @submit="sendMessage" />
@@ -32,6 +32,7 @@ export default {
     return {
       chatList: [],
       loading: false,
+      showVideoCall: false,
     }
   },
   computed: {
