@@ -81,16 +81,34 @@ export default {
       this.$emit('change', card)
     },
     async cardMoved(event) {
+      // pega o card
       let card = this.cards.find((c) => c.id === event.item.id)
+
+      // se o card foi movido pra uma coluna diferente da atual altera o status
       if (
-        !columns[event.to.id].status.find((status) => status === card.status)
+        !columns[event.to.id].status.find((status) => status.id === card.status)
       ) {
         card = await this.$axios
           .$put('/api/cards/' + card._id, {
             status: columns[event.to.id].status[0].id,
           })
           .catch(this.showError)
+        // se o card foi movido para a mesma coluna reordena coluna
       }
+
+      // roda nos filhos da coluna e pega os ids/ordem
+      const cardsToReorder = []
+      event.to.children.forEach((child, order) => {
+        cardsToReorder.push({ id: child.id, order })
+      })
+
+      // passa a lista de id + order de cada card pra ser reordenado na api
+      await this.$axios
+        .$put('/api/cards/reorder', {
+          cards: cardsToReorder,
+        })
+        .catch(this.showError)
+
       this.$emit('change', card)
     },
   },

@@ -60,19 +60,23 @@ router.post('/', authenticated, (req, res) => {
   })
 })
 
-router.post('/reorder', authenticated, async (req, res) => {
-  for (const item in req.body) {
-    await Card.findOneAndUpdate(
-      {
-        slug: req.body[item].slug,
-      },
-      {
-        $set: { order: req.body[item].order },
-      },
-      {
-        upsert: true,
-      }
-    )
+router.put('/reorder', authenticated, async (req, res) => {
+  if (req.body.cards) {
+    console.log(req.body.cards)
+    for (const item of req.body.cards) {
+      console.log(item)
+      await Card.findOneAndUpdate(
+        {
+          _id: item.id,
+        },
+        {
+          $set: { order: item.order },
+        },
+        {
+          upsert: true,
+        }
+      )
+    }
   }
   res.json('ok')
 })
