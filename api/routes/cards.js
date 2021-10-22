@@ -11,7 +11,7 @@ router.get('/', authenticated, (req, res) => {
   }
   Card.find(query)
     .populate('project')
-    .sort({ createdAt: 1 })
+    .sort('order')
     .exec((err, cards) => {
       if (err) {
         res.status(422).send(err.message)
@@ -58,6 +58,27 @@ router.post('/', authenticated, (req, res) => {
       res.send(card)
     }
   })
+})
+
+router.put('/reorder', authenticated, async (req, res) => {
+  if (req.body.cards) {
+    console.log(req.body.cards)
+    for (const item of req.body.cards) {
+      console.log(item)
+      await Card.findOneAndUpdate(
+        {
+          _id: item.id,
+        },
+        {
+          $set: { order: item.order },
+        },
+        {
+          upsert: true,
+        }
+      )
+    }
+  }
+  res.json('ok')
 })
 
 router.put('/:id', authenticated, (req, res) => {
