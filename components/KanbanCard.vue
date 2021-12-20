@@ -9,6 +9,7 @@
     <div>
       <div class="d-flex justify-content-between items-center mb-3">
         <div>
+          {{ card.id }}
           <Member v-for="member in card.members" :id="member" :key="member" />
         </div>
         <div>
