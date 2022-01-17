@@ -24,7 +24,6 @@ const CardSchema = mongoose.Schema(
     },
     note: {
       type: String,
-      required: true,
     },
     title: {
       type: String,

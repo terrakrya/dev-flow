@@ -1,34 +1,26 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <div
-    :id="card.id"
-    class="rounded p-3 border kanban-card"
-    @click.self="show_card_form = true"
-    @dblclick="show_card_form = true"
-  >
-    <div>
-      <div class="d-flex justify-content-between items-center mb-3">
-        <div>
-          {{ card.id }}
+  <div :id="card.id" class="rounded p-3 border kanban-card" @dblclick="open()">
+    <div class="pointer" @click="open()">
+      <div
+        v-if="card.title || card.note"
+        class="text-white mb-2"
+        style="font-size: 16px"
+      >
+        {{ (card.title || card.note).replace(/(<([^>]+)>)/gi, '') }}
+      </div>
+      <div class="d-flex justify-content-end items-center mb-3">
+        <div class="text-right">
           <Member v-for="member in card.members" :id="member" :key="member" />
         </div>
-        <div>
-          <n-link v-if="multiple" :to="`/projects/${card.project._id}`">
-            <b-badge
-              variant="secondary"
-              :style="`background-color: ${card.project.color} !important`"
-              >{{ card.project.name }}</b-badge
-            >
-          </n-link>
-        </div>
       </div>
-      <p v-if="card.title" v-linkify v-html="$md.render(card.title)"></p>
-      <div v-if="card.test_instructions">
+      <!-- <div v-if="card.test_instructions">
         <small>Instruções de teste:</small>
         <p v-linkify v-html="$md.render(card.test_instructions)"></p>
-      </div>
+      </div> -->
     </div>
-    <div class="d-flex justify-content-between items-center">
+    <hr />
+    <div class="d-flex justify-content-between align-items-center">
       <div>
         <b-btn
           variant="outline"
@@ -39,40 +31,51 @@
           <span v-if="comments.length">{{ comments.length }}</span>
         </b-btn>
       </div>
-      <div v-if="card.status === 'backlog'">
-        <div v-if="card.reviewed">
-          <b-badge variant="success">Revisado</b-badge>
+      <div class="text-right">
+        <n-link v-if="multiple" :to="`/projects/${card.project._id}`">
+          <b-badge
+            variant="secondary"
+            :style="`background-color: ${card.project.color} !important; font-size: 11px`"
+            >{{ card.project.name }}</b-badge
+          >
+        </n-link>
+        <div>
+          <div v-if="card.status === 'backlog'">
+            <div v-if="card.reviewed">
+              <b-badge variant="success">Revisado</b-badge>
+            </div>
+            <div v-else>
+              <small>Aguardando revisão</small>
+            </div>
+          </div>
+          <div v-else>
+            <a @click="open()">
+              <small>{{
+                statusList.find((status) => card.status == status.id).name
+              }}</small>
+            </a>
+            <b-btn
+              v-if="['ready_to_dev', 'ready_to_test'].includes(card.status)"
+              size="sm"
+              variant="outline"
+              title="Iniciar"
+              @click="nextStatus(card)"
+            >
+              <b-icon-play-circle />
+            </b-btn>
+            <b-btn
+              v-if="
+                ['developing', 'testing', 'ready_to_prod'].includes(card.status)
+              "
+              size="sm"
+              variant="success"
+              title="Finalizar"
+              @click="nextStatus(card)"
+            >
+              <b-icon-check-circle />
+            </b-btn>
+          </div>
         </div>
-        <div v-else>
-          <small>Aguardando revisão</small>
-        </div>
-      </div>
-      <div v-else>
-        <a @click="show_card_form = true">
-          <small>{{
-            statusList.find((status) => card.status == status.id).name
-          }}</small>
-        </a>
-        <b-btn
-          v-if="['ready_to_dev', 'ready_to_test'].includes(card.status)"
-          size="sm"
-          variant="outline"
-          title="Iniciar"
-          @click="nextStatus(card)"
-        >
-          <b-icon-play-circle />
-        </b-btn>
-        <b-btn
-          v-if="
-            ['developing', 'testing', 'ready_to_prod'].includes(card.status)
-          "
-          size="sm"
-          variant="success"
-          title="Finalizar"
-          @click="nextStatus(card)"
-        >
-          <b-icon-check-circle />
-        </b-btn>
       </div>
     </div>
     <div v-if="show_next_status && card.status === 'developing'" class="pt-3">
@@ -87,10 +90,11 @@
       <Comments v-if="show_comments" :target="target" @change="commentSaved" />
     </div>
     <b-modal
-      v-model="show_card_form"
+      :visible="showCard"
       title="Editar cartão"
       hide-footer
       size="lg"
+      @hide="close"
     >
       <card-form :project="card.project" :edit="card" @change="cardChanged" />
     </b-modal>
@@ -114,13 +118,15 @@ export default {
     return {
       target: `card-${this.card.id}`,
       show_comments: false,
-      show_card_form: false,
       show_next_status: false,
       test_instructions: this.card.test_instructions,
       comments: [],
     }
   },
   computed: {
+    showCard() {
+      return this.$route.query.card && this.$route.query.card === this.card.id
+    },
     members() {
       return this.$store.state.members
     },
@@ -141,7 +147,7 @@ export default {
   },
   methods: {
     cardChanged(card) {
-      this.show_card_form = false
+      this.close()
       this.$emit('change', card)
     },
     async nextStatus(card) {
@@ -174,6 +180,12 @@ export default {
     },
     commentSaved(comment) {
       this.comments.push(comment)
+    },
+    open() {
+      this.$router.push(this.$route.path + '?card=' + this.card.id)
+    },
+    close() {
+      this.$router.push(this.$route.path)
     },
   },
 }

@@ -5,43 +5,49 @@
         <table class="table b-table b-table-stacked-sm mb-1">
           <tbody>
             <tr v-for="(item, index) in preview" :key="index">
-              <td style="width: 100px">
-                <a :href="item.url" target="_blank">
-                  <b-img
-                    v-if="item.thumb"
-                    :src="item.thumb"
-                    fluid
-                    thumbnail
-                    width="100"
-                  />
-                  <b-icon-image v-else-if="type === 'images'" scale="2" />
-                  <b-icon-file-earmark-text v-else scale="2" />
-                </a>
+              <td
+                style="width: 100px"
+                vertical-align="center"
+                class="text-center"
+              >
+                <div>
+                  <a
+                    :href="item.url"
+                    target="_blank"
+                    class="text-decoration-none text-white"
+                  >
+                    <b-img
+                      v-if="item.thumb"
+                      :src="item.thumb"
+                      fluid
+                      thumbnail
+                      width="100"
+                    />
+                    <b-icon-image v-else-if="type === 'images'" scale="2" />
+                    <b-icon-file-earmark-text v-else scale="2" />
+                  </a>
+                </div>
               </td>
               <td v-if="editTitle || editDescription || editLink">
                 <b-form-input
                   v-if="editTitle"
                   v-model="item.title"
                   placeholder="Título"
-                  class="mt-1"
                 />
                 <b-form-textarea
                   v-if="editDescription"
                   v-model="item.description"
                   placeholder="Descrição"
-                  class="mt-1"
                 />
                 <b-form-input
                   v-if="editLink"
                   v-model="item.link"
                   placeholder="Link"
-                  class="mt-1"
                 />
                 <b-form-input
                   v-if="editLink"
                   v-model="item.link_title"
                   placeholder="Título do link"
-                  class="mt-1"
                 />
               </td>
               <td v-if="editDescription" />

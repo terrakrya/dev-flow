@@ -12,48 +12,54 @@
       </b-form-group>
       <div v-if="form.project">
         <b-form-group
-          ><b-form-textarea
-            v-model="form.title"
-            rows="5"
-            placeholder="Título do Cartão"
-          />
-        </b-form-group>
-        <b-form-group>
+          description="Escreva um resumo da história de forma que ajude a identificar o conteúdo"
+        >
           <validation-provider
             v-slot="{ errors }"
-            name="conteúdo"
+            name="título"
             rules="required"
           >
-            <Mentionable
-              :keys="['@']"
-              :items="
-                members.map((member) => ({
-                  value: member.login,
-                  avatar_url: member.avatar_url,
-                }))
-              "
-              offset="6"
-            >
-              <b-form-textarea
-                v-model="form.note"
-                rows="5"
-                placeholder="Detalhes do cartão"
-              />
-              <template #item-@="{ item }">
-                <div class="user">
-                  <b-avatar
-                    :src="item.avatar_url"
-                    class="mr-1"
-                    size="2rem"
-                    :alt="item.value"
-                  />
-                  <span class="dim"> {{ item.value }} </span>
-                </div>
-              </template>
-            </Mentionable>
-            <accept-markdown />
+            <b-form-textarea
+              v-model="form.title"
+              rows="1"
+              max-rows="8"
+              grow
+              placeholder="Título"
+            />
             <span class="text-danger">{{ errors[0] }}</span>
           </validation-provider>
+        </b-form-group>
+        <b-form-group
+          description="Descreva com o máximo de detalhes o a história para que seja fácil do responsável entender a questão"
+        >
+          <Mentionable
+            :keys="['@']"
+            :items="
+              members.map((member) => ({
+                value: member.login,
+                avatar_url: member.avatar_url,
+              }))
+            "
+            offset="6"
+          >
+            <b-form-textarea
+              v-model="form.note"
+              rows="5"
+              placeholder="Descrição detalhada"
+            />
+            <template #item-@="{ item }">
+              <div class="user">
+                <b-avatar
+                  :src="item.avatar_url"
+                  class="mr-1"
+                  size="2rem"
+                  :alt="item.value"
+                />
+                <span class="dim"> {{ item.value }} </span>
+              </div>
+            </template>
+          </Mentionable>
+          <accept-markdown />
         </b-form-group>
         <b-form-group
           v-if="form.status !== 'backlog'"
@@ -69,9 +75,11 @@
         <Upload
           v-model="form.documents"
           type="documents"
-          label="Anexos Documentos"
+          label="Documentos"
+          edit-title
+          multiple
         />
-        <Upload v-model="form.images" type="images" label="Anexos Imagens" />
+        <Upload v-model="form.images" type="images" label="Imagens" multiple />
         <b-row>
           <b-col md="6">
             <b-form-group label="Status">
@@ -80,6 +88,7 @@
                 :options="statusList"
                 value-field="id"
                 text-field="name"
+                class="mb-3"
               >
               </b-form-select>
               <b-form-checkbox
@@ -88,7 +97,11 @@
                 name="check-button"
                 switch
               >
-                {{ form.reviewed ? 'Revisado' : 'Aguardando revisão' }}
+                {{
+                  form.reviewed
+                    ? 'Revisado'
+                    : 'Esta história ainda não foi revisada'
+                }}
               </b-form-checkbox>
             </b-form-group>
           </b-col>
@@ -101,7 +114,13 @@
             </a>
           </small>
         </div>
-        <b-button type="submit" variant="secondary" block :disabled="invalid">
+        <b-button
+          type="submit"
+          variant="secondary"
+          block
+          :disabled="invalid"
+          size="lg"
+        >
           Salvar
         </b-button>
       </div>

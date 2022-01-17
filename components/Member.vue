@@ -1,13 +1,12 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
-  <n-link v-if="member" :to="'/members/' + member.id">
-    <b-avatar
-      :src="member.avatar_url"
-      class="mr-1"
-      size="2rem"
-      :alt="member.name"
-    />
-  </n-link>
+  <b-avatar
+    v-if="member"
+    :src="member.avatar_url"
+    class="mr-1"
+    size="2rem"
+    :alt="member.name"
+  />
 </template>
 <script>
 export default {
