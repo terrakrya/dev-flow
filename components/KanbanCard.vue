@@ -24,13 +24,15 @@
         </b-btn>
       </div>
       <div class="text-right">
-        <n-link v-if="multiple" :to="`/projects/${card.project._id}`">
-          <b-badge
-            variant="secondary"
-            :style="`background-color: ${card.project.color} !important; font-size: 11px`"
-            >{{ card.project.name }}</b-badge
-          >
-        </n-link>
+        <div v-if="multiple" class="mb-2">
+          <n-link :to="`/projects/${card.project._id}`">
+            <b-badge
+              variant="secondary"
+              :style="`background-color: ${card.project.color} !important; font-size: 11px`"
+              >{{ card.project.name }}</b-badge
+            >
+          </n-link>
+        </div>
         <div>
           <div v-if="card.status === 'backlog'">
             <div v-if="card.reviewed">

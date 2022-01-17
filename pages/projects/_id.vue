@@ -79,6 +79,7 @@ export default {
     },
     cardSaved() {
       this.loadCards()
+      this.show_card_form = false
     },
     projectSaved() {
       this.show_project_form = false
