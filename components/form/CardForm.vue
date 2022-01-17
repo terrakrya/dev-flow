@@ -47,6 +47,7 @@
               rows="5"
               placeholder="Descrição detalhada"
             />
+            <!-- eslint-disable-next-line vue/no-lone-template -->
             <template #item-@="{ item }">
               <div class="user">
                 <b-avatar

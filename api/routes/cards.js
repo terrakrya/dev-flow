@@ -62,9 +62,7 @@ router.post('/', authenticated, (req, res) => {
 
 router.put('/reorder', authenticated, async (req, res) => {
   if (req.body.cards) {
-    console.log(req.body.cards)
     for (const item of req.body.cards) {
-      console.log(item)
       await Card.findOneAndUpdate(
         {
           _id: item.id,

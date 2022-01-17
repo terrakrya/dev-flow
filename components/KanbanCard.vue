@@ -2,22 +2,14 @@
 <template>
   <div :id="card.id" class="rounded p-3 border kanban-card" @dblclick="open()">
     <div class="pointer" @click="open()">
-      <div
-        v-if="card.title || card.note"
-        class="text-white mb-2"
-        style="font-size: 16px"
-      >
-        {{ (card.title || card.note).replace(/(<([^>]+)>)/gi, '') }}
+      <div v-if="cardTitle" class="text-white mb-2" style="font-size: 16px">
+        {{ cardTitle }}
       </div>
       <div class="d-flex justify-content-end items-center mb-3">
         <div class="text-right">
           <Member v-for="member in card.members" :id="member" :key="member" />
         </div>
       </div>
-      <!-- <div v-if="card.test_instructions">
-        <small>Instruções de teste:</small>
-        <p v-linkify v-html="$md.render(card.test_instructions)"></p>
-      </div> -->
     </div>
     <hr />
     <div class="d-flex justify-content-between align-items-center">
@@ -124,6 +116,9 @@ export default {
     }
   },
   computed: {
+    cardTitle() {
+      return (this.card.title || this.card.note).replace(/(<([^>]+)>)/gi, '')
+    },
     showCard() {
       return this.$route.query.card && this.$route.query.card === this.card.id
     },
