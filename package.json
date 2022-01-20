@@ -15,7 +15,7 @@
   "dependencies": {
     "@mycure/vue-jitsi-meet": "^0.0.7",
     "@nuxt/content": "^1.9.0",
-    "@nuxtjs/auth-next": "5.0.0-1611071776.3646657",
+    "@nuxtjs/auth-next": "5.0.0-1642593631.b151936",
     "@nuxtjs/axios": "^5.12.2",
     "@nuxtjs/markdownit": "^2.0.0",
     "@nuxtjs/pwa": "^3.0.2",
