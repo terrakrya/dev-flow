@@ -20,7 +20,7 @@ export default {
   },
   computed: {
     members() {
-      return this.$store.state.members
+      return this.$store.state.organization?.members || []
     },
   },
   methods: {

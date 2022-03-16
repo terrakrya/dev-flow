@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
+const ObjectId = mongoose.Schema.Types.ObjectId
 
 const ProjectSchema = mongoose.Schema(
   {
@@ -8,7 +9,8 @@ const ProjectSchema = mongoose.Schema(
       required: true,
     },
     organization: {
-      type: String,
+      type: ObjectId,
+      ref: 'Organization',
       required: true,
     },
     repository: {

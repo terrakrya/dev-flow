@@ -4,7 +4,8 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const CommentSchema = mongoose.Schema(
   {
     organization: {
-      type: String,
+      type: ObjectId,
+      ref: 'Organization',
       required: true,
     },
     target: {
@@ -16,7 +17,8 @@ const CommentSchema = mongoose.Schema(
       ref: 'Comment',
     },
     member: {
-      type: String,
+      type: ObjectId,
+      ref: 'Profile',
       required: true,
     },
     message: {

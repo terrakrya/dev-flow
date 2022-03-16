@@ -9,8 +9,12 @@
         <b-collapse id="header-menu" is-nav>
           <b-navbar-nav />
           <b-navbar-nav class="ml-auto">
+            <b-nav-item>
+              <p>{{ organization.name }}</p>
+            </b-nav-item>
             <b-nav-item-dropdown right>
               <!-- Using 'button-content' slot -->
+
               <template #button-content>
                 <b-img
                   rounded="circle"
@@ -34,8 +38,11 @@
 <script>
 export default {
   computed: {
+    organization() {
+      return this.$store.state.organization || {}
+    },
     user() {
-      return this.$auth.user
+      return this.$auth.user || {}
     },
   },
 }

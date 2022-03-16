@@ -4,7 +4,8 @@ const ObjectId = mongoose.Schema.Types.ObjectId
 const CardSchema = mongoose.Schema(
   {
     organization: {
-      type: String,
+      type: ObjectId,
+      ref: 'Organization',
       required: true,
     },
     project: {
@@ -14,7 +15,8 @@ const CardSchema = mongoose.Schema(
     },
     members: [
       {
-        type: String,
+        type: ObjectId,
+        ref: 'Profile',
         required: true,
       },
     ],

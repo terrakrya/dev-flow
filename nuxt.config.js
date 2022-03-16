@@ -88,13 +88,28 @@ export default {
         },
         user: {
           property: false,
+          autoFetch: true,
         },
         endpoints: {
-          login: { url: '/api/auth/login', method: 'post' },
+          login: { url: '/api/auth/login/password', method: 'post' },
           logout: { url: '/api/auth/logout', method: 'get' },
           user: { url: '/api/auth/me', method: 'get' },
         },
       },
+      // local: {
+      //   token: {
+      //     property: 'token',
+      //     type: 'Token',
+      //   },
+      //   user: {
+      //     property: false,
+      //   },
+      //   endpoints: {
+      //     login: { url: '/api/auth/login', method: 'post' },
+      //     logout: { url: '/api/auth/logout', method: 'get' },
+      //     user: { url: '/api/auth/me', method: 'get' },
+      //   },
+      // },
     },
   },
   bootstrapVue: {

@@ -55,7 +55,6 @@ export default {
   data() {
     return {
       form: {
-        organization: 'terrakrya',
         repository: null,
         name: '',
         description: '',
@@ -84,9 +83,11 @@ export default {
       }
     },
     async save() {
+      const activeOrganizationId = this.$store.state.organization.id
+      const requestData = { ...this.form, organization: activeOrganizationId }
       if (this.edit) {
         const project = await this.$axios
-          .$put('/api/projects/' + this.edit._id, this.form)
+          .$put('/api/projects/' + this.edit._id, requestData)
           .catch(this.showError)
         if (project) {
           this.$toast.success('Projeto atualizado com sucesso!')
@@ -94,7 +95,7 @@ export default {
         }
       } else {
         const project = await this.$axios
-          .$post('/api/projects', this.form)
+          .$post('/api/projects', requestData)
           .catch(this.showError)
         if (project) {
           this.$toast.success('Projeto cadastrado com sucesso!')

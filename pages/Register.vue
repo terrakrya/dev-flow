@@ -6,9 +6,11 @@
       <div class="mt-4">
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
-          <b-input v-model="username" />
+          <b-input v-model="email" />
           <b-input v-model="password" />
-          <b-btn class="btn btn-primary" @click="localLogin"> Entre </b-btn>
+          <b-btn class="btn btn-primary" @click="localRegister">
+            Registrar
+          </b-btn>
         </div>
       </div>
     </div>
@@ -21,21 +23,23 @@ export default {
   data() {
     return {
       authenticating: false,
-      username: '',
+      email: '',
       password: '',
     }
   },
   methods: {
-    async localLogin() {
+    async localRegister() {
       try {
-        const response = await this.$auth.loginWith('local', {
+        await this.$axios.$post('api/auth/register', {
+          email: this.email,
+          password: this.password,
+        })
+        await this.$auth.loginWith('local', {
           data: {
-            email: this.username,
+            email: this.email,
             password: this.password,
           },
         })
-        console.log('response', response)
-        this.$router.push('/admin')
       } catch (error) {
         this.showError(error)
       }

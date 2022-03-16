@@ -24,9 +24,13 @@ router.get('/', authenticated, (req, res) => {
 router.get('/my', authenticated, (req, res) => {
   const query = {
     archived: false,
-    members: req.user.id,
+    members: [req.user._id],
     $and: [{ status: { $ne: 'backlog' } }, { status: { $ne: 'published' } }],
   }
+  if (req.query.organization) {
+    query.organization = req.query.organization
+  }
+
   Card.find(query)
     .populate('project')
     .exec((err, cards) => {

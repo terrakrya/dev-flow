@@ -153,7 +153,6 @@ export default {
   data() {
     return {
       form: {
-        organization: 'terrakrya',
         project: this.project ? this.project.id : null,
         note: '',
         test_instructions: '',
@@ -173,6 +172,9 @@ export default {
     projects() {
       return this.$store.state.projects
     },
+    activeOrganization() {
+      return this.$store.state.organization?.id
+    },
     statusList() {
       const statusList = []
       Object.keys(columns).forEach((cid) => {
@@ -190,9 +192,10 @@ export default {
   },
   methods: {
     async save() {
+      const queryData = { ...this.form, organization: this.activeOrganization }
       if (this.edit) {
         const card = await this.$axios
-          .$put('/api/cards/' + this.edit._id, this.form)
+          .$put('/api/cards/' + this.edit._id, queryData)
           .catch(this.showError)
         if (card) {
           this.$toast.success('Cartão atualizado com sucesso!')
@@ -200,7 +203,7 @@ export default {
         }
       } else {
         const card = await this.$axios
-          .$post('/api/cards', this.form)
+          .$post('/api/cards', queryData)
           .catch(this.showError)
         if (card) {
           this.$toast.success('Cartão cadastrado com sucesso!')

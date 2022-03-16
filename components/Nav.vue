@@ -18,6 +18,10 @@
         <b-icon-people />
         Chat (beta)
       </b-nav-item>
+      <b-nav-item to="/organizations">
+        <b-icon-people />
+        Organizações
+      </b-nav-item>
     </b-nav>
     <JitsiMeet />
   </b-container>
@@ -33,7 +37,7 @@ export default {
       return this.$store.state.projects
     },
     members() {
-      return this.$store.state.members
+      return this.$store.state.organization?.members || []
     },
   },
 }
