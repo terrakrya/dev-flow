@@ -3,24 +3,64 @@
     <b-row>
       <b-col md="8">
         <b-card v-if="note || editing">
-          <b-btn @click="toggleEdit">{{ editing ? 'salvar' : 'editar' }}</b-btn>
-          <b-btn v-if="note" @click="deleteNote">Apagar nota</b-btn>
           <div v-if="editing">
-            <b-input v-model="form.title" placeholder="Titulo" />
-            <quill-editor
-              ref="quillEdit"
-              v-model="form.content"
-              toolbar="minimal"
-            />
+            <b-row>
+              <b-col md="11">
+                <b-input v-model="form.title" placeholder="Titulo" />
+              </b-col>
+              <b-col md="1">
+                <b-btn pill variant="success" @click="toggleEdit">
+                  <b-icon-check
+                /></b-btn>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md="12">
+                <quill-editor
+                  ref="quillEdit"
+                  v-model="form.content"
+                  class="mt-4"
+                  toolbar="minimal"
+                />
+              </b-col>
+            </b-row>
           </div>
           <div v-else-if="note">
-            <h1>{{ note.title }}</h1>
-            <p v-html="note.content" />
+            <b-row>
+              <b-col md="10">
+                <h1>{{ note.title }}</h1>
+              </b-col>
+              <b-col md="2" class="d-flex justify-content-end">
+                <b-btn pill variant="success" @click="toggleEdit">
+                  <b-icon-pencil
+                /></b-btn>
+                <b-btn
+                  v-if="note"
+                  class="ml-2"
+                  pill
+                  variant="outline-danger"
+                  @click="deleteNote"
+                >
+                  <b-icon-trash
+                /></b-btn>
+              </b-col>
+            </b-row>
+            <b-row>
+              <b-col md="12">
+                <p v-html="note.content" />
+              </b-col>
+            </b-row>
           </div>
         </b-card>
       </b-col>
       <b-col md="4">
-        <b-btn v-if="!editing" @click="createNote">Nova nota</b-btn>
+        <b-btn
+          variant="outline-success"
+          class="my-2"
+          v-if="!editing"
+          @click="createNote"
+          ><b-icon-plus /> Nova nota</b-btn
+        >
 
         <b-list-group>
           <b-list-group-item

@@ -2,7 +2,7 @@
   <b-container fluid>
     <b-row>
       <b-col md="8">
-        <h1>Membros de {{ activeOrganization.name }}</h1>
+        <h1>Integrantes de {{ activeOrganization.name }}</h1>
 
         <!-- card components for each members of activeOrganization  -->
         <b-container class="d-flex justify-content-end">
@@ -12,19 +12,25 @@
             class="member-card m-2"
           >
             <b-card-body>
-              <b-row>
-                <b-col md="8">
-                  <b-avatar class="m-2" />
-                  <h5>{{ member.name }}</h5>
-                  <p>{{ member.email }}</p>
-                </b-col>
-                <b-col md="4">
-                  <b-btn variant="outline-primary" size="sm">
-                    <b-icon-user-edit />
-                    ver mais
-                  </b-btn>
-                </b-col>
-              </b-row>
+              <div
+                class="
+                  d-flex
+                  flex-column
+                  justify-content-center
+                  align-items-center
+                "
+              >
+                <Avatar
+                  class="mb-2"
+                  :src="member.avatarUrl"
+                  :name="member.name"
+                />
+                <h3>{{ member.name }}</h3>
+                <p>{{ member.email }}</p>
+                <b-btn variant="outline-primary" size="sm" block>
+                  ver mais
+                </b-btn>
+              </div>
             </b-card-body>
           </b-card>
         </b-container>

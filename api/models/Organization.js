@@ -5,6 +5,7 @@ const OrganizationSchema = mongoose.Schema(
   {
     githubId: String,
     matrixRooms: [String],
+    avatarUrl: String,
     mainRoom: String,
     creator: String,
     name: String,

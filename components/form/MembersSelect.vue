@@ -1,10 +1,11 @@
 <template>
   <div class="members-select">
-    <a v-for="member in members" :key="member.id" @click="select(member)">
-      <b-avatar
-        :src="member.avatar_url"
+    <a v-for="(member, key) in members" :key="key" @click="select(member)">
+      <Avatar
+        :src="member.avatarUrl"
+        :name="member.name"
         class="mr-1"
-        :class="{ inactive: !value.includes(member.id.toString()) }"
+        :class="{ inactive: !value.includes(getMemberId(member)) }"
       />
       {{ member.name || member.email }}
     </a>
@@ -25,8 +26,18 @@ export default {
     },
   },
   methods: {
+    getMemberId(member) {
+      // In case the members come as string instead the whole object (should not happen)
+      let id
+      if (typeof member === 'string') {
+        id = member
+      } else if (typeof member === 'object') {
+        id = member.id
+      }
+      return id
+    },
     select(member) {
-      const id = member.id.toString()
+      const id = this.getMemberId(member)
       if (this.value.includes(id)) {
         this.$emit(
           'input',

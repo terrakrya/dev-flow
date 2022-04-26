@@ -5,17 +5,34 @@
         <b-card class="d-flex align-items-center">
           <h1>Meu Perfil</h1>
           <div class="d-flex justify-content-center">
-            <b-avatar size="4rem" class="m-4" />
+            <Upload
+              v-if="isEditing"
+              v-model="uploadedImage"
+              avatar
+              type="images"
+              @input="handleAvatarUpload"
+            />
+            <Avatar
+              v-else
+              :src="user.avatarUrl"
+              :name="user.name"
+              size="8rem"
+            />
           </div>
           <div v-if="isEditing">
-            <b-input v-model="form.name" placeholder="Nome" />
-            <b-input v-model="form.email" placeholder="Email" />
+            <b-input class="mt-2" v-model="form.name" placeholder="Nome" />
+            <b-input
+              v-model="form.email"
+              class="mt-2"
+              placeholder="Email"
+              disabled
+            />
           </div>
-          <div v-else>
-            <p>Nome: {{ user.name }}</p>
-            <p>Email: {{ user.email }}</p>
+          <div class="mt-4" v-else>
+            <p class="m-2">Nome: {{ user.name }}</p>
+            <p class="m-2">Email: {{ user.email }}</p>
           </div>
-          <b-button @click="toggleEdit">{{
+          <b-button class="mt-4" block variant="success" @click="toggleEdit">{{
             isEditing ? 'Salvar' : 'Editar'
           }}</b-button>
         </b-card>
@@ -30,9 +47,11 @@
 export default {
   data() {
     return {
+      uploadedImage: null,
       form: {
         name: '',
         email: '',
+        avatarUrl: null,
       },
       isEditing: false,
     }
@@ -48,15 +67,22 @@ export default {
         this.updateUser(this.form)
         this.isEditing = false
       } else {
-        this.isEditing = true
         this.form.name = this.user.name
         this.form.email = this.user.email
+        this.form.avatarUrl = this.user.avatarUrl
+        this.uploadedImage = { thumb: this.user.avatarUrl }
+        this.isEditing = true
       }
     },
     async updateUser() {
-      await this.$axios.$put('/api/auth', this.form)
+      await this.$axios.$put('/api/auth/me', this.form)
       await this.$auth.fetchUser()
       this.isEditing = false
+    },
+    handleAvatarUpload(file) {
+      if (file?.url) {
+        this.form.avatarUrl = file.url
+      }
     },
   },
 }

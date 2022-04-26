@@ -9,8 +9,8 @@
       <b-col md="4">
         <OrganizationsList :organizations="organizations" />
 
-        <b-btn class="m-4" v-b-modal.modal-add
-          >Adicionar Organização (com ID)</b-btn
+        <b-btn variant="outline-success" class="m-4" v-b-modal.modal-add
+          >Adicionar Organização</b-btn
         >
         <b-modal
           @ok="joinOrganization"
@@ -22,7 +22,7 @@
             v-model="joinOrganizationLink"
           />
         </b-modal>
-        <b-btn class="m-4" v-b-modal.modal-create>Criar Organização</b-btn>
+        <b-btn class="ml-4 mt-2" variant="outline-success" v-b-modal.modal-create>Criar Organização</b-btn>
         <b-modal
           @ok="createOrganization"
           id="modal-create"
@@ -63,13 +63,12 @@ export default {
   },
   methods: {
     async leaveOrganization(organizationId) {
-      await this.$axios.$post(`/api/organizations/${organizationId}/leave`)
-      await this.$auth.fetchUser()
-      this.setOrganizationAsActive()
-
-      if (this.organizations.length > 0) {
-        this.setOrganizationAsActive(this.organizations[0])
+      if (this.organizations.length === 0) {
+        return
       }
+      await this.$axios.$post(`/api/organizations/${organizationId}/leave`)
+      this.setOrganizationAsActive(this.organizations[0])
+      await this.$auth.fetchUser()
     },
     async joinOrganization() {
       await this.$axios.$post(
@@ -87,7 +86,6 @@ export default {
           description: this.newOrganization.description,
         })
         .then((created) => {
-          console.log('created', created)
           this.$auth.fetchUser()
 
           this.setOrganizationAsActive(created)

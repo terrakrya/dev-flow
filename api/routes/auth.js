@@ -73,20 +73,18 @@ router.get('/me', authenticated, function (req, res) {
     })
 })
 
-
 router.put('/me', authenticated, function (req, res) {
-  Profile.findOne({ email: req.user.email })
+  Profile.findOneAndUpdate({ email: req.user.email }, req.body, { new: true })
     .populate({ path: 'organizations', populate: { path: 'members' } })
     .populate('network')
-    .exec(function (err, user) {
-      if (!err && user) {
-        res.send(user.toJSON())
+    .exec(function (err, updatedUser) {
+      if (!err && updatedUser) {
+        res.send(updatedUser.toJSON())
       } else {
-        res.status(422).send('Usuário não encontrado')
+        res.status(422).send('Erro ao atualizar usuário')
       }
     })
 })
-
 
 router.post('/login', function (req, res) {
   res.send(req.user)

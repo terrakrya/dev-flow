@@ -14,6 +14,7 @@ const ProfileSchema = mongoose.Schema(
       required: false,
     },
     name: String,
+    avatarUrl: String,
     matrixId: String,
     matrixAccessToken: String,
     username: {

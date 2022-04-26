@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="mt-4 mb-4">
+  <b-container fluid class="mb-2">
     <b-nav tabs>
       <b-nav-item to="/admin"> <b-icon-bar-chart /> Dashboard </b-nav-item>
       <b-nav-item v-if="projects" to="/projects" class="text-dark">

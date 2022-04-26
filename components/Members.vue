@@ -4,11 +4,13 @@
       <span class="title">Membros</span>
     </b-card-title>
     <div>
-      <b-avatar
+      <Avatar
         v-for="member in members"
         :key="member.id"
-        :src="member.avatar_url"
+        :src="member.avatarUrl"
+        :name="member.name"
         class="mr-1"
+        size="3rem"
       />
     </div>
   </b-card>

@@ -26,6 +26,7 @@ if (isProduction) {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
+      useFindAndModify: true,
     }
   )
   mongoose.set('debug', true)

@@ -17,8 +17,8 @@
                     class="text-decoration-none text-white"
                   >
                     <b-img
-                      v-if="item.thumb"
-                      :src="item.thumb"
+                      v-if="item.thumb || url"
+                      :src="item.thumb || url"
                       fluid
                       thumbnail
                       width="100"

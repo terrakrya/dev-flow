@@ -20,7 +20,29 @@ const Project = mongoose.model('Project')
 //   })
 // })
 
-router.put('/:id', authenticated, (req, res) => {})
+router.put('/:id', authenticated, (req, res) => {
+  const params = req.body
+  const query = { _id: req.params.id }
+
+  Organization.findOneAndUpdate(
+    query,
+    {
+      $set: params,
+    },
+    {
+      upsert: true,
+      new: true,
+    }
+  )
+    .populate('members')
+    .exec((err, updatedOrganization) => {
+      if (err) {
+        res.status(422).send(err.message)
+      } else {
+        res.send(updatedOrganization)
+      }
+    })
+})
 
 router.post('/:id/leave', authenticated, (req, res) => {
   const orgId = req.params.id
@@ -56,7 +78,6 @@ router.post('/:id/leave', authenticated, (req, res) => {
 
 router.post('/:id/join', authenticated, (req, res) => {
   const orgId = req.params.id
-  console.log('reqjooin', orgId)
   const userId = req.user._id
 
   try {
@@ -146,27 +167,6 @@ router.get('/:id/projects', authenticated, (req, res) => {
 //       res.send(comment)
 //     }
 //   })
-// })
-
-// router.put('/:id', authenticated, (req, res) => {
-//   const params = req.body
-//   const query = { _id: req.params.id, member: req.user.id }
-//   Comment.findOneAndUpdate(
-//     query,
-//     {
-//       $set: params,
-//     },
-//     {
-//       upsert: true,
-//     },
-//     (err, comment) => {
-//       if (err) {
-//         res.status(422).send(err.message)
-//       } else {
-//         res.send(comment)
-//       }
-//     }
-//   )
 // })
 
 // router.delete('/:id', authenticated, (req, res) => {

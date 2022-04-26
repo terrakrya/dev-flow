@@ -3,34 +3,44 @@
     <div class="organizations-list">
       <b-row>
         <b-col md="12">
-          <h3>Outras Organizações</h3>
+          <h3>Suas Organizações</h3>
         </b-col>
       </b-row>
       <b-row>
         <b-col md="12">
           <b-col>
-            <b-card
-              v-for="organization in otherOrganizations"
-              :key="organization.id"
-            >
-              <b-card-body>
+            <b-list-group>
+              <b-list-group-item
+                v-for="organization in organizations"
+                :key="organization.id"
+                button
+                :active="organization.id === activeOrganization.id"
+                :disabled="organization.id === activeOrganization.id"
+                @click="setOrganizationAsActive(organization)"
+              >
                 <b-row>
-                  <b-col md="8">
-                    <h5>{{ organization.name }}</h5>
-                    <p>{{ organization.description }}</p>
+                  <b-col md="2">
+                    <Avatar
+                      :name="organization.name"
+                      :src="organization.avatarUrl"
+                      size="3rem"
+                    />
                   </b-col>
-                  <b-col md="4">
-                    <b-btn
-                      @click="setOrganizationAsActive(organization)"
-                      size="sm"
-                      variant="outline-primary"
-                    >
-                      Selecionar
-                    </b-btn>
+                  <b-col
+                    md="10"
+                    class="d-flex align-items-center justify-content-between"
+                  >
+                    <h5>{{ organization.name }}</h5>
+                    <div class="d-flex align-items-center">
+                      <b-icon-person-fill />
+                      <b-badge variant="primary" pill
+                        >{{ organization.members.length }}
+                      </b-badge>
+                    </div>
                   </b-col>
                 </b-row>
-              </b-card-body>
-            </b-card>
+              </b-list-group-item>
+            </b-list-group>
           </b-col>
         </b-col>
       </b-row>

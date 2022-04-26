@@ -9,21 +9,16 @@
         <b-collapse id="header-menu" is-nav>
           <b-navbar-nav />
           <b-navbar-nav class="ml-auto">
+            <!--
             <b-nav-item>
-              <p>{{ organization.name }}</p>
+              {{ organization.name }}
             </b-nav-item>
+            -->
             <b-nav-item-dropdown right>
               <!-- Using 'button-content' slot -->
 
               <template #button-content>
-                <b-img
-                  rounded="circle"
-                  fluid
-                  :src="user.avatar_url"
-                  :alt="user.name"
-                  class="thumb-sm mr-1"
-                />
-                {{ user.name }}
+                <Avatar :name="user.name" :src="user.avatarUrl" size="3rem" />
               </template>
               <b-dropdown-item to="/profile">Perfil</b-dropdown-item>
               <b-dropdown-item @click="$auth.logout()">Sair</b-dropdown-item>

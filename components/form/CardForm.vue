@@ -36,8 +36,8 @@
             :keys="['@']"
             :items="
               members.map((member) => ({
-                value: member.login,
-                avatar_url: member.avatar_url,
+                value: member.name,
+                avatar_url: member.avatarUrl,
               }))
             "
             offset="6"
@@ -167,7 +167,7 @@ export default {
   },
   computed: {
     members() {
-      return this.$store.state.members
+      return this.$store.state.organization?.members
     },
     projects() {
       return this.$store.state.projects
