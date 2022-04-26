@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const router = express.Router()
 const { authenticated } = require('../config/auth')
-const Card = mongoose.model('Card')
+const Note = mongoose.model('Note')
 
 router.get('/', authenticated, (req, res) => {
   const query = { archived: false }
@@ -13,8 +13,9 @@ router.get('/', authenticated, (req, res) => {
     query.organization = req.query.organization
   }
 
-  Card.find(query)
-    .populate('project')
+  // folder
+
+  Note.find(query)
     .sort('order')
     .exec((err, cards) => {
       if (err) {
@@ -24,31 +25,9 @@ router.get('/', authenticated, (req, res) => {
       }
     })
 })
-
-router.get('/my', authenticated, (req, res) => {
-  const query = {
-    archived: false,
-    members: [req.user._id],
-    $and: [{ status: { $ne: 'backlog' } }, { status: { $ne: 'published' } }],
-  }
-  if (req.query.organization) {
-    query.organization = req.query.organization
-  }
-
-  Card.find(query)
-    .populate('project')
-    .exec((err, cards) => {
-      if (err) {
-        res.status(422).send(err.message)
-      } else {
-        res.json(cards)
-      }
-    })
-})
-
 router.get('/:id', authenticated, (req, res) => {
   const query = { _id: req.params.id }
-  Card.findOne(query).exec((err, card) => {
+  Note.findOne(query).exec((err, card) => {
     if (err) {
       res.status(422).send(err.message)
     } else {
@@ -58,8 +37,8 @@ router.get('/:id', authenticated, (req, res) => {
 })
 
 router.post('/', authenticated, (req, res) => {
-  const newCard = new Card(req.body)
-  newCard.save((err, card) => {
+  const newNote = new Note(req.body)
+  newNote.save((err, card) => {
     if (err) {
       res.status(422).send(err.message)
     } else {
@@ -68,29 +47,10 @@ router.post('/', authenticated, (req, res) => {
   })
 })
 
-router.put('/reorder', authenticated, async (req, res) => {
-  if (req.body.cards) {
-    for (const item of req.body.cards) {
-      await Card.findOneAndUpdate(
-        {
-          _id: item.id,
-        },
-        {
-          $set: { order: item.order },
-        },
-        {
-          upsert: true,
-        }
-      )
-    }
-  }
-  res.json('ok')
-})
-
 router.put('/:id', authenticated, (req, res) => {
   const params = req.body
   const query = { _id: req.params.id }
-  Card.findOneAndUpdate(
+  Note.findOneAndUpdate(
     query,
     {
       $set: params,
@@ -112,7 +72,7 @@ router.put('/:id', authenticated, (req, res) => {
 router.delete('/:id', authenticated, (req, res) => {
   const query = { _id: req.params.id }
 
-  Card.findOne(query).exec(async (err, card) => {
+  Note.findOne(query).exec(async (err, card) => {
     if (err) {
       res.status(422).send(err.message)
     } else {

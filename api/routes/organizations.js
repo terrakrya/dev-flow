@@ -90,6 +90,7 @@ router.post('/new', authenticated, async (req, res) => {
   try {
     let newOrganization = new Organization({
       name: req.body.name,
+      description: req.body.description,
       members: [req.user._id],
       creator: req.user.email,
     })

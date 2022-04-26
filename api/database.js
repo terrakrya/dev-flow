@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 
+import './models/Note'
 import './models/Project'
 import './models/Card'
 import './models/Comment'

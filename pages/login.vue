@@ -6,9 +6,13 @@
       <div class="mt-4">
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
-          <b-input v-model="username" />
-          <b-input v-model="password" />
+          <h2>Entrar</h2>
+          <b-input class="m-4" placeholder="Email" v-model="username" />
+          <b-input class="m-4" placeholder="Senha" v-model="password" />
           <b-btn class="btn btn-primary" @click="localLogin"> Entre </b-btn>
+          <b-btn to="/register" class="btn btn-primary" @click="localLogin">
+            Registrar
+          </b-btn>
         </div>
       </div>
     </div>

@@ -2,38 +2,44 @@
   <b-container fluid>
     <b-row>
       <b-col md="8">
-        <h1>Organizações</h1>
-        <ul>
-          <li v-for="organization in organizations" :key="organization.id">
-            {{ organization.name }}
-            {{ organization.id }}
-
-            <b-btn
-              v-if="organization.id !== activeOrganization.id"
-              @click="setOrganizationAsActive(organization)"
-              >Ativar</b-btn
-            >
-            <b-btn v-else disabled>Ativa</b-btn>
-
-            <b-btn @click="leaveOrganization(organization.id)"
-              >Sair da Organização</b-btn
-            >
-          </li>
-        </ul>
-        <b-input v-model="newOrganization.name" placeholder="Nome" />
-        <b-input
-          v-model="newOrganization.description"
-          placeholder="Descrição"
-        />
-
-        <b-btn @click="createOrganization">Criar Organização</b-btn></b-col
-      >
-
+        <div>
+          <OrganizationInfo :organization="activeOrganization" />
+        </div>
+      </b-col>
       <b-col md="4">
-        <b-input v-model="joinOrganizationLink" />
-        <b-btn placeholder="Identifica" @click="joinOrganization"
-          >Entrar em Organização por link</b-btn
+        <OrganizationsList :organizations="organizations" />
+
+        <b-btn class="m-4" v-b-modal.modal-add
+          >Adicionar Organização (com ID)</b-btn
         >
+        <b-modal
+          @ok="joinOrganization"
+          id="modal-add"
+          title="Adicionar Organização"
+        >
+          <b-input
+            placeholder="ID da organização. Ex: 623219de495b346fae1d45ff"
+            v-model="joinOrganizationLink"
+          />
+        </b-modal>
+        <b-btn class="m-4" v-b-modal.modal-create>Criar Organização</b-btn>
+        <b-modal
+          @ok="createOrganization"
+          id="modal-create"
+          title="Criar Organização"
+        >
+          <b-input
+            class="m-2"
+            placeholder="Nome da Organização"
+            v-model="newOrganization.name"
+          />
+          <b-input
+            required
+            class="m-2"
+            placeholder="Descrição"
+            v-model="newOrganization.description"
+          />
+        </b-modal>
       </b-col>
     </b-row>
   </b-container>
@@ -44,7 +50,7 @@ export default {
   data() {
     return {
       joinOrganizationLink: '',
-      newOrganization: { name: '' },
+      newOrganization: { name: '', description: '' },
     }
   },
   computed: {
@@ -56,15 +62,14 @@ export default {
     },
   },
   methods: {
-    async createOrganization() {
-      await this.$axios.$post('/api/organizations/new', {
-        name: this.newOrganization.name,
-      })
-      await this.$auth.fetchUser()
-    },
     async leaveOrganization(organizationId) {
       await this.$axios.$post(`/api/organizations/${organizationId}/leave`)
       await this.$auth.fetchUser()
+      this.setOrganizationAsActive()
+
+      if (this.organizations.length > 0) {
+        this.setOrganizationAsActive(this.organizations[0])
+      }
     },
     async joinOrganization() {
       await this.$axios.$post(
@@ -74,6 +79,24 @@ export default {
     },
     setOrganizationAsActive(organization) {
       this.$store.dispatch('setActiveOrganization', organization)
+    },
+    createOrganization() {
+      this.$axios
+        .$post('/api/organizations/new', {
+          name: this.newOrganization.name,
+          description: this.newOrganization.description,
+        })
+        .then((created) => {
+          console.log('created', created)
+          this.$auth.fetchUser()
+
+          this.setOrganizationAsActive(created)
+          this.newOrganization.name = ''
+          this.newOrganization.description = ''
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
   },
 }

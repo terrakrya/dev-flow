@@ -6,6 +6,7 @@
         class="mr-1"
         :class="{ inactive: !value.includes(member.id.toString()) }"
       />
+      {{ member.name || member.email }}
     </a>
   </div>
 </template>

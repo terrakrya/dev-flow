@@ -6,10 +6,18 @@
       <div class="mt-4">
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
-          <b-input v-model="email" />
-          <b-input v-model="password" />
+          <h2>Registrar</h2>
+          <b-input required class="m-2" v-model="name" placeholder="Nome" />
+          <b-input required class="m-2" v-model="email" placeholder="Email" />
+          <b-input
+            required
+            class="m-2"
+            v-model="password"
+            placeholder="Senha"
+            type="password"
+          />
           <b-btn class="btn btn-primary" @click="localRegister">
-            Registrar
+            Confirmar
           </b-btn>
         </div>
       </div>
@@ -25,6 +33,7 @@ export default {
       authenticating: false,
       email: '',
       password: '',
+      name: '',
     }
   },
   methods: {
@@ -33,6 +42,7 @@ export default {
         await this.$axios.$post('api/auth/register', {
           email: this.email,
           password: this.password,
+          name: this.name,
         })
         await this.$auth.loginWith('local', {
           data: {

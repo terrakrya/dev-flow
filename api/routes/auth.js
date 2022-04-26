@@ -11,11 +11,10 @@ router.get('/github', passport.authenticate('github'))
 
 router.post('/register', async (req, res) => {
   // console.log('req', req)
-  const user = new Profile({ email: req.body.email })
+  const user = new Profile({ email: req.body.email, name: req.body.name })
   user.setPassword(req.body.password)
   try {
     await user.save()
-    console.log('user', user)
     res.status(200).send(user.toJSON())
   } catch (error) {
     console.log('usererr', error)
@@ -73,6 +72,21 @@ router.get('/me', authenticated, function (req, res) {
       }
     })
 })
+
+
+router.put('/me', authenticated, function (req, res) {
+  Profile.findOne({ email: req.user.email })
+    .populate({ path: 'organizations', populate: { path: 'members' } })
+    .populate('network')
+    .exec(function (err, user) {
+      if (!err && user) {
+        res.send(user.toJSON())
+      } else {
+        res.status(422).send('Usuário não encontrado')
+      }
+    })
+})
+
 
 router.post('/login', function (req, res) {
   res.send(req.user)

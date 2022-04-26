@@ -14,6 +14,7 @@ const OrganizationSchema = mongoose.Schema(
         ref: 'Profile',
       },
     ],
+    description: String,
   },
   {
     timestamps: true,

@@ -69,4 +69,10 @@ export const actions = {
     commit('setOrganization', organization)
     dispatch('loadProjects')
   },
+  activateDefaultOrganization({ commit, rootState }) {
+    if (rootState.auth.user.organizations.length > 0) {
+      const defaultOrganization = rootState.auth.user.organizations[0] // procurar
+      commit('setOrganization', defaultOrganization)
+    }
+  },
 }
