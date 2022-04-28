@@ -9,35 +9,40 @@
       <b-col md="4">
         <OrganizationsList :organizations="organizations" />
 
-        <b-btn variant="outline-success" class="m-4" v-b-modal.modal-add
+        <b-btn v-b-modal.modal-add variant="outline-success" class="m-4"
           >Adicionar Organização</b-btn
         >
         <b-modal
-          @ok="joinOrganization"
           id="modal-add"
           title="Adicionar Organização"
+          @ok="joinOrganization"
         >
           <b-input
-            placeholder="ID da organização. Ex: 623219de495b346fae1d45ff"
             v-model="joinOrganizationLink"
+            placeholder="ID da organização. Ex: 623219de495b346fae1d45ff"
           />
         </b-modal>
-        <b-btn class="ml-4 mt-2" variant="outline-success" v-b-modal.modal-create>Criar Organização</b-btn>
+        <b-btn
+          v-b-modal.modal-create
+          class="ml-4 mt-2"
+          variant="outline-success"
+          >Criar Organização</b-btn
+        >
         <b-modal
-          @ok="createOrganization"
           id="modal-create"
           title="Criar Organização"
+          @ok="createOrganization"
         >
           <b-input
+            v-model="newOrganization.name"
             class="m-2"
             placeholder="Nome da Organização"
-            v-model="newOrganization.name"
           />
           <b-input
+            v-model="newOrganization.description"
             required
             class="m-2"
             placeholder="Descrição"
-            v-model="newOrganization.description"
           />
         </b-modal>
       </b-col>

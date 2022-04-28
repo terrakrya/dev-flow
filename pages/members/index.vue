@@ -13,12 +13,7 @@
           >
             <b-card-body>
               <div
-                class="
-                  d-flex
-                  flex-column
-                  justify-content-center
-                  align-items-center
-                "
+                class="d-flex flex-column justify-content-center align-items-center"
               >
                 <Avatar
                   class="mb-2"
