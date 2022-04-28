@@ -3,15 +3,18 @@ const express = require('express')
 const router = express.Router()
 const multer = require('multer')
 const sharp = require('sharp')
-const { PDFImage } = require('pdf-image')
 const axios = require('axios')
+// const { PDFImage } = require('pdf-image')
+
 const auth = require('../config/auth')
+const uploadFileToS3 = require('../uploadService').uploadFileToS3
 
 const createPath = (path) => {
   !fs.existsSync(path) && fs.mkdirSync(path)
 }
-
+const fullBucketProjectPath = process.env.DEFAULT_STORAGE_BUCKET_FULL_URL
 const UPLOAD_PATH = 'api/uploads/'
+
 createPath(UPLOAD_PATH)
 
 const imagesPath = () => {
@@ -60,42 +63,50 @@ const imageUploader = multer({
 router.post(
   '/images',
   [auth.authenticated, imageUploader.single('file')],
-  (req, res) => {
+  async (req, res) => {
     const filename = req.file.filename
     const original = imagesPath() + filename
     const thumb = thumbsPath() + filename
-    const average = averagesPath() + filename
-    sharp(original, { failOnError: false })
+
+    await uploadFileToS3({
+      filename,
+      originalFilePath: original,
+      targetFolder: imagesPath(),
+    })
+
+    const thumbData = await sharp(original, { failOnError: false })
       .resize({
         width: 400,
         height: 400,
         withoutEnlargement: true,
         fit: sharp.fit.inside,
       })
-      .toFile(thumb, function (err) {
-        if (!err) {
-          sharp(original, { failOnError: false })
-            .resize({
-              width: 1600,
-              withoutEnlargement: true,
-            })
-            .toFile(average, function (err) {
-              if (!err) {
-                res.status(201).send({
-                  title: '',
-                  url: '/' + original,
-                  thumb: '/' + thumb,
-                  average: '/' + average,
-                })
-              }
-            })
-        } else {
-          res.status(201).send({
-            title: '',
-            url: '/' + original,
-          })
-        }
+      .toBuffer()
+
+    await uploadFileToS3({
+      filename,
+      fileBuffer: thumbData,
+      targetFolder: thumbsPath(),
+    })
+
+    res.status(201).send({
+      title: '',
+      url: fullBucketProjectPath + original,
+      thumb: fullBucketProjectPath + thumb,
+    })
+
+    const averageData = await sharp(original, { failOnError: false })
+      .resize({
+        width: 1600,
+        withoutEnlargement: true,
       })
+      .toBuffer()
+
+    await uploadFileToS3({
+      filename,
+      fileBuffer: averageData,
+      targetFolder: averagesPath(),
+    })
   }
 )
 
@@ -121,6 +132,7 @@ const documentStorage = multer.diskStorage({
     cb(null, filename)
   },
 })
+
 const documentUploader = multer({
   storage: documentStorage,
   limits: {
@@ -130,49 +142,70 @@ const documentUploader = multer({
 router.post(
   '/documents',
   [auth.authenticated, documentUploader.single('file')],
-  (req, res) => {
+  async (req, res) => {
     const filename = req.file.filename
     const path = documentsPath()
 
-    if (filename.endsWith('.pdf')) {
-      const thumb = thumbsPath() + filename.replace('.pdf', '.png')
-      const average = averagesPath() + filename.replace('.pdf', '.png')
+    await uploadFileToS3({
+      filename,
+      originalFilePath: path + filename,
+      targetFolder: path,
+    }).catch((error) => {
+      res.status(500).send(error)
+    })
 
-      const pdfImage = new PDFImage(req.file.path)
+    res
+      .status(201)
+      .send({ title: filename, url: fullBucketProjectPath + path + filename })
 
-      pdfImage
-        .convertPage(0)
-        .then(function (original) {
-          sharp(original, { failOnError: false })
-            .resize({
-              width: 400,
-              height: 400,
-              withoutEnlargement: true,
-              fit: sharp.fit.cover,
-            })
-            .toFile(thumb, function (err) {
-              if (!err) {
-                sharp(original, { failOnError: false })
-                  .resize(1600)
-                  .toFile(average, function (err) {
-                    if (!err) {
-                      res.status(201).send({
-                        title: filename,
-                        url: '/' + req.file.path,
-                        average: '/' + average,
-                        thumb: '/' + thumb,
-                      })
-                    }
-                  })
-              }
-            })
-        })
-        .catch(() => {
-          res.status(201).send({ title: filename, url: path + filename })
-        })
-    } else {
-      res.status(201).send({ title: filename, url: path + filename })
-    }
+    // PDFImage not working
+    // if (filename.endsWith('.pdf')) {
+    //   const filenameAsPng = filename.replace('.pdf', '.png')
+    //   const thumb = thumbsPath() + filenameAsPng
+    //   const average = averagesPath() + filenameAsPng
+    //   try {
+    //     console.log('thumb', thumb)
+    //     const pdfImage = new PDFImage(req.file.path)
+    //     const pdfCoverImage = await pdfImage.convertPage(0)
+    //     console.log('after', thumb)
+    //     const thumbData = await sharp(pdfCoverImage, { failOnError: false })
+    //       .resize({
+    //         width: 400,
+    //         height: 400,
+    //         withoutEnlargement: true,
+    //         fit: sharp.fit.cover,
+    //       })
+    //       .toBuffer()
+
+    //     await uploadFileToS3({
+    //       filenameAsPng,
+    //       fileBuffer: thumbData,
+    //       targetFolder: thumbsPath(),
+    //     })
+
+    //     const averageData = await sharp(pdfCoverImage, { failOnError: false })
+    //       .resize(1600)
+    //       .toBuffer()
+
+    //     await uploadFileToS3({
+    //       filenameAsPng,
+    //       fileBuffer: averageData,
+    //       targetFolder: averagesPath(),
+    //     })
+
+    //     res.status(201).send({
+    //       title: filename,
+    //       url: fullBucketProjectPath + path + filename,
+    //       average: fullBucketProjectPath + average,
+    //       thumb: fullBucketProjectPath + thumb,
+    //     })
+    //   } catch (error) {
+    //     console.log(error)
+    //     res.status(201).send({ title: filename, url: path + filename })
+    //   }
+    // } else {
+    // res.status(201).send({ title: filename, url: path + filename })
+    // }
   }
 )
 
