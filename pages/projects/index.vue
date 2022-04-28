@@ -49,13 +49,18 @@ export default {
     projects() {
       return this.$store.state.projects
     },
+    activeOrganizationId() {
+      return this.$store.state.organization.id
+    },
   },
   created() {
     this.loadCards()
   },
   methods: {
     async loadCards() {
-      this.cards = await this.$axios.$get('/api/cards')
+      this.cards = await this.$axios.$get(
+        `/api/cards?organization=${this.activeOrganizationId}`
+      )
     },
     projectSaved() {
       this.show_project_form = false

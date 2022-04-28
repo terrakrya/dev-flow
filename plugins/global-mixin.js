@@ -9,9 +9,9 @@ if (!Vue.__my_mixin__) {
           auth: this.$auth.strategy.token.get(),
         })
       },
-      org() {
-        return 'terrakrya'
-      },
+      // org() {
+      //   return this.$store.state.organization.id
+      // },
     },
     methods: {
       showError(error) {

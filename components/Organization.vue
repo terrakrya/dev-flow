@@ -1,11 +1,10 @@
 <template>
   <b-container v-if="organization" fluid>
-    <div class="mt-4">
-      <b-img
-        left
-        :src="organization.avatar_url"
+    <div class="mt-4 ml-4 d-flex justify-content-start">
+      <Avatar
+        :src="organization.avatarUrl"
+        :name="organization.name"
         class="logo mr-3"
-        :alt="organization.name"
       />
       <div>
         <h3>{{ organization.name }}</h3>

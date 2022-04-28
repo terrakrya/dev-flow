@@ -6,16 +6,18 @@
       <div class="mt-4">
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
-          <b-input v-model="username" class="m-4" placeholder="Email" />
+          <h2>Registrar</h2>
+          <b-input required class="m-2" v-model="name" placeholder="Nome" />
+          <b-input required class="m-2" v-model="email" placeholder="Email" />
           <b-input
+            required
+            class="m-2"
             v-model="password"
-            class="m-4"
             placeholder="Senha"
             type="password"
           />
-          <b-btn class="btn btn-primary" @click="localLogin">Entrar</b-btn>
-          <b-btn to="/register" class="btn btn-primary" @click="localLogin">
-            Registrar
+          <b-btn class="btn btn-primary" @click="localRegister">
+            Confirmar
           </b-btn>
         </div>
       </div>
@@ -29,21 +31,25 @@ export default {
   data() {
     return {
       authenticating: false,
-      username: '',
+      email: '',
       password: '',
+      name: '',
     }
   },
   methods: {
-    async localLogin() {
+    async localRegister() {
       try {
-        const response = await this.$auth.loginWith('local', {
+        await this.$axios.$post('api/auth/register', {
+          email: this.email,
+          password: this.password,
+          name: this.name,
+        })
+        await this.$auth.loginWith('local', {
           data: {
-            email: this.username,
+            email: this.email,
             password: this.password,
           },
         })
-        console.log('response', response)
-        this.$router.push('/admin')
       } catch (error) {
         this.showError(error)
       }

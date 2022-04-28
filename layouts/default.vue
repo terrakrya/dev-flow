@@ -15,30 +15,32 @@ export default {
   middleware: 'auth',
   created() {
     if (this.$auth.loggedIn) {
-      this.octokit.repos
-        .listForOrg({
-          org: this.org,
-        })
-        .then((resp) => {
-          this.$store.commit('setRepositories', resp.data.reverse())
-        })
+      this.$store.dispatch('activateDefaultOrganization')
+      // if no organization, show
+      // this.octokit.repos
+      //   .listForOrg({
+      //     org: this.org,
+      //   })
+      //   .then((resp) => {
+      //     this.$store.commit('setRepositories', resp.data.reverse())
+      //   })
 
-      this.octokit.orgs
-        .get({
-          org: this.org,
-        })
-        .then((res) => {
-          this.$store.commit('setOrganization', res.data)
-        })
+      // this.octokit.orgs
+      //   .get({
+      //     org: this.org,
+      //   })
+      //   .then((res) => {
+      //     this.$store.commit('setOrganization', res.data)
+      //   })
 
-      this.octokit.orgs
-        .listMembers({
-          org: this.org,
-        })
-        .then((resp) => {
-          this.$store.commit('setMembers', resp.data)
-        })
-      this.$store.dispatch('loadProjects')
+      // this.octokit.orgs
+      //   .listMembers({
+      //     org: this.org,
+      //   })
+      //   .then((resp) => {
+      //     this.$store.commit('setMembers', resp.data)
+      //   })
+      // this.$store.dispatch('loadProjects')
     }
   },
   methods: {

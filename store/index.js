@@ -11,6 +11,12 @@ export const state = () => ({
   showVideoCall: false,
 })
 
+export const getters = {
+  members(state) {
+    return state.organization?.members
+  },
+}
+
 export const mutations = {
   setOrganization(state, organization) {
     state.organization = organization
@@ -46,12 +52,27 @@ export const mutations = {
 }
 
 export const actions = {
-  async loadProjects({ commit, auth }) {
-    const projects = await this.$axios.$get('/api/projects')
-    commit('setProjects', projects)
+  async loadProjects({ commit, state, auth }) {
+    const organizationId = state.organization.id
+    if (organizationId) {
+      const projects = await this.$axios.$get(
+        `/api/organizations/${organizationId}/projects`
+      )
+      commit('setProjects', projects)
+    }
   },
   async loadOrganization({ commit, auth }) {
     const organization = await this.$axios.$get('/api/organizations/')
     commit('setOrganization', organization)
+  },
+  setActiveOrganization({ commit, dispatch, auth }, organization) {
+    commit('setOrganization', organization)
+    dispatch('loadProjects')
+  },
+  activateDefaultOrganization({ commit, rootState }) {
+    if (rootState.auth.user.organizations.length > 0) {
+      const defaultOrganization = rootState.auth.user.organizations[0] // procurar
+      commit('setOrganization', defaultOrganization)
+    }
   },
 }

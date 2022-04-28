@@ -32,12 +32,17 @@ export default {
   data() {
     return {
       form: {
-        organization: 'terrakrya',
+        organization: this.organization,
         comment: this.comment,
         target: this.target,
         message: null,
       },
     }
+  },
+  computed: {
+    activeOrganization() {
+      return this.$store.state.organization?.id
+    },
   },
   methods: {
     async save() {

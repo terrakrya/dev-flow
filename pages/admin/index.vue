@@ -39,7 +39,10 @@ export default {
   },
   methods: {
     async loadCards() {
-      this.cards = await this.$axios.$get('/api/cards/my')
+      const activeOrganizationId = this.$store.state.organization?.id
+      this.cards = await this.$axios.$get(
+        `/api/cards/my?organization=${activeOrganizationId}`
+      )
     },
   },
 }

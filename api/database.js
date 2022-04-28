@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 
+import './models/Note'
 import './models/Project'
 import './models/Card'
 import './models/Comment'
@@ -25,6 +26,7 @@ if (isProduction) {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
+      useFindAndModify: true,
     }
   )
   mongoose.set('debug', true)
