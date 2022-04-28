@@ -161,6 +161,7 @@ export default {
       return null
     },
     preview() {
+      console.log('preview', this.value)
       if (Array.isArray(this.value)) {
         return this.value
       } else if (this.value) {

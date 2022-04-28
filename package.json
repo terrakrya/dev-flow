@@ -13,6 +13,7 @@
     "lint": "yarn lint:style --fix && yarn lint:js --fix"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.58.0",
     "@mycure/vue-jitsi-meet": "^0.0.7",
     "@nuxt/content": "^1.9.0",
     "@nuxtjs/auth-next": "5.0.0-1611071776.3646657",
@@ -42,7 +43,6 @@
     "passport": "^0.4.1",
     "passport-github": "^1.1.0",
     "passport-local": "^1.0.0",
-    "pdf-image": "^2.0.0",
     "quill-markdown-shortcuts": "^0.0.10",
     "quilljs-markdown": "^1.1.10",
     "sharp": "^0.28.1",
