@@ -115,7 +115,6 @@ router.post('/new', authenticated, async (req, res) => {
       members: [req.user._id],
       creator: req.user.email,
     })
-    // newOrganization.addMember(req.user.email)
 
     newOrganization = await newOrganization.save()
 
@@ -126,6 +125,7 @@ router.post('/new', authenticated, async (req, res) => {
         if (err) {
           res.status(422).send(err)
         }
+        newOrganization.members = [profile] // add populated member to response
         res.send(newOrganization)
       }
     )
