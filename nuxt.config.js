@@ -22,6 +22,7 @@ export default {
     '~/plugins/global-mixin.js',
     '~/plugins/v-tooltip.js',
     '~/plugins/linkify.js',
+    { src: '~/plugins/observable.client.js', ssr: false },
     { src: '~plugins/quill.js', ssr: false },
   ],
 
