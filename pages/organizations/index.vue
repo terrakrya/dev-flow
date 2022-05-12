@@ -3,7 +3,7 @@
     <b-row>
       <b-col md="8">
         <div>
-          <OrganizationInfo :organization="activeOrganization" />
+          <OrganizationsOrganizationInfo :organization="activeOrganization" />
         </div>
       </b-col>
       <b-col md="4">

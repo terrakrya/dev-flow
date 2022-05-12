@@ -25,12 +25,12 @@
         Membros <b-badge> {{ members.length }} </b-badge>
       </b-nav-item>
 
-      <b-nav-item to="/chat/!wgWHBtEuZsOYCjtfaz:terrakrya.com">
+      <b-nav-item to="/chat/index">
         <b-icon-people />
         Chat (beta)
       </b-nav-item>
     </b-nav>
-    <JitsiMeet />
+    <ChatJitsiMeet />
   </b-container>
 </template>
 

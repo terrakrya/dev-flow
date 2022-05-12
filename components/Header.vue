@@ -3,17 +3,14 @@
     <b-navbar toggleable="md" variant="dark" type="dark">
       <b-container fluid>
         <b-navbar-brand to="/">
-          <Logo />
+          <div class="d-flex justify-content-center">
+            <Organization />
+          </div>
         </b-navbar-brand>
         <b-navbar-toggle target="header-menu" />
         <b-collapse id="header-menu" is-nav>
           <b-navbar-nav />
           <b-navbar-nav class="ml-auto">
-            <!--
-            <b-nav-item>
-              {{ organization.name }}
-            </b-nav-item>
-            -->
             <b-nav-item-dropdown right>
               <!-- Using 'button-content' slot -->
 

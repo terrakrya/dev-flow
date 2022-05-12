@@ -55,9 +55,9 @@
       </b-col>
       <b-col md="4">
         <b-btn
+          v-if="!editing"
           variant="outline-success"
           class="my-2"
-          v-if="!editing"
           @click="createNote"
           ><b-icon-plus /> Nova nota</b-btn
         >

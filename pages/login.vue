@@ -36,13 +36,12 @@ export default {
   methods: {
     async localLogin() {
       try {
-        const response = await this.$auth.loginWith('local', {
+        await this.$auth.loginWith('local', {
           data: {
             email: this.username,
             password: this.password,
           },
         })
-        console.log('response', response)
         this.$router.push('/admin')
       } catch (error) {
         this.showError(error)

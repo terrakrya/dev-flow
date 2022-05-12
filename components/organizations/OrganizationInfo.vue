@@ -25,6 +25,8 @@
           <div v-if="isEditing" class="mt-4">
             <b-input v-model="form.name" class="m-2" />
             <b-input v-model="form.description" class="m-2" />
+            <b-input v-model="form.mainRoom" label="Matrix Space" class="m-2" />
+
             <b-button class="m-2" variant="info" block @click="toggleEdit">
               <div v-if="!isSaving">
                 <b-icon-pencil />
@@ -36,6 +38,9 @@
           <div v-else md="8">
             <h2>{{ organization.name }}</h2>
             <p>{{ organization.description }}</p>
+            <p v-if="organization.mainRoom">
+              Espaço Matrix: {{ organization.mainRoom }}
+            </p>
           </div>
 
           <div v-if="!isEditing">
@@ -75,6 +80,7 @@ export default {
         name: '',
         description: '',
         avatarUrl: '',
+        mainRoom: '',
       },
       isEditing: false,
       isSaving: false,
@@ -94,6 +100,7 @@ export default {
         this.form = {
           name: this.organization.name,
           description: this.organization.description,
+          mainRoom: this.organization.mainRoom,
         }
         this.uploadedImage = { thumb: this.organization.avatarUrl }
         this.isEditing = true
