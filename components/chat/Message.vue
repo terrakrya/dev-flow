@@ -1,12 +1,16 @@
 <template>
   <ChatMessageBubble
-    v-if="['m.text', 'm.image'].includes(message.type)"
+    v-if="allowedTypes.includes(message.type)"
     :message="message"
     :is-first-from-sender="isFirstFromSender"
   >
     <ChatTextMessage v-if="message.type === 'm.text'" :message="message" />
     <ChatImageMessage
       v-else-if="message.type === 'm.image'"
+      :message="message"
+    />
+    <ChatNoticeMessage
+      v-else-if="message.type === 'm.notice'"
       :message="message"
     />
   </ChatMessageBubble>
@@ -23,15 +27,25 @@ export default {
       type: Boolean,
     },
   },
+  data() {
+    return {
+      showNotice: false,
+    }
+  },
+  computed: {
+    allowedTypes() {
+      let allowed = ['m.text', 'm.image']
+      if (this.showNotice) {
+        allowed = [...allowed, 'm.notice']
+      }
+      return allowed
+    },
+  },
 }
 </script>
 <style>
 .message {
   margin-left: 20px;
-
-  /* border: 1px solid black;
-  background-color: green;
-  border-radius: 2; */
 }
 
 .first {

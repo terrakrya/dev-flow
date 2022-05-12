@@ -1,21 +1,19 @@
 import * as sdk from 'matrix-js-sdk'
-import axios from 'axios'
+// import axios from 'axios'
 import throttle from 'lodash/throttle'
+import { v4 as uuidv4 } from 'uuid'
 import Service from '@/services/service'
 import LogsService from '@/services/logs-service'
 
 const MATRIX_HOMESERVER = 'https://matrix.terrakrya.com'
+const DEFAULT_PASSWORD = 'tCDMiELuphq5Dr'
 
 class MatrixService extends Service {
   client = null
   activeRoom = null
   $log = LogsService
   activeRoomListener = null
-  //   constructor() {
-  //     super()
-  //   }
 
-  // How should I call storeUser vs matrixUser?
   get storeUser() {
     return this.$auth.user
   }
@@ -54,7 +52,7 @@ class MatrixService extends Service {
           this.activeRoom.getLiveTimeline(),
           {
             backwards: true,
-            limit: 30,
+            limit: 50,
           }
         )
       },
@@ -113,7 +111,6 @@ class MatrixService extends Service {
       // )
       const replyId = this.getReplyIdFromEvent(event)
       const replyEvent = this.activeRoom.findEventById(replyId)
-
       return [
         ...messages,
         {
@@ -269,10 +266,10 @@ class MatrixService extends Service {
       if (room) {
         this.setupActiveRoom(room)
       } else {
-        this.client
+        return this.client
           .joinRoom(roomId)
           .then((joinedRoom) => {
-            this.setupActiveRoom(joinedRoom)
+            return this.setupActiveRoom(joinedRoom)
           })
           .catch((error) => {
             this.$log.error(error)
@@ -315,8 +312,7 @@ class MatrixService extends Service {
     this.activeRoomListener = this.client.on('Room.timeline', (event, room) => {
       if (
         event.getRoomId() !== this.activeRoomId ||
-        (event.getType() !== 'm.room.message' &&
-          event.getType() !== 'm.room.redaction')
+        event.getType() !== ('m.room.message' || 'm.room.redaction')
       ) {
         return
       }
@@ -362,6 +358,48 @@ class MatrixService extends Service {
     })
   }
 
+  async registerUser({ authenticatedAxios }) {
+    const username = `terrakrya_${uuidv4()}`
+    console.log(`<<< Start Registration ${username} >>>`)
+
+    const client = await sdk.createClient({
+      baseUrl: MATRIX_HOMESERVER,
+    })
+    try {
+      await client.registerRequest({})
+    } catch (error) {
+      try {
+        const matrixUser = await client.registerRequest({
+          username,
+          password: DEFAULT_PASSWORD,
+          inhibit_login: false,
+          auth: {
+            type: 'm.login.dummy',
+            session: error.session,
+          },
+        })
+
+        if (matrixUser && matrixUser.user_id && matrixUser.access_token) {
+          const matrixCredentials = {
+            matrixId: matrixUser.user_id,
+            matrixAccessToken: matrixUser.access_token,
+          }
+          await authenticatedAxios.put('/api/auth/me', matrixCredentials)
+          await this.createClient(matrixCredentials)
+          return matrixUser
+        } else {
+          throw new Error(
+            'Missing fields from matrix registration response!',
+            matrixUser
+          )
+        }
+      } catch (e) {
+        console.log('Register user error:', e)
+        throw e
+      }
+    }
+  }
+
   async sendEditMessage(txt, targetEventId) {
     const formatedContent = ' * ' + txt
     await this.client.sendEvent(this.activeRoomId, 'm.room.message', {
@@ -380,18 +418,26 @@ class MatrixService extends Service {
     })
   }
 
-  createRoom({ name, topic = '' }) {}
+  // registerUser = async ({ authenticatedAxios }) => {
+  //
+  // }
 
-  registerUser() {
-    // if (!this.storeUser.matrixAccessToken) {
-    //   const method = axios.post
-    //   return method(`/api/chat/${this.storeUser.id}/activateChat`)
-    //     .then(({ data }) => {
-    //       this.$auth.setUser({ ...this.$auth.user, ...data })
-    //       return data
-    //     })
-    //     .catch((error) => console.log(error))
-    // }
+  async createRoom({ name, topic }) {
+    const roomAlias = `devflow_${uuidv4()}`
+    // TODO: Pegar o access token automaticamente caso esse pare de funcionar
+
+    try {
+      const room = await this.client.createRoom({
+        name,
+        topic,
+        visibility: 'public',
+        room_alias_name: roomAlias,
+      })
+      return room
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
   }
 }
 

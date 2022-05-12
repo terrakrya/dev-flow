@@ -1,7 +1,7 @@
 <template>
   <no-ssr>
-    <b-container v-if="organization.mainRoom" fluid class="main-container">
-      <b-row v-if="chatReady">
+    <b-container fluid class="main-container">
+      <b-row v-if="chatReady && organization.mainRoom">
         <b-col md="12" class="mb-3">
           <ChatRoomHeader
             :room-name="activeRoom && activeRoom.name"
@@ -56,12 +56,18 @@
           class="m-2"
           variant="primary"
           :disabled="activating"
-          @click="activateChat(true)"
+          @click="registerMatrixUser(true)"
         >
           <b-spinner v-if="activating" />
           <span v-else>Criar e Conectar</span>
         </b-button>
       </b-row>
+      <div
+        v-else-if="!organization.mainRoom"
+        class="d-flex justify-content-center align-content-center mt-4"
+      >
+        <h2>Parece que o chat ainda não foi ativado para essa organização</h2>
+      </div>
       <b-row
         v-else
         class="d-flex justify-content-center align-items-center m-4"
@@ -69,9 +75,6 @@
         <b-spinner variant="success" type="grow" label="Spinning" />
       </b-row>
     </b-container>
-    <div v-else class="d-flex justify-content-center align-content-center mt-4">
-      <h2>Parece que o chat ainda não foi ativado para essa organização</h2>
-    </div>
   </no-ssr>
 </template>
 
@@ -80,7 +83,6 @@ export default {
   data() {
     return {
       fetching: false,
-      chatList: [],
       loading: false,
       activating: false,
       messagesLoaded: false,
@@ -120,6 +122,9 @@ export default {
     },
     activeRoomId() {
       return this.chatReady ? this.$store.state.activeRoom : null
+    },
+    chatList() {
+      return this.$store.state.chat.spaceRooms || []
     },
   },
   watch: {
@@ -173,75 +178,76 @@ export default {
     },
     async getChatList() {
       // should be in store already
-      const mainRoom = this.$matrix.client.getRoom(
-        this.$store.state.organization.mainRoom
-      )
-      const childRooms = await mainRoom.currentState.getStateEvents(
-        'm.space.child'
-      )
+      // const mainRoom = this.$matrix.client.getRoom(
+      //   this.$store.state.organization.mainRoom
+      // )
+      // const childRooms = await mainRoom.currentState.getStateEvents(
+      //   'm.space.child'
+      // )
+      let roomList = []
+      const spaceSummary =
+        (
+          await this.$matrix.client.getRoomHierarchy(
+            this.$store.state.organization.mainRoom
+          )
+        )?.rooms || []
 
-      let chatList = []
-
-      for (const roomEvent of childRooms) {
-        const roomId = roomEvent.getStateKey()
-        const room = this.$matrix.client.getRoom(roomId)
-
-        if (room) {
-          // const members = await this.$matrix.client.getJoinedRoomMembers(roomId)
-          // members = reduce(
-          //   members?.joined,
-          //   (reducedMembers, member, key) => {
-          //     if (!key || !member.display_name) {
-          //       return reducedMembers
-          //     }
-          //     return [
-          //       ...reducedMembers,
-          //       {
-          //         _id: key,
-          //         username: member.display_name,
-          //       },
-          //     ]
-          //   },
-          //   []
-          // )
-
-          // const lastMessageEvent =
-          //   room.timeline.length > 0 &&
-          //   room.timeline[room.timeline.length - 1].event?.type ===
-          //     'm.room.message' &&
-          //   room.timeline[room.timeline.length - 1].event?.content?.body
-          //     ? room.timeline[room.timeline.length - 1].event
-          //     : null
-
-          // if (lastMessageEvent) {
-          //   // parse timestamp into human readable format, showing only the time if the date is the same and only the date if the date is different
-          //   const today = new Date()
-          //   const lastMessageDate = new Date(lastMessageEvent.origin_server_ts)
-          //   let humanReadableTimestamp = ''
-          //   const isToday =
-          //     today.getDate() === lastMessageDate.getDate() &&
-          //     today.getMonth() === lastMessageDate.getMonth() &&
-          //     today.getFullYear() === lastMessageDate.getFullYear()
-
-          //   const [humanizedDate, humanizedTime] = lastMessageDate
-          //     .toLocaleString('pt-BR', {
-          //       hour12: false,
-          //     })
-          //     .split(' ') // [0] is the date, [1] is the time
-
-          //   humanReadableTimestamp = isToday ? humanizedTime : humanizedDate
-          //   parsedRoomData.lastMessage = {
-          //     content: lastMessageEvent.content.body,
-          //     senderId: lastMessageEvent.sender,
-          //     username: lastMessageEvent.sender,
-          //     timestamp: humanReadableTimestamp,
-          //     saved: true,
-          //   }
-          // }
-          chatList = [...chatList, room]
-        }
+      for (const entry of spaceSummary) {
+        // const room = this.$matrix.client.getRoom(entry.room_id)
+        if (entry.room_type !== 'm.space') roomList = [...roomList, entry]
       }
-      this.chatList = chatList
+      this.$store.commit('chat/setSpaceRooms', roomList)
+      //   if (room) {
+      // const members = await this.$matrix.client.getJoinedRoomMembers(roomId)
+      // members = reduce(
+      //   members?.joined,
+      //   (reducedMembers, member, key) => {
+      //     if (!key || !member.display_name) {
+      //       return reducedMembers
+      //     }
+      //     return [
+      //       ...reducedMembers,
+      //       {
+      //         _id: key,
+      //         username: member.display_name,
+      //       },
+      //     ]
+      //   },
+      //   []
+      // )
+      // const lastMessageEvent =
+      //   room.timeline.length > 0 &&
+      //   room.timeline[room.timeline.length - 1].event?.type ===
+      //     'm.room.message' &&
+      //   room.timeline[room.timeline.length - 1].event?.content?.body
+      //     ? room.timeline[room.timeline.length - 1].event
+      //     : null
+      // if (lastMessageEvent) {
+      //   // parse timestamp into human readable format, showing only the time if the date is the same and only the date if the date is different
+      //   const today = new Date()
+      //   const lastMessageDate = new Date(lastMessageEvent.origin_server_ts)
+      //   let humanReadableTimestamp = ''
+      //   const isToday =
+      //     today.getDate() === lastMessageDate.getDate() &&
+      //     today.getMonth() === lastMessageDate.getMonth() &&
+      //     today.getFullYear() === lastMessageDate.getFullYear()
+      //   const [humanizedDate, humanizedTime] = lastMessageDate
+      //     .toLocaleString('pt-BR', {
+      //       hour12: false,
+      //     })
+      //     .split(' ') // [0] is the date, [1] is the time
+      //   humanReadableTimestamp = isToday ? humanizedTime : humanizedDate
+      //   parsedRoomData.lastMessage = {
+      //     content: lastMessageEvent.content.body,
+      //     senderId: lastMessageEvent.sender,
+      //     username: lastMessageEvent.sender,
+      //     timestamp: humanReadableTimestamp,
+      //     saved: true,
+      //   }
+      // }
+      // }
+      // }
+      // chatList)
     },
 
     async sendMessage(text) {
@@ -274,16 +280,6 @@ export default {
           this.loginForm.password,
           this.$axios
         )
-        // const initialized = await this.$matrix.init()
-        // if (!initialized) {
-        //   const response = await this.$matrix.login(
-        //     this.loginForm.login,
-        //     this.loginForm.password,
-        //     this.$axios
-        //   )
-        //   console.log('login', response)
-        // }
-        // await this.$auth.fetchUser()
       }
       this.activating = false
 
@@ -299,6 +295,11 @@ export default {
         await this.fetchChatData()
       }
     },
+
+    async registerMatrixUser() {
+      await this.$matrix.registerUser({ authenticatedAxios: this.$axios })
+      // await this.$matrix.login()
+    },
     async fetchChatData() {
       if (this.chatReady) {
         if (this.chatList.length === 0) {
@@ -308,7 +309,7 @@ export default {
           await this.$matrix.setActiveRoom(this.$route.params.id)
         } else if (this.chatList.length > 0 && !this.$matrix.activeRoom) {
           // Later should be able to retreive default room to open
-          await this.$matrix.setActiveRoom(this.chatList[0].roomId)
+          await this.$matrix.setActiveRoom(this.chatList[0].room_id)
         }
       }
       this.scrollToBottom()

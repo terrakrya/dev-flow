@@ -50,11 +50,11 @@ export default {
   methods: {
     // when there is an edit it still doesnt update
     async getRelations() {
-      if (!this.relations)
-        this.relations = await this.$matrix.client.fetchRelations(
-          this.$store.state.activeRoom,
-          this.message.id
-        )
+      // if (!this.relations)
+      //   this.relations = await this.$matrix.client.fetchRelations(
+      //     this.$store.state.activeRoom,
+      //     this.message.id
+      //   )
     },
   },
 }

@@ -3,10 +3,13 @@
     <NuxtLink
       v-for="(chat, index) in chatList"
       :key="index"
-      :to="'/chat/' + chat.roomId"
+      :to="'/chat/' + chat.room_id"
     >
-      <div class="li-room" :class="{ current: isActive(chat.roomId) }">
-        <b-avatar v-if="getAvatar(chat)" :src="getAvatar(chat)" />
+      <div class="li-room" :class="{ current: isActive(chat.room_id) }">
+        <b-avatar
+          v-if="getAvatar(chat.room_id)"
+          :src="getAvatar(chat.room_id)"
+        />
         <b-avatar v-else> <b-icon-hash /></b-avatar>
         <span class="mr-auto ml-3">{{ chat.name }}</span>
         <b-badge>{{ chat.unread }}</b-badge>
@@ -28,10 +31,11 @@ export default {
     isActive(chatId) {
       return this.$store.state.activeRoom === chatId
     },
-    getAvatar(room) {
+    getAvatar(roomId) {
+      const room = this.$matrix.client.getRoom(roomId)
       const avatarUrl = room?.getAvatarUrl()
-      const baseUrl = this.$matrix.client.getHomeserverUrl()
       if (avatarUrl) {
+        const baseUrl = this.$matrix.client.getHomeserverUrl()
         return avatarUrl.replace('undefined', baseUrl)
       } else {
         return false
