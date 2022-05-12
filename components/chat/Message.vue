@@ -1,15 +1,15 @@
 <template>
-  <div :class="{ message: true, first: isFirstFromSender }">
-    <div v-if="isFirstFromSender" class="d-flex justify-content-between">
-      <h5 class="title">
-        {{ message.sender }}
-      </h5>
-      <small>{{ date }}</small>
-    </div>
-    <p>
-      {{ message.content }}
-    </p>
-  </div>
+  <ChatMessageBubble
+    v-if="['m.text', 'm.image'].includes(message.type)"
+    :message="message"
+    :is-first-from-sender="isFirstFromSender"
+  >
+    <ChatTextMessage v-if="message.type === 'm.text'" :message="message" />
+    <ChatImageMessage
+      v-else-if="message.type === 'm.image'"
+      :message="message"
+    />
+  </ChatMessageBubble>
 </template>
 
 <script>
@@ -23,18 +23,15 @@ export default {
       type: Boolean,
     },
   },
-  computed: {
-    date() {
-      const d = new Date(this.message.timestamp)
-      return d.toDateString()
-    },
-  },
-  created() {},
 }
 </script>
 <style>
 .message {
   margin-left: 20px;
+
+  /* border: 1px solid black;
+  background-color: green;
+  border-radius: 2; */
 }
 
 .first {
@@ -42,6 +39,6 @@ export default {
   border-top: 1px dashed rgba(80, 80, 80, 0.6);
 }
 .title {
-  margin-left: -10px;
+  margin-left: 10px;
 }
 </style>

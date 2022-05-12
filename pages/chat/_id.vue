@@ -1,48 +1,103 @@
 <template>
-  <b-container>
-    <b-row v-if="chatReady">
-      <b-col md="12">
-        <RoomHeader :room-name="activeRoom && activeRoom.name" />
-      </b-col>
-      <b-col md="9">
-        <div class="d-flex flex-column justify-content-end chat-ui">
-          <Messages v-if="!loading" :messages="messages" />
-          <b-spinner v-else label="Carregando..." />
-          <InputBox @submit="sendMessage" />
-        </div>
-      </b-col>
-      <b-col md="3">
-        <ChatList :chat-list="chatList" />
-        <CreateRoom @submit="createRoom" />
-      </b-col>
-    </b-row>
-    <b-row v-else>
-      <b-button
-        block
-        variant="primary"
-        :disabled="activating"
-        @click="activateChat(true)"
+  <no-ssr>
+    <b-container v-if="organization.mainRoom" fluid class="main-container">
+      <b-row v-if="chatReady">
+        <b-col md="12" class="mb-3">
+          <ChatRoomHeader
+            :room-name="activeRoom && activeRoom.name"
+            :room="activeRoom"
+          />
+        </b-col>
+        <b-col md="9">
+          <div class="d-flex flex-column justify-content-end chat-ui">
+            <ChatMessages v-if="!loading" :messages="messages" />
+            <b-spinner v-else label="Carregando..." />
+            <ChatInputBox
+              id="#dummy-page-bottom"
+              @submit="sendMessage"
+              @reply="replyMessage"
+              @edit="editMessage"
+            />
+          </div>
+        </b-col>
+        <b-col md="3" class="chat-ui">
+          <ChatList :chat-list="chatList" />
+          <ChatCreateRoom @submit="createRoom" />
+        </b-col>
+      </b-row>
+      <b-row
+        v-else-if="!hasMatrixAccount"
+        class="m-4 px-4 pt-4 d-flex justify-content-center"
       >
-        <b-spinner v-if="activating" />
-        <span v-else> Ativar chat </span>
-      </b-button>
-    </b-row>
-  </b-container>
+        <h4>Conectar conta Matrix existente</h4>
+        <b-input v-model="loginForm.login" class="m-2" placeholder="Login" />
+        <b-input
+          v-model="loginForm.password"
+          class="m-2"
+          type="password"
+          placeholder="Senha"
+        />
+        <b-button
+          block
+          class="m-2"
+          variant="primary"
+          :disabled="activating"
+          @click="activateChat(true)"
+        >
+          <b-spinner v-if="activating" />
+          <span v-else>Conectar</span>
+        </b-button>
+        <p class="text-muted m-2 align-center">
+          Ou se preferir, clique abaixo para criar e salvar uma nova conta
+          automaticamente.
+        </p>
+        <b-button
+          block
+          class="m-2"
+          variant="primary"
+          :disabled="activating"
+          @click="activateChat(true)"
+        >
+          <b-spinner v-if="activating" />
+          <span v-else>Criar e Conectar</span>
+        </b-button>
+      </b-row>
+      <b-row
+        v-else
+        class="d-flex justify-content-center align-items-center m-4"
+      >
+        <b-spinner variant="success" type="grow" label="Spinning" />
+      </b-row>
+    </b-container>
+    <div v-else class="d-flex justify-content-center align-content-center mt-4">
+      <h2>Parece que o chat ainda não foi ativado para essa organização</h2>
+    </div>
+  </no-ssr>
 </template>
 
 <script>
-// <b-button @click="getChatList">Buscar lista</b-button>
-
 export default {
   data() {
     return {
+      fetching: false,
       chatList: [],
       loading: false,
       activating: false,
+      messagesLoaded: false,
       showVideoCall: false,
+      loginForm: {
+        login: '',
+        password: '',
+      },
     }
   },
   computed: {
+    matrixId() {
+      return this.$auth.user.matrixId
+    },
+    hasMatrixAccount() {
+      return this.$auth.user.matrixId && this.$auth.user.matrixAccessToken
+    },
     chatReady() {
       return this.$store.state.clientPrepared
     },
@@ -52,6 +107,9 @@ export default {
     messages() {
       return this.$store.state.activeRoomMessages
     },
+    organization() {
+      return this.$store.state.organization
+    },
     organizationId() {
       return this.$store.state.organization.id
     },
@@ -60,8 +118,17 @@ export default {
         ? this.$matrix.client.getRoom(this.$store.state.activeRoom)
         : null
     },
+    activeRoomId() {
+      return this.chatReady ? this.$store.state.activeRoom : null
+    },
   },
   watch: {
+    'this.$route.params.id': {
+      imediate: true,
+      handler(id) {
+        this.fetchChatData()
+      },
+    },
     chatReady(current, old) {
       if (current === true) this.fetchChatData()
     },
@@ -74,42 +141,106 @@ export default {
     },
   },
   created() {
-    this.activateChat()
+    if (
+      !this.chatReady &&
+      this.$auth.user.matrixId &&
+      this.$auth.user.matrixAccessToken
+    ) {
+      this.$matrix.login({ authenticatedAxios: this.$axios })
+    }
+  },
+  mounted() {
+    this.fetchChatData()
   },
   methods: {
+    parseMessages(messages) {
+      return messages.map((message) => {
+        return message
+      })
+    },
+    async fetchMessages({ room }) {
+      this.fetching = true
+      if (this.$route.params.id === room.roomId) {
+        await this.$matrix.fetchHistory()
+      } else {
+        this.$router.replace('/chat/' + room.roomId)
+        await this.fetchChatData()
+      }
+      this.fetching = false
+    },
     async createRoom({ name, topic }) {
-      await this.$matrix.createRoom
-      this.$axios
-        .post(`/api/chat/${this.organizationId}/rooms`, { name, topic })
-        .then((response) => {
-          this.getChatList()
-        })
-
       // const roomId = this.$matrix.createRoom(data)
     },
     async getChatList() {
       // should be in store already
-      const response = await this.$axios.get(
-        `/api/chat/${this.organizationId}/rooms`
+      const mainRoom = this.$matrix.client.getRoom(
+        this.$store.state.organization.mainRoom
       )
-      const organizationRoomsIds = response.data.rooms
+      const childRooms = await mainRoom.currentState.getStateEvents(
+        'm.space.child'
+      )
+
       let chatList = []
 
-      for (const roomId of organizationRoomsIds) {
-        let room = this.$matrix.client.getRoom(roomId)
-        this.$log.info(roomId)
+      for (const roomEvent of childRooms) {
+        const roomId = roomEvent.getStateKey()
+        const room = this.$matrix.client.getRoom(roomId)
 
         if (room) {
-          chatList = [...chatList, room]
-        } else {
-          room = await this.$matrix.client
-            .joinRoom(roomId)
-            .catch((error) => console.log(error))
+          // const members = await this.$matrix.client.getJoinedRoomMembers(roomId)
+          // members = reduce(
+          //   members?.joined,
+          //   (reducedMembers, member, key) => {
+          //     if (!key || !member.display_name) {
+          //       return reducedMembers
+          //     }
+          //     return [
+          //       ...reducedMembers,
+          //       {
+          //         _id: key,
+          //         username: member.display_name,
+          //       },
+          //     ]
+          //   },
+          //   []
+          // )
 
-          if (room) chatList = [...chatList, room]
+          // const lastMessageEvent =
+          //   room.timeline.length > 0 &&
+          //   room.timeline[room.timeline.length - 1].event?.type ===
+          //     'm.room.message' &&
+          //   room.timeline[room.timeline.length - 1].event?.content?.body
+          //     ? room.timeline[room.timeline.length - 1].event
+          //     : null
+
+          // if (lastMessageEvent) {
+          //   // parse timestamp into human readable format, showing only the time if the date is the same and only the date if the date is different
+          //   const today = new Date()
+          //   const lastMessageDate = new Date(lastMessageEvent.origin_server_ts)
+          //   let humanReadableTimestamp = ''
+          //   const isToday =
+          //     today.getDate() === lastMessageDate.getDate() &&
+          //     today.getMonth() === lastMessageDate.getMonth() &&
+          //     today.getFullYear() === lastMessageDate.getFullYear()
+
+          //   const [humanizedDate, humanizedTime] = lastMessageDate
+          //     .toLocaleString('pt-BR', {
+          //       hour12: false,
+          //     })
+          //     .split(' ') // [0] is the date, [1] is the time
+
+          //   humanReadableTimestamp = isToday ? humanizedTime : humanizedDate
+          //   parsedRoomData.lastMessage = {
+          //     content: lastMessageEvent.content.body,
+          //     senderId: lastMessageEvent.sender,
+          //     username: lastMessageEvent.sender,
+          //     timestamp: humanReadableTimestamp,
+          //     saved: true,
+          //   }
+          // }
+          chatList = [...chatList, room]
         }
       }
-
       this.chatList = chatList
     },
 
@@ -121,10 +252,38 @@ export default {
         await this.$matrix.sendTextMessage(text)
       }
     },
+
+    async replyMessage({ text, eventId }) {
+      if (text.length > 0) {
+        await this.$matrix.sendReplyMessage(text, eventId)
+      }
+    },
+
+    async editMessage({ text, eventId }) {
+      if (text.length > 0) {
+        await this.$matrix.sendEditMessage(text, eventId)
+      }
+    },
+
     async activateChat(force) {
       this.activating = true
+
       if (!this.chatReady) {
-        await this.$matrix.init(force)
+        await this.$matrix.login(
+          this.loginForm.login,
+          this.loginForm.password,
+          this.$axios
+        )
+        // const initialized = await this.$matrix.init()
+        // if (!initialized) {
+        //   const response = await this.$matrix.login(
+        //     this.loginForm.login,
+        //     this.loginForm.password,
+        //     this.$axios
+        //   )
+        //   console.log('login', response)
+        // }
+        // await this.$auth.fetchUser()
       }
       this.activating = false
 
@@ -142,16 +301,34 @@ export default {
     },
     async fetchChatData() {
       if (this.chatReady) {
-        await this.$matrix.setActiveRoom(this.$route.params.id)
-        await this.getChatList()
+        if (this.$route.params.id !== 'index') {
+          await this.$matrix.setActiveRoom(this.$route.params.id)
+        }
+        if (this.chatList.length === 0) {
+          await this.getChatList()
+        }
       }
+      this.scrollToBottom()
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        window.scrollTo({
+          left: 0,
+          top: document.body.scrollHeight,
+          behavior: 'smooth',
+        })
+      })
     },
   },
 }
 </script>
 <style>
 .chat-ui {
-  height: 700px;
-  padding-bottom: 20px;
+  height: 100%;
+  max-height: 680px;
+  margin-bottom: 30px;
+}
+.main-container {
+  max-width: 1400px;
 }
 </style>

@@ -1,7 +1,14 @@
 <template>
   <div>
-    <b-button v-b-modal="'modal-form'">Criar Sala</b-button>
-    <b-modal id="modal-form" ref="modal" @ok="onOk">
+    <b-button
+      ref="modal"
+      v-b-modal="'modal-form'"
+      block
+      variant="outline-success"
+      class="m-2"
+      ><b-icon-plus-circle-fill class="mr-1" /> Criar Sala
+    </b-button>
+    <b-modal id=" modal-form" @ok="onOk">
       <b-form title="Criar Sala" @submit.prevent="onSubmit">
         <!--
             <b-form-group v-if="!project" label="Projeto">

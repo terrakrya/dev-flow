@@ -77,6 +77,7 @@ router.put('/me', authenticated, function (req, res) {
   Profile.findOneAndUpdate({ email: req.user.email }, req.body, { new: true })
     .populate({ path: 'organizations', populate: { path: 'members' } })
     .populate('network')
+    .populate('projects')
     .exec(function (err, updatedUser) {
       if (!err && updatedUser) {
         res.send(updatedUser.toJSON())

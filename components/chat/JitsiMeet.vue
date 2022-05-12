@@ -39,7 +39,7 @@ export default {
     },
     jitsiOptions() {
       return {
-        roomName: this.$store.state.activeRoom.replace(/\W/g, ''),
+        roomName: this.$store.state.activeRoom?.replace(/\W/g, ''),
         noSSL: false,
         userInfo: {
           email: '',

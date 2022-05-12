@@ -7,7 +7,9 @@ export const state = () => ({
   activeRoom: null,
   activeRoomMessages: [],
   chatList: [],
-  isFirstMatrixUse: false,
+  replyToMessage: null,
+  editMessage: null,
+  isFirstMatrixUse: true,
   showVideoCall: false,
 })
 
@@ -49,6 +51,12 @@ export const mutations = {
   stopVideoCall(state) {
     state.showVideoCall = false
   },
+  setReplyToMessage(state, message) {
+    state.replyToMessage = message
+  },
+  setEditMessage(state, message) {
+    state.editMessage = message
+  },
 }
 
 export const actions = {
@@ -66,13 +74,20 @@ export const actions = {
     commit('setOrganization', organization)
   },
   setActiveOrganization({ commit, dispatch, auth }, organization) {
-    commit('setOrganization', organization)
     dispatch('loadProjects')
+    commit('setOrganization', organization)
   },
-  activateDefaultOrganization({ commit, rootState }) {
+  activateDefaultOrganization({ commit, dispatch, rootState }) {
     if (rootState.auth.user.organizations.length > 0) {
       const defaultOrganization = rootState.auth.user.organizations[0] // procurar
       commit('setOrganization', defaultOrganization)
+      dispatch('loadProjects')
     }
+  },
+  setReplyToMessage({ commit }, message) {
+    commit('setReplyToMessage', message)
+  },
+  setEditMessage({ commit }, message) {
+    commit('setEditMessage', message)
   },
 }

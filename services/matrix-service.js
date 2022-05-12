@@ -1,7 +1,8 @@
-import Service from '@/services/service'
 import * as sdk from 'matrix-js-sdk'
-import LogsService from '@/services/logs-service'
 import axios from 'axios'
+import throttle from 'lodash/throttle'
+import Service from '@/services/service'
+import LogsService from '@/services/logs-service'
 
 const MATRIX_HOMESERVER = 'https://matrix.terrakrya.com'
 
@@ -9,6 +10,7 @@ class MatrixService extends Service {
   client = null
   activeRoom = null
   $log = LogsService
+  activeRoomListener = null
   //   constructor() {
   //     super()
   //   }
@@ -33,42 +35,99 @@ class MatrixService extends Service {
   get roomList() {
     return this.client && this.client.getRooms()
   }
+  // utils
 
-  async fetchHistory() {
-    const paginated = await this.client.paginateEventTimeline(
-      this.activeRoom.getLiveTimeline(),
-      { backwards: true, limit: 20 }
-    )
-    // const paginated = await this.client.scrollback(this.activeRoom, 30)
-    // TODO: qual é melhor?
-    return paginated
+  getReplyIdFromEvent = (event) => {
+    const content = event.getContent()
+    const replyEventId = content['m.relates_to']?.['m.in_reply_to']?.event_id
+    return replyEventId
   }
 
-  async setActiveRoomMessages() {
-    await this.client.roomInitialSync(this.activeRoomId, 20)
-    const events = this.activeRoom.getLiveTimeline().getEvents()
+  //
+  async fetchHistory() {
+    if (!this.client || !this.activeRoom) {
+      return
+    }
+    const paginated = throttle(
+      async () => {
+        return await this.client.paginateEventTimeline(
+          this.activeRoom.getLiveTimeline(),
+          {
+            backwards: true,
+            limit: 30,
+          }
+        )
+      },
+      2000,
+      { leading: true }
+    )
+    // const paginated = await this.client.scrollback(this.activeRoom, 30)
+    // // TODO: which is better?
+    // return paginated()
+    return await paginated()
+  }
 
+  async setActiveRoomMessages(newEvent) {
+    const timeline = this.activeRoom.getLiveTimeline()
+    let events = timeline.getEvents()
+
+    // const timelineSet = timeline.getTimelineSet()
+
+    // timelineSet.unstableClientRelationAggregation = true
+    // timelineSet.relations = {}
+    if (events.length === 0) {
+      await this.client.roomInitialSync(this.activeRoomId, 20)
+      events = this.activeRoom.getLiveTimeline().getEvents()
+    }
     const messageList = events.reduce((messages, event, index) => {
-      const content = event.getContent()
+      let content = event.getContent()
+      const type = event.getType()
+
+      if (
+        type !== 'm.room.message' ||
+        !content.body ||
+        event.isRelation('m.replace')
+      ) {
+        return messages
+      }
+      const isUpdate =
+        newEvent?.isRelation('m.replace') &&
+        newEvent.getRelation()?.event_id === event.getId()
+
+      if (isUpdate) {
+        content = newEvent.getContent()
+      }
       const sender = event.getSender()
       const senderUser = this.client.getUser(sender)
       const author =
-        this.storeUser.matrixId === senderUser.id
-          ? 'Eu'
-          : senderUser.displayName
-
-      if (!content.body) {
-        return messages
-      }
+        this.storeUser.matrixId === sender ? 'Eu' : senderUser.displayName
+      // const humanizedTimestamp = new Date(event.localTimestamp).toLocaleString(
+      //   'pt-BR',
+      //   {
+      //     hour12: false,
+      //     day: '2-digit',
+      //     month: '2-digit',
+      //     hour: '2-digit',
+      //     minute: '2-digit',
+      //   }
+      // )
+      const replyId = this.getReplyIdFromEvent(event)
+      const replyEvent = this.activeRoom.findEventById(replyId)
 
       return [
         ...messages,
         {
-          type: 'text',
+          type: content.msgtype,
           sender: author,
           id: event.getId(),
-          content: content.body,
+          content:
+            (replyEvent && content.body.replace(/>.*\n/, '')) ||
+            content.formatted_body ||
+            content.body,
+          replyEvent,
           timestamp: event.localTimestamp,
+          update: isUpdate,
+          canEdit: this.storeUser.matrixId === sender,
         },
       ]
     }, [])
@@ -89,24 +148,25 @@ class MatrixService extends Service {
     return true
   }
 
-  async createClient() {
+  async createClient({ matrixId, accessToken }) {
     if (!this.storeUser) {
       throw new Error('No user logged In')
     }
+    const finalMatrixId = matrixId || this.storeUser.matrixId
+    const finalAccessToken = accessToken || this.storeUser.matrixAccessToken
 
-    if (!this.storeUser.matrixId || !this.storeUser.matrixAccessToken) {
+    if (!finalMatrixId || !finalAccessToken) {
       this.$log.info(this.$auth.user)
-      await this.registerUser()
+      return
     }
 
     let opts = {}
     try {
       const store = new sdk.IndexedDBStore({
-        indexedDB:
-          window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB,
-        dbName: this.storeUser.matrixId,
+        indexedDB: window.indexedDB,
+        localStorage: window.localStorage,
+        dbName: this.storeUser.matrixId + '-' + this.storeUser.id,
       })
-
       await store.startup()
       opts = { store }
     } catch (e) {
@@ -127,9 +187,64 @@ class MatrixService extends Service {
     }
   }
 
+  async login({ userId, password, authenticatedAxios }) {
+    let accessToken = this.storeUser.matrixAccessToken
+
+    if (userId && password) {
+      const tempClient = await sdk.createClient({
+        baseUrl: MATRIX_HOMESERVER,
+      })
+
+      const loginResponse = await tempClient.loginWithPassword(userId, password)
+      this.$log.info(loginResponse)
+
+      accessToken = loginResponse?.access_token
+    }
+
+    if (accessToken) {
+      // TODO: deduplicate this
+      let opts = {}
+      try {
+        const store = new sdk.IndexedDBStore({
+          indexedDB: window.indexedDB,
+          localStorage: window.localStorage,
+          dbName: this.storeUser.matrixId + '-' + this.storeUser.id,
+        })
+        await store.startup()
+        opts = { store }
+      } catch (e) {
+        this.$log.error('IndexDB error:', e)
+      }
+      try {
+        await this.createClient({
+          matrixId: userId,
+          accessToken,
+          baseUrl: MATRIX_HOMESERVER,
+          ...opts,
+        })
+        this.$store.commit('setFirstMatrixUse', true)
+
+        await authenticatedAxios.put('/api/auth/me', {
+          matrixId: userId,
+          matrixAccessToken: accessToken,
+        })
+        await this.startClient()
+
+        return true
+      } catch (error) {
+        this.$log.error(error)
+        return false
+      }
+    } else {
+      return false
+    }
+  }
+
   async startClient() {
     if (this.client) {
-      await this.client.startClient({ initialSyncLimit: 20 })
+      await this.client.startClient({
+        initialSyncLimit: 20,
+      })
       await this.client.once('sync', (state, prevState, res) => {
         if (state === 'PREPARED') {
           this.$store.commit('setClientPrepared', true)
@@ -177,10 +292,11 @@ class MatrixService extends Service {
 
   setupActiveRoom(room) {
     if (!room) return
-
     this.$store.commit('setActiveRoom', room.roomId)
+
     this.stopListeningRoomEvents()
     this.activeRoom = room
+
     this.setActiveRoomMessages()
     this.startListeningRoomEvents()
   }
@@ -196,49 +312,86 @@ class MatrixService extends Service {
   }
 
   startListeningRoomEvents() {
-    this.client.on('Room.timeline', (event, room) => {
+    this.activeRoomListener = this.client.on('Room.timeline', (event, room) => {
       if (
-        event.getType() !== 'm.room.message' ||
-        event.getRoomId() !== this.activeRoomId
+        event.getRoomId() !== this.activeRoomId ||
+        (event.getType() !== 'm.room.message' &&
+          event.getType() !== 'm.room.redaction')
       ) {
         return
       }
-      this.setActiveRoomMessages()
+      this.setActiveRoomMessages(event)
     })
   }
 
   stopListeningRoomEvents() {
-    // this.client.removeListener('Room.timeline')
+    // if (this.activeRoomListener)
+    //   this.client.removeListener(this.activeRoomListener)
   }
 
   sendTextMessage(txt) {
     this.client.sendTextMessage(this.activeRoomId, txt)
   }
 
-  createRoom({ name, topic = '' }) {
-    // slugify name as alias?
-    // passo pro backend aqui ou la na sala?2
-    // isso tinha que ser num application service
-    axios
-      .post(`/api/chat/${this.storeUser.githubId}/rooms`, { name, topic })
-      .then((success) => {
-        return true
-      })
-      .catch((err) => {
-        throw err
-      })
+  async sendReplyMessage(txt, targetEventId) {
+    const targetEvent = this.activeRoom?.findEventById(targetEventId)
+    const sender = targetEvent.getSender()
+    const senderUser = this.client.getUser(sender)
+    await this.client.sendEvent(this.activeRoomId, 'm.room.message', {
+      body: txt,
+      msgtype: 'm.text',
+      format: 'org.matrix.custom.html',
+      formatted_body: `<mx-reply>
+      <blockquote>
+        <a href="https://matrix.to/#/${
+          this.activeRoomId
+        }/${targetEventId}">In reply to</a>
+        <a href="https://matrix.to/#/${targetEvent.sender}">${
+        senderUser.displayName
+      }</a>
+        <br />
+        ${targetEvent.getContent().body}}}
+      </blockquote>
+    </mx-reply>
+   ${txt}`,
+      'm.relates_to': {
+        'm.in_reply_to': {
+          event_id: targetEventId,
+        },
+      },
+    })
   }
 
+  async sendEditMessage(txt, targetEventId) {
+    const formatedContent = ' * ' + txt
+    await this.client.sendEvent(this.activeRoomId, 'm.room.message', {
+      'org.matrix.msc1767.text': formatedContent,
+      body: formatedContent,
+      msgtype: 'm.text',
+      'm.new_content': {
+        'org.matrix.msc1767.text': txt,
+        body: txt,
+        msgtype: 'm.text',
+      },
+      'm.relates_to': {
+        rel_type: 'm.replace',
+        event_id: targetEventId,
+      },
+    })
+  }
+
+  createRoom({ name, topic = '' }) {}
+
   registerUser() {
-    if (!this.storeUser.matrixAccessToken) {
-      const method = axios.post
-      return method(`/api/chat/${this.storeUser.githubId}/activateChat`)
-        .then(({ data }) => {
-          this.$auth.setUser({ ...this.$auth.user, ...data })
-          return data
-        })
-        .catch((error) => console.log(error))
-    }
+    // if (!this.storeUser.matrixAccessToken) {
+    //   const method = axios.post
+    //   return method(`/api/chat/${this.storeUser.id}/activateChat`)
+    //     .then(({ data }) => {
+    //       this.$auth.setUser({ ...this.$auth.user, ...data })
+    //       return data
+    //     })
+    //     .catch((error) => console.log(error))
+    // }
   }
 }
 
