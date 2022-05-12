@@ -301,11 +301,14 @@ export default {
     },
     async fetchChatData() {
       if (this.chatReady) {
-        if (this.$route.params.id !== 'index') {
-          await this.$matrix.setActiveRoom(this.$route.params.id)
-        }
         if (this.chatList.length === 0) {
           await this.getChatList()
+        }
+        if (this.$route.params.id !== 'index') {
+          await this.$matrix.setActiveRoom(this.$route.params.id)
+        } else if (this.chatList.length > 0 && !this.$matrix.activeRoom) {
+          // Later should be able to retreive default room to open
+          await this.$matrix.setActiveRoom(this.chatList[0].roomId)
         }
       }
       this.scrollToBottom()
