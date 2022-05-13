@@ -1,7 +1,7 @@
 <template>
   <no-ssr>
     <b-container fluid class="main-container">
-      <b-row v-if="chatReady && organization.mainRoom">
+      <b-row v-if="chatReady && orgMainRoom">
         <b-col md="12" class="mb-3">
           <ChatRoomHeader
             :room-name="activeRoom && activeRoom.name"
@@ -63,10 +63,22 @@
         </b-button>
       </b-row>
       <div
-        v-else-if="!organization.mainRoom"
-        class="d-flex justify-content-center align-content-center mt-4"
+        v-else-if="!orgMainRoom"
+        class="d-flex justify-content-center align-content-center mt-4 pt-4"
       >
-        <h2>Parece que o chat ainda não foi ativado para essa organização</h2>
+        <div
+          v-if="organization && organization.creator === user.email"
+          class="d-flex flex-column justify-content-center align-content-center"
+        >
+          <h2>O chat ainda não foi ativado para essa organização.</h2>
+          <b-button variant="success" @click="addSpace">
+            Ativar chat organização
+          </b-button>
+        </div>
+        <h2 v-else>
+          Parece que o chat não foi ativado para essa organização, e você não
+          tem permissão para ativar
+        </h2>
       </div>
       <b-row
         v-else
@@ -94,6 +106,9 @@ export default {
     }
   },
   computed: {
+    user() {
+      return this.$auth.user
+    },
     matrixId() {
       return this.$auth.user.matrixId
     },
@@ -114,6 +129,9 @@ export default {
     },
     organizationId() {
       return this.$store.state.organization.id
+    },
+    orgMainRoom() {
+      return this.organization?.mainRoom
     },
     activeRoom() {
       return this.chatReady
@@ -158,6 +176,11 @@ export default {
     this.fetchChatData()
   },
   methods: {
+    async addSpace() {
+      this.loading = true
+      await this.$store.dispatch('chat/createSpaceForOrg')
+      this.loading = false
+    },
     parseMessages(messages) {
       return messages.map((message) => {
         return message
@@ -174,80 +197,14 @@ export default {
       this.fetching = false
     },
     async createRoom({ name, topic }) {
-      // const roomId = this.$matrix.createRoom(data)
-    },
-    async getChatList() {
-      // should be in store already
-      // const mainRoom = this.$matrix.client.getRoom(
-      //   this.$store.state.organization.mainRoom
-      // )
-      // const childRooms = await mainRoom.currentState.getStateEvents(
-      //   'm.space.child'
-      // )
-      let roomList = []
-      const spaceSummary =
-        (
-          await this.$matrix.client.getRoomHierarchy(
-            this.$store.state.organization.mainRoom
-          )
-        )?.rooms || []
-
-      for (const entry of spaceSummary) {
-        // const room = this.$matrix.client.getRoom(entry.room_id)
-        if (entry.room_type !== 'm.space') roomList = [...roomList, entry]
+      if (this.orgMainRoom) {
+        await this.$matrix.createChildRoom({
+          name,
+          topic,
+          parentSpaceId: this.orgMainRoom,
+        })
+        this.$store.dispatch('chat/fetchSpaceRooms')
       }
-      this.$store.commit('chat/setSpaceRooms', roomList)
-      //   if (room) {
-      // const members = await this.$matrix.client.getJoinedRoomMembers(roomId)
-      // members = reduce(
-      //   members?.joined,
-      //   (reducedMembers, member, key) => {
-      //     if (!key || !member.display_name) {
-      //       return reducedMembers
-      //     }
-      //     return [
-      //       ...reducedMembers,
-      //       {
-      //         _id: key,
-      //         username: member.display_name,
-      //       },
-      //     ]
-      //   },
-      //   []
-      // )
-      // const lastMessageEvent =
-      //   room.timeline.length > 0 &&
-      //   room.timeline[room.timeline.length - 1].event?.type ===
-      //     'm.room.message' &&
-      //   room.timeline[room.timeline.length - 1].event?.content?.body
-      //     ? room.timeline[room.timeline.length - 1].event
-      //     : null
-      // if (lastMessageEvent) {
-      //   // parse timestamp into human readable format, showing only the time if the date is the same and only the date if the date is different
-      //   const today = new Date()
-      //   const lastMessageDate = new Date(lastMessageEvent.origin_server_ts)
-      //   let humanReadableTimestamp = ''
-      //   const isToday =
-      //     today.getDate() === lastMessageDate.getDate() &&
-      //     today.getMonth() === lastMessageDate.getMonth() &&
-      //     today.getFullYear() === lastMessageDate.getFullYear()
-      //   const [humanizedDate, humanizedTime] = lastMessageDate
-      //     .toLocaleString('pt-BR', {
-      //       hour12: false,
-      //     })
-      //     .split(' ') // [0] is the date, [1] is the time
-      //   humanReadableTimestamp = isToday ? humanizedTime : humanizedDate
-      //   parsedRoomData.lastMessage = {
-      //     content: lastMessageEvent.content.body,
-      //     senderId: lastMessageEvent.sender,
-      //     username: lastMessageEvent.sender,
-      //     timestamp: humanReadableTimestamp,
-      //     saved: true,
-      //   }
-      // }
-      // }
-      // }
-      // chatList)
     },
 
     async sendMessage(text) {
@@ -303,7 +260,7 @@ export default {
     async fetchChatData() {
       if (this.chatReady) {
         if (this.chatList.length === 0) {
-          await this.getChatList()
+          await this.$store.dispatch('chat/fetchSpaceRooms')
         }
         if (this.$route.params.id !== 'index') {
           await this.$matrix.setActiveRoom(this.$route.params.id)

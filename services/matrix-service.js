@@ -248,6 +248,9 @@ class MatrixService extends Service {
           this.$log.info(state)
           this.$log.info(this.$auth)
           this.client.setDisplayName(this.storeUser.name)
+          if (this.storeUser.avatar) {
+            this.client.setAvatarUrl(this.storeUser.avatarUrl)
+          }
         } else {
           this.$log.info(state)
         }
@@ -386,6 +389,7 @@ class MatrixService extends Service {
           }
           await authenticatedAxios.put('/api/auth/me', matrixCredentials)
           await this.createClient(matrixCredentials)
+          await this.startClient()
           return matrixUser
         } else {
           throw new Error(
@@ -423,7 +427,7 @@ class MatrixService extends Service {
   // }
 
   async createRoom({ name, topic }) {
-    const roomAlias = `devflow_${uuidv4()}`
+    // const roomAlias = `devflow_${uuidv4()}`
     // TODO: Pegar o access token automaticamente caso esse pare de funcionar
 
     try {
@@ -431,8 +435,61 @@ class MatrixService extends Service {
         name,
         topic,
         visibility: 'public',
-        room_alias_name: roomAlias,
+        // room_alias_name: roomAlias,
       })
+      return room
+    } catch (e) {
+      console.log(e)
+      throw e
+    }
+  }
+
+  async createChildRoom({ name, topic, parentSpaceId }) {
+    const newRoom = await this.createRoom({ name, topic }).catch((error) => {
+      console.log('CreateChildRoom error', error)
+      return false
+    })
+
+    if (newRoom) {
+      await this.client.sendStateEvent(
+        parentSpaceId,
+        'm.space.child',
+        {
+          via: ['terrakrya.com'],
+          suggested: true,
+          auto_join: true,
+        },
+        newRoom.room_id
+      )
+      return newRoom
+    }
+  }
+
+  async createSpace({ name, topic, childRoom }) {
+    // const roomAlias = `devflow_space_${uuidv4()}:terrakrya.com`
+    // TODO: Pegar o access token automaticamente caso esse pare de funcionar
+
+    const opts = {
+      name,
+      visibility: 'public',
+      // room_alias_name: roomAlias,
+      initial_state: [
+        {
+          type: 'm.space.child',
+          state_key: childRoom,
+          content: {
+            via: ['terrakrya.com'],
+          },
+          suggested: true,
+          auto_join: true,
+        },
+      ],
+      creation_content: { type: 'm.space' },
+    }
+
+    console.log('Initial state:', opts)
+    try {
+      const room = await this.client.createRoom(opts)
       return room
     } catch (e) {
       console.log(e)

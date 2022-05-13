@@ -76,6 +76,9 @@ export const actions = {
   setActiveOrganization({ commit, dispatch, auth }, organization) {
     dispatch('loadProjects')
     commit('setOrganization', organization)
+    commit('setActiveRoom', null)
+    this.$matrix.activeRoom = null
+    dispatch('chat/fetchSpaceRooms', [], { root: true })
   },
   activateDefaultOrganization({ commit, dispatch, rootState }) {
     if (rootState.auth.user.organizations.length > 0) {

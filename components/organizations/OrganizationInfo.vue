@@ -119,6 +119,7 @@ export default {
         })
       this.isSaving = false
     },
+    addSpace() {},
     handleAvatarUpload(file) {
       this.form.avatarUrl = file.url
     },

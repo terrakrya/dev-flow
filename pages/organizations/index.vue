@@ -94,6 +94,7 @@ export default {
           this.$auth.fetchUser()
 
           this.setOrganizationAsActive(created)
+          this.$store.dispatch('chat/createSpaceForOrg')
           this.newOrganization.name = ''
           this.newOrganization.description = ''
         })
