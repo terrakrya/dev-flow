@@ -18,7 +18,7 @@
                 <Avatar :name="user.name" :src="user.avatarUrl" size="3rem" />
               </template>
               <b-dropdown-item to="/profile">Perfil</b-dropdown-item>
-              <b-dropdown-item @click="$auth.logout()">Sair</b-dropdown-item>
+              <b-dropdown-item @click="logout()">Sair</b-dropdown-item>
             </b-nav-item-dropdown>
             <b-nav-item to="/admin"> </b-nav-item>
           </b-navbar-nav>
@@ -35,6 +35,15 @@ export default {
     },
     user() {
       return this.$auth.user || {}
+    },
+  },
+  methods: {
+    async logout() {
+      await this.$auth.logout()
+      this.$nextTick(() => {
+        localStorage.clear()
+        window.location.reload()
+      })
     },
   },
 }
