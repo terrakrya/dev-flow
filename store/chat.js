@@ -18,7 +18,7 @@ export const actions = {
     let roomList = []
     const spaceSummary =
       (
-        await this.$matrix.client.getRoomHierarchy(
+        await this.$matrix.client?.getRoomHierarchy(
           rootState.organization.mainRoom
         )
       )?.rooms || []
@@ -30,7 +30,7 @@ export const actions = {
     commit('setSpaceRooms', roomList)
   },
   async createSpaceForOrg({ commit, dispatch, rootState }) {
-    if (!rootState.organization || !this.$matrix.client.isLoggedIn())
+    if (!rootState.organization || !this.$matrix.client?.isLoggedIn())
       return false
 
     const firstRoom = await this.$matrix.createRoom({

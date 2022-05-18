@@ -5,6 +5,7 @@
       <Nav />
       <Nuxt />
       <!-- dummy div to help scroll page to bottom when needed-->
+      <Onboarding />
       <div id="dummy-page-bottom" />
     </div>
   </div>
@@ -15,7 +16,7 @@ export default {
   components: { Header },
   middleware: 'auth',
   created() {
-    if (this.$auth.loggedIn) {
+    if (this.$auth.loggedIn && !this.$store.state.organization) {
       this.$store.dispatch('activateDefaultOrganization')
     }
   },

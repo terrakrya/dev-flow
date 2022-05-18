@@ -8,20 +8,6 @@
       </b-col>
       <b-col md="4">
         <OrganizationsList :organizations="organizations" />
-
-        <b-btn v-b-modal.modal-add variant="outline-success" class="m-4"
-          >Adicionar Organização</b-btn
-        >
-        <b-modal
-          id="modal-add"
-          title="Adicionar Organização"
-          @ok="joinOrganization"
-        >
-          <b-input
-            v-model="joinOrganizationLink"
-            placeholder="ID da organização. Ex: 623219de495b346fae1d45ff"
-          />
-        </b-modal>
         <b-btn
           v-b-modal.modal-create
           class="ml-4 mt-2"
@@ -75,12 +61,7 @@ export default {
       this.setOrganizationAsActive(this.organizations[0])
       await this.$auth.fetchUser()
     },
-    async joinOrganization() {
-      await this.$axios.$post(
-        `/api/organizations/${this.joinOrganizationLink}/join`
-      )
-      await this.$auth.fetchUser()
-    },
+
     setOrganizationAsActive(organization) {
       this.$store.dispatch('setActiveOrganization', organization)
     },

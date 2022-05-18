@@ -11,6 +11,7 @@ export const state = () => ({
   editMessage: null,
   isFirstMatrixUse: true,
   showVideoCall: false,
+  organizationInvite: null,
 })
 
 export const getters = {
@@ -57,11 +58,14 @@ export const mutations = {
   setEditMessage(state, message) {
     state.editMessage = message
   },
+  setOrganizationInvite(state, invite) {
+    state.organizationInvite = invite
+  },
 }
 
 export const actions = {
   async loadProjects({ commit, state, auth }) {
-    const organizationId = state.organization.id
+    const organizationId = state.organization?.id
     if (organizationId) {
       const projects = await this.$axios.$get(
         `/api/organizations/${organizationId}/projects`
@@ -69,14 +73,18 @@ export const actions = {
       commit('setProjects', projects)
     }
   },
+  async loadOrganizations({ commit, auth }) {
+    const organization = await this.$axios.$get('/api/organizations/')
+    commit('setOrganization', organization)
+  },
   async loadOrganization({ commit, auth }) {
     const organization = await this.$axios.$get('/api/organizations/')
     commit('setOrganization', organization)
   },
   setActiveOrganization({ commit, dispatch, auth }, organization) {
-    dispatch('loadProjects')
     commit('setOrganization', organization)
     commit('setActiveRoom', null)
+    dispatch('loadProjects')
     this.$matrix.activeRoom = null
     dispatch('chat/fetchSpaceRooms', [], { root: true })
   },

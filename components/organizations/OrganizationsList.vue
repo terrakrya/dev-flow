@@ -59,11 +59,6 @@ export default {
     activeOrganization() {
       return this.$store.state.organization || []
     },
-    otherOrganizations() {
-      return this.organizations.filter((organization) => {
-        return organization.id !== this.activeOrganization.id
-      })
-    },
   },
   methods: {
     setOrganizationAsActive(organization) {

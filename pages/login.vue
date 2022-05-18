@@ -14,9 +14,7 @@
             type="password"
           />
           <b-btn class="btn btn-primary" @click="localLogin">Entrar</b-btn>
-          <b-btn to="/register" class="btn btn-primary" @click="localLogin">
-            Registrar
-          </b-btn>
+          <b-btn to="/register" class="btn btn-primary"> Registrar </b-btn>
         </div>
       </div>
     </div>
@@ -42,7 +40,12 @@ export default {
             password: this.password,
           },
         })
-        this.$router.push('/admin')
+        if (this.$store.state.organizationInvite) {
+          this.$router.push(this.$store.state.organizationInvite)
+          this.$store.commit('setOrganizationInvite', null)
+        } else {
+          this.$router.push('/admin')
+        }
       } catch (error) {
         this.showError(error)
       }

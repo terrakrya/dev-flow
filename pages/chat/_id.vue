@@ -255,7 +255,6 @@ export default {
 
     async registerMatrixUser() {
       await this.$matrix.registerUser({ authenticatedAxios: this.$axios })
-      // await this.$matrix.login()
     },
     async fetchChatData() {
       if (this.chatReady) {

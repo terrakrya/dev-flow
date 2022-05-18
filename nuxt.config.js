@@ -65,6 +65,7 @@ export default {
 
   env: {
     jitsiServerUrl: process.env.JITSI_SERVER_URL,
+    baseUrl: process.env.BASE_URL || 'http://127.0.0.1:3000/',
   },
 
   server: {
