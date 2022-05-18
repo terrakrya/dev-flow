@@ -291,41 +291,41 @@ class MatrixService extends Service {
   }
 
   setupActiveRoom(room) {
+    this.stopListeningRoomEvents()
     if (!room) return
     this.$store.commit('setActiveRoom', room.roomId)
 
-    this.stopListeningRoomEvents()
     this.activeRoom = room
 
     this.setActiveRoomMessages()
     this.startListeningRoomEvents()
   }
 
-  roomTimelineEventHandler(event, room) {
+  roomTimelineEventHandler = (event, room) => {
     if (
-      event.getType() !== 'm.room.message' ||
-      event.room_id !== this.activeRoomId
+      room?.roomId !== this.activeRoomId ||
+      event.getType() !== ('m.room.message' || 'm.room.redaction')
     ) {
       return
     }
-    this.setActiveRoomMessages()
+    this.setActiveRoomMessages(event)
   }
 
   startListeningRoomEvents() {
-    this.activeRoomListener = this.client.on('Room.timeline', (event, room) => {
-      if (
-        event.getRoomId() !== this.activeRoomId ||
-        event.getType() !== ('m.room.message' || 'm.room.redaction')
-      ) {
-        return
+    this.client.on('Room.timeline', this.roomTimelineEventHandler)
+    this.client.on(
+      'Room.localEchoUpdated',
+      (event, room, oldEventId, oldStatus) => {
+        if (oldStatus === 'sending') {
+          this.setActiveRoomMessages()
+        }
       }
-      this.setActiveRoomMessages(event)
-    })
+    )
   }
 
   stopListeningRoomEvents() {
-    // if (this.activeRoomListener)
-    //   this.client.removeListener(this.activeRoomListener)
+    this.client.removeAllListeners('Room.timeline')
+    this.client.removeAllListeners('Room.localEchoUpdated')
   }
 
   sendTextMessage(txt) {
@@ -363,8 +363,6 @@ class MatrixService extends Service {
 
   async registerUser({ authenticatedAxios }) {
     const username = `terrakrya_${uuidv4()}`
-    console.log(`<<< Start Registration ${username} >>>`)
-
     const client = await sdk.createClient({
       baseUrl: MATRIX_HOMESERVER,
     })
@@ -446,7 +444,7 @@ class MatrixService extends Service {
 
   async createChildRoom({ name, topic, parentSpaceId }) {
     const newRoom = await this.createRoom({ name, topic }).catch((error) => {
-      console.log('CreateChildRoom error', error)
+      console.log('CreateChildRoom Error', error)
       return false
     })
 
@@ -487,7 +485,6 @@ class MatrixService extends Service {
       creation_content: { type: 'm.space' },
     }
 
-    console.log('Initial state:', opts)
     try {
       const room = await this.client.createRoom(opts)
       return room
