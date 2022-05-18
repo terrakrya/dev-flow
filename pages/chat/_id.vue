@@ -77,7 +77,7 @@
         </div>
         <h2 v-else>
           Parece que o chat não foi ativado para essa organização, e você não
-          tem permissão para ativar
+          tem permissão para ativar.
         </h2>
       </div>
       <b-row
@@ -177,9 +177,9 @@ export default {
   },
   methods: {
     async addSpace() {
-      this.loading = true
+      this.activating = true
       await this.$store.dispatch('chat/createSpaceForOrg')
-      this.loading = false
+      this.activating = false
     },
     parseMessages(messages) {
       return messages.map((message) => {

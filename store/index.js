@@ -74,12 +74,18 @@ export const actions = {
     }
   },
   async loadOrganizations({ commit, auth }) {
-    const organization = await this.$axios.$get('/api/organizations/')
-    commit('setOrganization', organization)
+    // const organization = await this.$axios.$get('/api/organizations/')
+    // commit('setOrganization', organization)
   },
-  async loadOrganization({ commit, auth }) {
-    const organization = await this.$axios.$get('/api/organizations/')
-    commit('setOrganization', organization)
+  async loadOrganization({ commit, state }) {
+    const organizationId = state.organization?.id
+    if (organizationId) {
+      const organization = await this.$axios.$get(
+        `/api/organizations/${organizationId}`
+      )
+      console.log('organization', organization)
+      commit('setOrganization', organization)
+    }
   },
   setActiveOrganization({ commit, dispatch, auth }, organization) {
     commit('setOrganization', organization)

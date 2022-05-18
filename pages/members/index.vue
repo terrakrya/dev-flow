@@ -40,6 +40,9 @@ export default {
       return this.$store.state.organization || {}
     },
   },
+  created() {
+    this.$store.dispatch('loadOrganization')
+  },
 }
 </script>
 <style>

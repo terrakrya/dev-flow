@@ -84,6 +84,9 @@ export default {
     }
   },
   computed: {
+    baseURL() {
+      return process.env.baseUrl
+    },
     labelText() {
       if (this.label) {
         return this.label

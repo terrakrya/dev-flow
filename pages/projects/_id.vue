@@ -14,7 +14,7 @@
             title="Editar projeto"
             hide-footer
           >
-            <project-form
+            <form-project-form
               :edit="project"
               @change="projectSaved"
               @archived="projectArchived"
@@ -33,7 +33,7 @@
             title="Adicionar cartão"
             hide-footer
           >
-            <card-form :project="project" @change="cardSaved" />
+            <form-card-form :project="project" @change="cardSaved" />
           </b-modal>
         </b-col>
       </b-row>

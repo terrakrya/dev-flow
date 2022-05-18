@@ -33,7 +33,7 @@
       v-observable="setScrolledToBottom"
       :message="lastMessage"
       :is-first-from-sender="
-        messagesWithoutLast.lengh > 0
+        messagesWithoutLast.length > 0
           ? lastMessage.sender !=
             messagesWithoutLast[messagesWithoutLast.length - 1].sender
           : true

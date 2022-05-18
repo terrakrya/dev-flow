@@ -2,7 +2,7 @@
   <header>
     <b-navbar toggleable="md" variant="dark" type="dark">
       <b-container fluid>
-        <b-navbar-brand to="/">
+        <b-navbar-brand to="/admin">
           <div class="d-flex justify-content-center">
             <Organization />
           </div>
@@ -12,8 +12,6 @@
           <b-navbar-nav />
           <b-navbar-nav class="ml-auto">
             <b-nav-item-dropdown right>
-              <!-- Using 'button-content' slot -->
-
               <template #button-content>
                 <Avatar :name="user.name" :src="user.avatarUrl" size="3rem" />
               </template>

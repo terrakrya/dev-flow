@@ -10,7 +10,9 @@
       />
       <div>
         <h3>{{ organization.name }}</h3>
-        <p>{{ organization.description }}</p>
+        <p :class="{ hide: !organization.description }">
+          {{ organization.description || 'descrição' }}
+        </p>
       </div>
     </div>
   </b-container>
@@ -35,5 +37,8 @@ export default {
 }
 .navbar-brand {
   margin-bottom: -16px;
+}
+.hide {
+  visibility: hidden;
 }
 </style>

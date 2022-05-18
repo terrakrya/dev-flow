@@ -6,19 +6,17 @@ const Profile = require('../models/Profile')
 const Organization = mongoose.model('Organization')
 const Project = mongoose.model('Project')
 
-// router.get('/', authenticated, (req, res) => {
-//   Organization.findOne(
-//     { githubId: req.user.organization },
-//     { githubId: req.user.organization },
-//     { upsert: true, new: true }
-//   ).exec((err, organization) => {
-//     if (err) {
-//       res.status(422).send(err.message)
-//     } else {
-//       res.json(organization)
-//     }
-//   })
-// })
+router.get('/:id', authenticated, (req, res) => {
+  Organization.findById(req.params.id)
+    .populate('members')
+    .exec((err, organization) => {
+      if (err) {
+        res.status(422).send(err.message)
+      } else {
+        res.json(organization)
+      }
+    })
+})
 
 router.put('/:id', authenticated, (req, res) => {
   const params = req.body
@@ -81,10 +79,9 @@ router.post('/:id/join', authenticated, (req, res) => {
   const userId = req.user._id
 
   try {
-    Organization.findByIdAndUpdate(
-      orgId,
-      { $push: { members: userId } },
-      (err, organization) => {
+    Organization.findByIdAndUpdate(orgId, { $push: { members: userId } })
+      .populate('members')
+      .exec((err, organization) => {
         if (err) {
           res.status(422).send(err)
         }
@@ -97,11 +94,10 @@ router.post('/:id/join', authenticated, (req, res) => {
               res.status(422).send(err)
             }
 
-            res.status(200).send()
+            res.status(200).send(organization)
           }
         )
-      }
-    )
+      })
   } catch (err) {
     res.status(422).send(err)
   }
