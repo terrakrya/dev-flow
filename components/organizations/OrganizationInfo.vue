@@ -11,7 +11,6 @@
               v-model="uploadedImage"
               avatar
               type="images"
-              label=""
               @input="handleAvatarUpload"
             />
             <Avatar
@@ -25,6 +24,13 @@
           <div v-if="isEditing" class="mt-4">
             <b-input v-model="form.name" class="m-2" />
             <b-input v-model="form.description" class="m-2" />
+            <h5>Matrix</h5>
+            <b-input
+              v-model="form.mainRoom"
+              label="Endereço do Espaço"
+              class="m-2"
+            />
+
             <b-button class="m-2" variant="info" block @click="toggleEdit">
               <div v-if="!isSaving">
                 <b-icon-pencil />
@@ -36,15 +42,37 @@
           <div v-else md="8">
             <h2>{{ organization.name }}</h2>
             <p>{{ organization.description }}</p>
-          </div>
+            <h5>Matrix</h5>
 
+            <p class="m-2">
+              Status do Espaço:
+              {{ organization.mainRoom ? 'Ativo' : 'Inativo' }}
+            </p>
+          </div>
+          <div v-if="inviting" class="m-2">
+            <b-input-group>
+              <b-input
+                ref="inviteInput"
+                readonly
+                :value="OrgInviteLink"
+                @focus="$event.target.select()"
+              />
+              <b-input-group-prepend>
+                <b-button @click="copyToClipboard"
+                  ><b-icon-clipboard /> Copiar</b-button
+                >
+              </b-input-group-prepend>
+            </b-input-group>
+            <small>Copie e envie o link de convite</small>
+          </div>
           <div v-if="!isEditing">
+            <b-button block variant="success" @click="inviting = !inviting">
+              <b-icon-people />
+              {{ inviting ? 'Esconder convites' : 'Convidar Pessoas' }}
+            </b-button>
+
             <b-button class="my-2" variant="info" block @click="toggleEdit">
               Editar
-            </b-button>
-            <b-button variant="success" to="/members" block>
-              <b-icon-people />
-              Ver Membros
             </b-button>
             <b-btn
               block
@@ -53,7 +81,8 @@
             >
               Sair da organização
             </b-btn>
-            <p class="mt-4">ID: {{ organization.id }}</p>
+
+            <small class="mt-4">ID: {{ organization.id }}</small>
           </div>
         </div>
       </b-card-body>
@@ -70,21 +99,36 @@ export default {
   },
   data() {
     return {
+      inviting: false,
       uploadedImage: null,
       form: {
         name: '',
         description: '',
         avatarUrl: '',
+        mainRoom: '',
       },
       isEditing: false,
       isSaving: false,
     }
+  },
+  computed: {
+    OrgInviteLink() {
+      return `${process.env.baseUrl}/organizations/${this.organization.id}/invite`.replace(
+        '//org',
+        '/org'
+      )
+    },
   },
   methods: {
     async leaveOrganization(organizationId) {
       await this.$axios.$post(`/api/organizations/${organizationId}/leave`)
       await this.$auth.fetchUser()
       // TODO
+    },
+    copyToClipboard() {
+      this.$refs.inviteInput.focus()
+      document.execCommand('copy')
+      this.$toast.success('Link de convite copiado!')
     },
     async toggleEdit() {
       if (this.isEditing) {
@@ -94,6 +138,7 @@ export default {
         this.form = {
           name: this.organization.name,
           description: this.organization.description,
+          mainRoom: this.organization.mainRoom,
         }
         this.uploadedImage = { thumb: this.organization.avatarUrl }
         this.isEditing = true
@@ -112,6 +157,7 @@ export default {
         })
       this.isSaving = false
     },
+    addSpace() {},
     handleAvatarUpload(file) {
       this.form.avatarUrl = file.url
     },

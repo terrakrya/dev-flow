@@ -7,12 +7,12 @@
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
           <h2>Registrar</h2>
-          <b-input required class="m-2" v-model="name" placeholder="Nome" />
-          <b-input required class="m-2" v-model="email" placeholder="Email" />
+          <b-input v-model="name" required class="m-2" placeholder="Nome" />
+          <b-input v-model="email" required class="m-2" placeholder="Email" />
           <b-input
+            v-model="password"
             required
             class="m-2"
-            v-model="password"
             placeholder="Senha"
             type="password"
           />
@@ -50,6 +50,10 @@ export default {
             password: this.password,
           },
         })
+        if (this.$store.state.organizationInvite) {
+          this.$router.push(this.$store.state.organizationInvite)
+          this.$store.commit('setOrganizationInvite', null)
+        }
       } catch (error) {
         this.showError(error)
       }

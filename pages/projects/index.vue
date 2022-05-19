@@ -25,12 +25,12 @@
           <b-icon-plus /> Adicionar cartão
         </b-btn>
         <b-modal v-model="show_card_form" title="Adicionar cartão" hide-footer>
-          <card-form @change="cardSaved" />
+          <form-card-form @change="cardSaved" />
         </b-modal>
       </b-col>
     </b-row>
     <b-modal v-model="show_project_form" title="Adicionar projeto" hide-footer>
-      <project-form @change="projectSaved" />
+      <form-project-form @change="projectSaved" />
     </b-modal>
     <Kanban :cards="cards" multiple @change="loadCards" />
   </b-container>
@@ -54,9 +54,14 @@ export default {
     },
   },
   created() {
+    this.loadProjects()
     this.loadCards()
   },
+
   methods: {
+    loadProjects() {
+      this.$store.dispatch('loadProjects')
+    },
     async loadCards() {
       this.cards = await this.$axios.$get(
         `/api/cards?organization=${this.activeOrganizationId}`

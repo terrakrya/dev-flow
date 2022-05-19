@@ -20,7 +20,7 @@
             />
           </div>
           <div v-if="isEditing">
-            <b-input class="mt-2" v-model="form.name" placeholder="Nome" />
+            <b-input v-model="form.name" class="mt-2" placeholder="Nome" />
             <b-input
               v-model="form.email"
               class="mt-2"
@@ -28,10 +28,21 @@
               disabled
             />
           </div>
-          <div class="mt-4" v-else>
+          <div v-else class="mt-4">
             <p class="m-2">Nome: {{ user.name }}</p>
             <p class="m-2">Email: {{ user.email }}</p>
+
+            <h5>Matrix</h5>
+            <p v-if="user.matrixId" class="m-2">Conta: {{ user.matrixId }}</p>
+            <p class="m-2">
+              Status: {{ isLoggedMatrix ? 'Conectado' : 'Desconectado' }}
+            </p>
+            <b-btn v-if="isLoggedMatrix">Conectar com outra conta Matrix</b-btn>
+            <b-btn v-else to="/chat/index">Conectar com uma conta Matrix</b-btn>
+
+            <b-btn v-if="isLoggedMatrix">Remover conta</b-btn>
           </div>
+
           <b-button class="mt-4" block variant="success" @click="toggleEdit">{{
             isEditing ? 'Salvar' : 'Editar'
           }}</b-button>
@@ -59,6 +70,9 @@ export default {
   computed: {
     user() {
       return this.$auth.user
+    },
+    isLoggedMatrix() {
+      return this.$matrix?.client?.isLoggedIn()
     },
   },
   methods: {

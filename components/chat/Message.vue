@@ -1,15 +1,19 @@
 <template>
-  <div :class="{ message: true, first: isFirstFromSender }">
-    <div v-if="isFirstFromSender" class="d-flex justify-content-between">
-      <h5 class="title">
-        {{ message.sender }}
-      </h5>
-      <small>{{ date }}</small>
-    </div>
-    <p>
-      {{ message.content }}
-    </p>
-  </div>
+  <ChatMessageBubble
+    v-if="allowedTypes.includes(message.type)"
+    :message="message"
+    :is-first-from-sender="isFirstFromSender"
+  >
+    <ChatTextMessage v-if="message.type === 'm.text'" :message="message" />
+    <ChatImageMessage
+      v-else-if="message.type === 'm.image'"
+      :message="message"
+    />
+    <ChatNoticeMessage
+      v-else-if="message.type === 'm.notice'"
+      :message="message"
+    />
+  </ChatMessageBubble>
 </template>
 
 <script>
@@ -23,13 +27,20 @@ export default {
       type: Boolean,
     },
   },
+  data() {
+    return {
+      showNotice: false,
+    }
+  },
   computed: {
-    date() {
-      const d = new Date(this.message.timestamp)
-      return d.toDateString()
+    allowedTypes() {
+      let allowed = ['m.text', 'm.image']
+      if (this.showNotice) {
+        allowed = [...allowed, 'm.notice']
+      }
+      return allowed
     },
   },
-  created() {},
 }
 </script>
 <style>
@@ -42,6 +53,6 @@ export default {
   border-top: 1px dashed rgba(80, 80, 80, 0.6);
 }
 .title {
-  margin-left: -10px;
+  margin-left: 10px;
 }
 </style>

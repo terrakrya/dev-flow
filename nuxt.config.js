@@ -22,6 +22,7 @@ export default {
     '~/plugins/global-mixin.js',
     '~/plugins/v-tooltip.js',
     '~/plugins/linkify.js',
+    { src: '~/plugins/observable.client.js', ssr: false },
     { src: '~plugins/quill.js', ssr: false },
   ],
 
@@ -64,6 +65,7 @@ export default {
 
   env: {
     jitsiServerUrl: process.env.JITSI_SERVER_URL,
+    baseUrl: process.env.BASE_URL || 'http://127.0.0.1:3000/',
   },
 
   server: {

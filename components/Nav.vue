@@ -1,5 +1,5 @@
 <template>
-  <b-container fluid class="mb-2">
+  <b-container fluid class="mb-2 mt-1">
     <b-nav tabs>
       <b-nav-item to="/admin"> <b-icon-bar-chart /> Dashboard </b-nav-item>
       <b-nav-item v-if="projects" to="/projects" class="text-dark">
@@ -25,12 +25,12 @@
         Membros <b-badge> {{ members.length }} </b-badge>
       </b-nav-item>
 
-      <b-nav-item to="/chat/!wgWHBtEuZsOYCjtfaz:terrakrya.com">
+      <b-nav-item to="/chat/index">
         <b-icon-people />
         Chat (beta)
       </b-nav-item>
     </b-nav>
-    <JitsiMeet />
+    <ChatJitsiMeet />
   </b-container>
 </template>
 

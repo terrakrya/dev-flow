@@ -90,7 +90,11 @@
       size="lg"
       @hide="close"
     >
-      <card-form :project="card.project" :edit="card" @change="cardChanged" />
+      <form-card-form
+        :project="card.project"
+        :edit="card"
+        @change="cardChanged"
+      />
     </b-modal>
   </div>
 </template>

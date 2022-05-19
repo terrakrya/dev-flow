@@ -2,9 +2,11 @@
   <div class="admin">
     <Header />
     <div class="main">
-      <Organization />
       <Nav />
       <Nuxt />
+      <!-- dummy div to help scroll page to bottom when needed-->
+      <Onboarding />
+      <div id="dummy-page-bottom" />
     </div>
   </div>
 </template>
@@ -14,33 +16,8 @@ export default {
   components: { Header },
   middleware: 'auth',
   created() {
-    if (this.$auth.loggedIn) {
+    if (this.$auth.loggedIn && !this.$store.state.organization) {
       this.$store.dispatch('activateDefaultOrganization')
-      // if no organization, show
-      // this.octokit.repos
-      //   .listForOrg({
-      //     org: this.org,
-      //   })
-      //   .then((resp) => {
-      //     this.$store.commit('setRepositories', resp.data.reverse())
-      //   })
-
-      // this.octokit.orgs
-      //   .get({
-      //     org: this.org,
-      //   })
-      //   .then((res) => {
-      //     this.$store.commit('setOrganization', res.data)
-      //   })
-
-      // this.octokit.orgs
-      //   .listMembers({
-      //     org: this.org,
-      //   })
-      //   .then((resp) => {
-      //     this.$store.commit('setMembers', resp.data)
-      //   })
-      // this.$store.dispatch('loadProjects')
     }
   },
   methods: {

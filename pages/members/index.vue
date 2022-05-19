@@ -2,8 +2,6 @@
   <b-container fluid>
     <b-row>
       <b-col md="8">
-        <h1>Integrantes de {{ activeOrganization.name }}</h1>
-
         <!-- card components for each members of activeOrganization  -->
         <b-container class="d-flex justify-content-end">
           <b-card
@@ -41,6 +39,9 @@ export default {
     activeOrganization() {
       return this.$store.state.organization || {}
     },
+  },
+  created() {
+    this.$store.dispatch('loadOrganization')
   },
 }
 </script>

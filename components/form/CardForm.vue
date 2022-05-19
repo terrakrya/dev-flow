@@ -71,7 +71,7 @@
           <span class="text-danger">{{ errors[0] }}</span>
         </b-form-group>
         <b-form-group label="Membros">
-          <MembersSelect v-model="form.members" />
+          <FormMembersSelect v-model="form.members" />
         </b-form-group>
         <Upload
           v-model="form.documents"
@@ -132,8 +132,8 @@
 <script>
 import { ValidationObserver, ValidationProvider } from 'vee-validate'
 import { Mentionable } from 'vue-mention'
-import columns from '@/content/columns.json'
 import { apiDataToForm } from './utils'
+import columns from '@/content/columns.json'
 export default {
   components: {
     ValidationObserver,

@@ -42,12 +42,11 @@
 
 <script>
 import draggable from 'vuedraggable'
+import forEach from 'lodash/forEach'
 import columns from '@/content/columns.json'
-import KanbanCard from './KanbanCard.vue'
 
 export default {
   components: {
-    KanbanCard,
     draggable,
   },
   props: {
@@ -98,7 +97,7 @@ export default {
 
       // roda nos filhos da coluna e pega os ids/ordem
       const cardsToReorder = []
-      event.to.children.forEach((child, order) => {
+      forEach(event.to.children, (child, order) => {
         cardsToReorder.push({ id: child.id, order })
       })
 

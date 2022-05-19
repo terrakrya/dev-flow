@@ -85,24 +85,22 @@ router.post('/:githubId/activateChat', authenticated, function (req, res) {
   )
 })
 
-router.put('/:githubId/activateChat', authenticated, function (req, res) {
-  Profile.findOne({ githubId: req.params.githubId }).exec(
-    async (err, profile) => {
-      if (err) {
-        res.status(422).send(err.message)
-      } else {
-        try {
-          const newMatrixUser = await registerMatrixUser()
-          profile.matrixId = newMatrixUser.user_id
-          profile.matrixAccessToken = newMatrixUser.access_token
-          await profile.save()
+router.put('/:userId/activateChat', authenticated, function (req, res) {
+  Profile.findById(req.params.userId).exec(async (err, profile) => {
+    if (err) {
+      res.status(422).send(err.message)
+    } else {
+      try {
+        const newMatrixUser = await registerMatrixUser()
+        profile.matrixId = newMatrixUser.user_id
+        profile.matrixAccessToken = newMatrixUser.access_token
+        await profile.save()
 
-          res.send(profile)
-        } catch (error) {
-          res.status(500).send(err)
-        }
+        res.send(profile)
+      } catch (error) {
+        res.status(500).send(err)
       }
     }
-  )
+  })
 })
 module.exports = router
