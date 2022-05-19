@@ -1,0 +1,8 @@
+User-Agent: *
+Allow: /
+
+# Host 
+Host: https://devflow.terrakrya.com
+
+# Sitemaps
+Sitemap: https://devflow.terrakrya.com/sitemap.xml
