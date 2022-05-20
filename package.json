@@ -2,6 +2,7 @@
   "name": "dev-flow",
   "version": "1.0.0",
   "private": true,
+ "nodeVersion": ">=12.0.0",
   "scripts": {
     "dev:docker": "docker-compose -f docker-compose.development.yml up --build",
     "dev": "nuxt",
