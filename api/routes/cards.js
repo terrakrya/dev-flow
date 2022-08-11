@@ -12,7 +12,6 @@ router.get('/', authenticated, (req, res) => {
   if (req.query.organization) {
     query.organization = req.query.organization
   }
-
   Card.find(query)
     .populate('project')
     .sort('order')

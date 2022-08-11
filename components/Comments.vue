@@ -10,7 +10,7 @@
         {{ comment.message }}
       </p>
     </b-media>
-    <CommentForm :target="target" @change="commentSaved" />
+    <FormCommentForm :target="target" @change="commentSaved" />
   </div>
 </template>
 <script>

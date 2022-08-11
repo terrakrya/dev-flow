@@ -142,9 +142,9 @@ export default {
     },
   },
   async created() {
-    this.comments = await this.$axios.$get('/api/comments', {
-      params: { target: this.target },
-    })
+    // this.comments = await this.$axios.$get('/api/comments', {
+    //   params: { target: this.target },
+    // })
   },
   methods: {
     cardChanged(card) {
