@@ -73,6 +73,32 @@
         <b-form-group label="Membros">
           <FormMembersSelect v-model="form.members" />
         </b-form-group>
+        <div class="tempo">
+          <small>Data limite</small>
+          <input
+            v-model="form.due_date"
+            size="sm"
+            type="date"
+            placeholder="Data limite"
+          />
+          <small>Tempo estimado (horas)</small>
+
+          <input
+            v-model="form.time_estimate"
+            size="sm"
+            type="number"
+            placeholder="Tempo estimado (horas)"
+            append="Horas"
+          />
+          <small>Tempo gasto (horas)</small>
+
+          <input
+            v-model="form.time_spent"
+            size="sm"
+            type="number"
+            placeholder="Tempo gasto (horas)"
+          />
+        </div>
         <Upload
           v-model="form.documents"
           type="documents"
@@ -162,6 +188,9 @@ export default {
         documents: [],
         images: [],
         title: '',
+        due_date: undefined,
+        time_estimate: undefined,
+        time_spent: undefined,
       },
     }
   },
@@ -226,3 +255,31 @@ export default {
   },
 }
 </script>
+<style>
+.tempo input {
+  max-width: fit-content !important;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid #28a745;
+  color: white;
+  margin-bottom: 8px;
+  padding-bottom: 2px;
+}
+
+.tempo input[type='number'] {
+  -moz-appearance: textfield;
+}
+.tempo input[type='number']::-webkit-inner-spin-button,
+.tempo input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.tempo {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-content: flex-start;
+  margin: 10px 0;
+  margin-bottom: 14px;
+}
+</style>

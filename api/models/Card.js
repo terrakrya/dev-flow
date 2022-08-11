@@ -52,6 +52,15 @@ const CardSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    due_date: {
+      type: Date,
+    },
+    time_estimate: {
+      type: Number, // hours
+    },
+    time_spent: {
+      type: Number, // hours
+    },
   },
   {
     timestamps: true,
