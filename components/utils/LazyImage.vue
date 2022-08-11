@@ -87,7 +87,7 @@ export default {
 
 .image {
   width: 100%;
-  height: 100%;
+  height: auto;
   border-radius: 6px;
 }
 .wrapper {
