@@ -33,19 +33,47 @@
             <p class="m-2">Email: {{ user.email }}</p>
 
             <h5>Matrix</h5>
-            <p v-if="user.matrixId" class="m-2">Conta: {{ user.matrixId }}</p>
-            <p class="m-2">
+            <p v-if="user.matrixId && !showChangeMxUser" class="m-2">
+              Conta: {{ user.matrixId }}
+            </p>
+            <p v-if="!showChangeMxUser" class="m-2">
               Status: {{ isLoggedMatrix ? 'Conectado' : 'Desconectado' }}
             </p>
-            <b-btn v-if="isLoggedMatrix">Conectar com outra conta Matrix</b-btn>
+
+            <div v-if="showChangeMxUser">
+              <b-input v-model="mxForm.matrixId" placeholder="Your matrix Id" />
+              <b-input
+                v-model="mxForm.password"
+                placeholder="password"
+                type="password"
+              />
+            </div>
+
+            <b-btn
+              v-if="isLoggedMatrix"
+              :disabled="loading"
+              @click="handleChangeMxAccount"
+              >{{
+                showChangeMxUser
+                  ? 'Confirmar'
+                  : 'Conectar com outra conta Matrix'
+              }}</b-btn
+            >
             <b-btn v-else to="/chat/index">Conectar com uma conta Matrix</b-btn>
 
-            <b-btn v-if="isLoggedMatrix">Remover conta</b-btn>
+            <b-btn v-if="isLoggedMatrix && !showChangeMxUser"
+              >Remover conta</b-btn
+            >
           </div>
 
-          <b-button class="mt-4" block variant="success" @click="toggleEdit">{{
-            isEditing ? 'Salvar' : 'Editar'
-          }}</b-button>
+          <b-button
+            :disabled="loading"
+            class="mt-4"
+            block
+            variant="success"
+            @click="toggleEdit"
+            >{{ isEditing ? 'Salvar' : 'Editar' }}</b-button
+          >
         </b-card>
       </b-col>
 
@@ -64,7 +92,13 @@ export default {
         email: '',
         avatarUrl: null,
       },
+      mxForm: {
+        matrixId: '',
+        password: '',
+      },
+      showChangeMxUser: false,
       isEditing: false,
+      loading: false,
     }
   },
   computed: {
@@ -76,6 +110,27 @@ export default {
     },
   },
   methods: {
+    async handleChangeMxAccount() {
+      if (this.showChangeMxUser) {
+        await this.updateMxAccount()
+        this.showChangeMxUser = false
+      } else {
+        this.showChangeMxUser = true
+      }
+    },
+    async updateMxAccount() {
+      this.loading = true
+      // await this.$matrix.client.logout()
+      await this.$matrix
+        .loginExistentUser(
+          this.mxForm.matrixId,
+          this.mxForm.password,
+          this.$axios
+        )
+        .catch(this.showError)
+      await this.$auth.fetchUser()
+      this.loading = false
+    },
     toggleEdit() {
       if (this.isEditing) {
         this.updateUser(this.form)
