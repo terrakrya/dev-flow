@@ -6,7 +6,7 @@
     }"
   >
     <b-button
-      v-if="canLoadMoreHistory"
+      v-if="!isFetchingHistory"
       v-observable:enter="fetchHistory"
       pill
       block
@@ -93,8 +93,8 @@ export default {
           console.log('fetching history')
           this.previousLastEventId = this.messagesWithoutLast[0]?.id
           this.isFetchingHistory = true
-          const response = await this.$matrix.fetchHistory()
-          this.canLoadMoreHistory = !!response
+          await this.$matrix.fetchHistory()
+          // this.canLoadMoreHistory = !!response
           this.isFetchingHistory = false
           this.scrollAfterFetch()
         },
