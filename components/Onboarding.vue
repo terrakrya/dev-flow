@@ -44,7 +44,7 @@
           variant="primary"
           @click="activateChat(true)"
         >
-          <b-spinner v-if="activating" />
+          <b-spinner v-if="loading" />
           <span v-else>Conectar</span>
         </b-button>
         <p class="text-muted m-2 align-center">
@@ -57,7 +57,7 @@
           variant="primary"
           @click="registerMatrixUser(true)"
         >
-          <b-spinner v-if="activating" />
+          <b-spinner v-if="loading" />
           <span v-else>Continuar</span>
         </b-button>
       </div>
@@ -132,6 +132,16 @@ export default {
     async registerMatrixUser() {
       this.loading = true
       await this.$matrix.registerUser({ authenticatedAxios: this.$axios })
+      await this.$auth.fetchUser()
+      this.loading = false
+    },
+    async activateChat() {
+      this.loading = true
+      await this.$matrix.loginExistentUser(
+        this.matrixForm.login,
+        this.matrixForm.password,
+        this.$axios
+      )
       await this.$auth.fetchUser()
       this.loading = false
     },

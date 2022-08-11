@@ -402,6 +402,34 @@ class MatrixService extends Service {
     }
   }
 
+  async loginExistentUser(userId, password, authenticatedAxios) {
+    try {
+      const tmpClient = await sdk.createClient({
+        baseUrl: MATRIX_HOMESERVER,
+      })
+      const matrixUser = await tmpClient.loginWithPassword(userId, password)
+
+      if (matrixUser && matrixUser.user_id && matrixUser.access_token) {
+        const matrixCredentials = {
+          matrixId: matrixUser.user_id,
+          matrixAccessToken: matrixUser.access_token,
+        }
+        await authenticatedAxios.put('/api/auth/me', matrixCredentials)
+        await this.createClient(matrixCredentials)
+        await this.startClient()
+        return matrixUser
+      } else {
+        throw new Error(
+          'Missing fields from matrix registration response!',
+          matrixUser
+        )
+      }
+    } catch (e) {
+      console.log('Login user error:', e)
+      throw e
+    }
+  }
+
   async sendEditMessage(txt, targetEventId) {
     const formatedContent = ' * ' + txt
     await this.client.sendEvent(this.activeRoomId, 'm.room.message', {
