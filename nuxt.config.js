@@ -60,18 +60,18 @@ export default {
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: process.env.BASE_URL || 'http://127.0.0.1:3000/',
+    baseURL: process.env.BASE_URL || 'http://0.0.0.0:3000/',
   },
 
   env: {
     DEFAULT_STORAGE_BUCKET_FULL_URL:
       process.env.DEFAULT_STORAGE_BUCKET_FULL_URL,
     jitsiServerUrl: process.env.JITSI_SERVER_URL,
-    baseUrl: process.env.BASE_URL || 'http://127.0.0.1:3000/',
+    baseUrl: process.env.BASE_URL || 'http://0.0.0.0:3000/',
   },
 
   server: {
-    host: '127.0.0.1',
+    host: '0.0.0.0',
   },
   // Content module configuration (https://go.nuxtjs.dev/config-content)
   content: {},
