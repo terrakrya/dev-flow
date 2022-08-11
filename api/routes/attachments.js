@@ -4,10 +4,14 @@ const router = express.Router()
 const multer = require('multer')
 const sharp = require('sharp')
 const { authenticated } = require('../config/auth')
+const { uploadFileToS3 } = require('../uploadService')
+
+const fullBucketProjectPath = process.env.DEFAULT_STORAGE_BUCKET_FULL_URL
 
 const UPLOAD_PATH = 'api/uploads/'
 const ATTACHMENTS_PATH = UPLOAD_PATH + 'attachments/'
 const THUMBS_PATH = UPLOAD_PATH + 'thumbs/'
+
 !fs.existsSync(UPLOAD_PATH) && fs.mkdirSync(UPLOAD_PATH)
 !fs.existsSync(ATTACHMENTS_PATH) && fs.mkdirSync(ATTACHMENTS_PATH)
 !fs.existsSync(THUMBS_PATH) && fs.mkdirSync(THUMBS_PATH)
@@ -36,26 +40,37 @@ const attachmentUploader = multer({
 router.post(
   '/upload',
   [authenticated, attachmentUploader.single('attachment')],
-  (req, res) => {
-    const url = req.file.filename
-    const original = ATTACHMENTS_PATH + url
-    const thumb = THUMBS_PATH + url
+  async (req, res) => {
+    const filename = req.file.filename
 
-    sharp(original)
+    await uploadFileToS3({
+      filename,
+      originalFilePath: ATTACHMENTS_PATH + filename,
+      targetFolder: ATTACHMENTS_PATH,
+    }).catch((error) => {
+      res.status(500).send(error)
+    })
+
+    const thumbData = sharp(ATTACHMENTS_PATH + filename)
       .resize({
         width: 200,
         height: 200,
         withoutEnlargement: true,
         fit: sharp.fit.cover,
       })
-      .toFile(thumb, function (err) {
-        if (!err) {
-          res.status(201).send({
-            url: '/' + original,
-            thumb: '/' + thumb,
-          })
-        }
-      })
+      .toBuffer()
+
+    await uploadFileToS3({
+      filename,
+      fileBuffer: thumbData,
+      targetFolder: THUMBS_PATH,
+    })
+
+    res.status(201).send({
+      title: filename,
+      url: ATTACHMENTS_PATH + filename,
+      thumb: THUMBS_PATH + filename,
+    })
   }
 )
 

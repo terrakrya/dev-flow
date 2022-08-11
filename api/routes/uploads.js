@@ -91,8 +91,8 @@ router.post(
 
     res.status(201).send({
       title: '',
-      url: fullBucketProjectPath + original,
-      thumb: fullBucketProjectPath + thumb,
+      url: original,
+      thumb,
     })
 
     const averageData = await sharp(original, { failOnError: false })
@@ -154,9 +154,7 @@ router.post(
       res.status(500).send(error)
     })
 
-    res
-      .status(201)
-      .send({ title: filename, url: fullBucketProjectPath + path + filename })
+    res.status(201).send({ title: filename, url: path + filename })
 
     // PDFImage not working
     // if (filename.endsWith('.pdf')) {

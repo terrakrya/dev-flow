@@ -12,13 +12,13 @@
               >
                 <div>
                   <a
-                    :href="item.url"
+                    :href="bucketUrl + item.url"
                     target="_blank"
                     class="text-decoration-none text-white"
                   >
                     <b-img
-                      v-if="item.thumb || url"
-                      :src="item.thumb || url"
+                      v-if="bucketUrl + item.thumb || bucketUrl + url"
+                      :src="bucketUrl + item.thumb || bucketUrl + url"
                       fluid
                       thumbnail
                       width="100"
@@ -68,7 +68,11 @@
         <b-avatar
           size="6rem"
           :src="
-            preview && preview[0] && preview[0].thumb ? preview[0].thumb : null
+            preview && preview[0] && preview[0]
+              ? preview[0].thumb
+                ? bucketUrl + preview[0].thumb
+                : bucketUrl + preview[0].url
+              : null
           "
         >
           <template #badge><b-icon-camera /></template>
@@ -149,6 +153,9 @@ export default {
     }
   },
   computed: {
+    bucketUrl() {
+      return process.env.DEFAULT_STORAGE_BUCKET_FULL_URL
+    },
     inputId() {
       return Math.random().toString(36).substring(2, 15)
     },
@@ -161,7 +168,6 @@ export default {
       return null
     },
     preview() {
-      console.log('preview', this.value)
       if (Array.isArray(this.value)) {
         return this.value
       } else if (this.value) {

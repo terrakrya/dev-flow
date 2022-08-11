@@ -11,7 +11,7 @@
       <a @click="open">
         <b-avatar
           size="6rem"
-          :src="value && value.thumb ? baseURL + value.thumb : null"
+          :src="value && value.thumb ? bucketUrl + value.thumb : null"
         >
           <template #badge><b-icon-upload /></template>
         </b-avatar>
@@ -27,7 +27,7 @@
       <div v-if="!is_loading" class="row images_preview">
         <template v-if="Array.isArray(value) && value.length > 0">
           <div v-for="(image, index) in value" :key="index" class="col-sm-3">
-            <b-img :src="baseURL + image.thumb" fluid thumbnail />
+            <b-img :src="bucketUrl + image.thumb" fluid thumbnail />
             <div class="text-center">
               <a class="btn btn-secondary btn-sm" @click="deleteImage(index)"
                 ><i class="fa fa-trash"></i
@@ -37,7 +37,7 @@
         </template>
         <template v-if="!Array.isArray(value) && value && value.thumb">
           <div class="col-sm-3">
-            <b-img :src="baseURL + value.thumb" fluid thumbnail />
+            <b-img :src="bucketUrl + value.thumb" fluid thumbnail />
             <div class="text-center">
               <a class="btn btn-secondary btn-sm" @click="deleteImage()"
                 ><i class="fa fa-trash"></i
@@ -84,8 +84,11 @@ export default {
     }
   },
   computed: {
-    baseURL() {
-      return process.env.baseUrl
+    // baseURL() {
+    //   return process.env.baseUrl
+    // },
+    bucketUrl() {
+      return process.env.DEFAULT_STORAGE_BUCKET_FULL_URL
     },
     labelText() {
       if (this.label) {
