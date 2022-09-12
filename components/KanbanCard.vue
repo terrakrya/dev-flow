@@ -1,6 +1,22 @@
 <!-- eslint-disable vue/no-v-html -->
 <template>
   <div :id="card.id" class="rounded p-3 border kanban-card" @dblclick="open()">
+    <div class="dateBadge">
+      <h5>
+        <b-badge
+          v-if="cardDueDate"
+          :variant="
+            timeToDueDate > 0
+              ? 'danger'
+              : warningDaysInMili * -1 < timeToDueDate
+              ? 'warning'
+              : ''
+          "
+        >
+          {{ cardDueDate }}</b-badge
+        >
+      </h5>
+    </div>
     <div class="pointer" @click="open()">
       <div v-if="cardTitle" class="text-white mb-2" style="font-size: 16px">
         {{ cardTitle }}
@@ -23,6 +39,7 @@
           <span v-if="comments.length">{{ comments.length }}</span>
         </b-btn>
       </div>
+
       <div class="text-right">
         <div v-if="multiple" class="mb-2">
           <n-link :to="`/projects/${card.project._id}`">
@@ -96,6 +113,11 @@
         @change="cardChanged"
       />
     </b-modal>
+    <h5 class="estimateBadge">
+      <b-badge v-if="card.time_estimate" variant="info">
+        {{ card.time_estimate }}
+      </b-badge>
+    </h5>
   </div>
 </template>
 <script>
@@ -124,6 +146,21 @@ export default {
   computed: {
     cardTitle() {
       return (this.card.title || this.card.note).replace(/(<([^>]+)>)/gi, '')
+    },
+    warningDaysInMili() {
+      print(3 * 24 * 60 * 60 * 1000, this.timeToDueDate)
+      return 3 * 24 * 60 * 60 * 1000
+    },
+    timeToDueDate() {
+      const today = new Date().getTime()
+      const dueDate = new Date(this.card.due_date).getTime()
+      return today - dueDate
+    },
+    cardDueDate() {
+      // return formated date like dd/mm from this.card.due_date
+      return this.card.due_date
+        ? new Date(this.card.due_date).toLocaleDateString()
+        : null
     },
     showCard() {
       return this.$route.query.card && this.$route.query.card === this.card.id
@@ -191,3 +228,22 @@ export default {
   },
 }
 </script>
+<style>
+.kanban-card {
+  position: relative;
+}
+.dateBadge {
+  position: absolute;
+  top: -14px;
+  right: -6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+.estimateBadge {
+  position: absolute;
+  bottom: 14px;
+  right: -12px;
+}
+</style>
