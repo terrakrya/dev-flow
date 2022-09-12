@@ -148,7 +148,6 @@ export default {
       return (this.card.title || this.card.note).replace(/(<([^>]+)>)/gi, '')
     },
     warningDaysInMili() {
-      print(3 * 24 * 60 * 60 * 1000, this.timeToDueDate)
       return 3 * 24 * 60 * 60 * 1000
     },
     timeToDueDate() {
