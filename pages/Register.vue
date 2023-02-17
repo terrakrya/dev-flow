@@ -7,18 +7,18 @@
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
           <h2>Registrar</h2>
-          <b-input v-model="name" required class="m-2" placeholder="Nome" />
-          <b-input v-model="email" required class="m-2" placeholder="Email" />
-          <b-input
-            v-model="password"
-            required
-            class="m-2"
-            placeholder="Senha"
-            type="password"
-          />
-          <b-btn class="btn btn-primary" @click="localRegister">
-            Confirmar
-          </b-btn>
+          <b-form @submit.prevent="localRegister">
+            <b-input v-model="name" required class="m-2" placeholder="Nome" />
+            <b-input v-model="email" required class="m-2" placeholder="Email" />
+            <b-input
+              v-model="password"
+              required
+              class="m-2"
+              placeholder="Senha"
+              type="password"
+            />
+            <b-btn class="btn btn-primary" type="submit"> Confirmar </b-btn>
+          </b-form>
         </div>
       </div>
     </div>
