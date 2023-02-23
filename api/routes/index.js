@@ -28,5 +28,7 @@ router.use('/comments', require('./comments'))
 router.use('/organizations', require('./organizations'))
 router.use('/chat', require('./chat'))
 router.use('/notes', require('./notes'))
+router.use('/folders', require('./folders'))
+router.use('/bookmarks', require('./bookmarks'))
 
 export default router

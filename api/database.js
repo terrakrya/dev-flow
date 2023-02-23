@@ -1,11 +1,14 @@
 import fs from 'fs'
 import mongoose from 'mongoose'
-import './models/Note'
 import './models/Project'
 import './models/Card'
 import './models/Comment'
 import './models/Profile'
 import './models/Organization'
+import './models/wiki/Folder'
+import './models/wiki/File'
+import './models/wiki/Bookmark'
+import './models/wiki/Note'
 
 const isProduction = process.env.NODE_ENV === 'production'
 

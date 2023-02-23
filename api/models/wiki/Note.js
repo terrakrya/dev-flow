@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 // const uniqueValidator = require('mongoose-unique-validator')
 const ObjectId = mongoose.Schema.Types.ObjectId
 
-const ProjectSchema = mongoose.Schema(
+const NoteSchema = mongoose.Schema(
   {
     organization: {
       type: ObjectId,
@@ -10,8 +10,7 @@ const ProjectSchema = mongoose.Schema(
       required: true,
     },
     creator: { type: ObjectId, ref: 'Profile' },
-    folder: { type: ObjectId, ref: 'Folder' },
-
+    project: { type: ObjectId, ref: 'Project' },
     title: String,
     content: String,
     tags: [String],
@@ -26,6 +25,13 @@ const ProjectSchema = mongoose.Schema(
   }
 )
 
-const Project =
-  mongoose.models.Project || mongoose.model('Project', ProjectSchema)
-module.exports = Project
+NoteSchema.virtual('folder', {
+  ref: 'Child',
+  localField: '_id',
+  foreignField: 'item',
+  // match: { type: 'Note' },
+})
+
+const Note = mongoose.models.Note || mongoose.model('Note', NoteSchema)
+module.exports = Note
+module.exports = NoteSchema

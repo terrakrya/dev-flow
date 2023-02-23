@@ -2,7 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const router = express.Router()
 const { authenticated } = require('../config/auth')
-const Note = mongoose.model('Note')
+const Bookmark = mongoose.model('Bookmark')
 
 router.get('/', authenticated, (req, res) => {
   const query = { archived: false }
@@ -14,8 +14,7 @@ router.get('/', authenticated, (req, res) => {
   }
 
   // folder
-
-  Note.find(query)
+  Bookmark.find(query)
     .sort('order')
     .exec((err, cards) => {
       if (err) {
@@ -25,9 +24,10 @@ router.get('/', authenticated, (req, res) => {
       }
     })
 })
+
 router.get('/:id', authenticated, (req, res) => {
   const query = { _id: req.params.id }
-  Note.findOne(query).exec((err, card) => {
+  Bookmark.findOne(query).exec((err, card) => {
     if (err) {
       res.status(422).send(err.message)
     } else {
@@ -37,9 +37,8 @@ router.get('/:id', authenticated, (req, res) => {
 })
 
 router.post('/', authenticated, (req, res) => {
-  const newNote = new Note(req.body)
-  // what folder to save?
-  newNote.save((err, card) => {
+  const newBookmark = new Bookmark(req.body)
+  newBookmark.save((err, card) => {
     if (err) {
       res.status(422).send(err.message)
     } else {
@@ -51,7 +50,7 @@ router.post('/', authenticated, (req, res) => {
 router.put('/:id', authenticated, (req, res) => {
   const params = req.body
   const query = { _id: req.params.id }
-  Note.findOneAndUpdate(
+  Bookmark.findOneAndUpdate(
     query,
     {
       $set: params,
@@ -73,7 +72,7 @@ router.put('/:id', authenticated, (req, res) => {
 router.delete('/:id', authenticated, (req, res) => {
   const query = { _id: req.params.id }
 
-  Note.findOne(query).exec(async (err, card) => {
+  Bookmark.findOne(query).exec(async (err, card) => {
     if (err) {
       res.status(422).send(err.message)
     } else {
