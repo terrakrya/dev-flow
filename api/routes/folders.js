@@ -5,7 +5,7 @@ const { authenticated } = require('../config/auth')
 const Folder = mongoose.model('Folder')
 
 router.get('/', authenticated, (req, res) => {
-  const query = { organization: req.query.organization }
+  const query = { organization: req.query.organization, root: true }
 
   Folder.find(query)
     .populate({ path: 'creator', select: 'name' })
@@ -79,6 +79,8 @@ router.put('/:id/addChild', authenticated, (req, res) => {
     item: params.item,
     order: params.order,
   }
+
+  console.log(child)
   Folder.findOneAndUpdate(
     query,
     {

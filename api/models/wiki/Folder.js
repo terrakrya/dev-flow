@@ -24,7 +24,7 @@ const FolderSchema = mongoose.Schema(
       required: true,
     },
     creator: { type: ObjectId, ref: 'Profile' },
-    title: String,
+    label: String,
     children: {
       type: [ChildSchema],
     },
@@ -33,7 +33,6 @@ const FolderSchema = mongoose.Schema(
     root: {
       type: Boolean,
       default: false,
-      unique: true,
     },
   },
   {

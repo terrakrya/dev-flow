@@ -1,29 +1,36 @@
 <template>
-  <!-- recursive component, can be another folder, or a note, or a bookmark, or other -->
-  <b-list-group-item @click="handleClick">
-    {{ data.title }}
-
-    <b-btn
-      v-if="data.type === 'Folder'"
-      variant="outline-success"
-      class="my-2"
-      @click="$emit('newFolder', data.id)"
-      ><b-icon-folder /> Nova pasta</b-btn
+  <div>
+    <div
+      :class="[
+        'd-flex',
+        'align-items-center',
+        {
+          'bg-dark': data.item === selectedFolder,
+          'text-light': data.item === selectedFolder,
+        },
+      ]"
     >
-    <b-list-group>
-      <b-list-group-item v-for="child in children" :key="child._id">
-        <b-list-group-item
-          v-if="child.type === 'Folder'"
-          :to="'/wiki/' + folder.id"
-        >
+      <b-icon
+        :icon="isExpanded ? 'folder-minus' : 'folder-plus'"
+        class="mr-2 text-success"
+        @click="handleClick"
+      />
+      <h2 class="mb-0" @click="handleClick">{{ data.label }}</h2>
+    </div>
+    <div v-if="isExpanded" class="ml-4">
+      <div v-for="child in children" :key="child._id" class="mb-2">
+        <div v-if="child.type === 'Folder'">
           <Folder :data="child" />
-        </b-list-group-item>
-        <b-list-group-item v-else-if="child.type === 'Note'">
-          Note: {{ child.label }}
-        </b-list-group-item>
-      </b-list-group-item>
-    </b-list-group>
-  </b-list-group-item>
+        </div>
+        <div v-else-if="child.type === 'Note'">
+          <router-link :to="'/wiki/' + child.item">
+            <b-icon icon="file" class="mr-2 text-success" />
+            {{ child.label }}
+          </router-link>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -36,11 +43,27 @@ export default {
   },
   data() {
     return {
-      isExpanded: false,
       isLoaded: false,
       children: [],
+      newFolderName: '',
     }
   },
+
+  computed: {
+    selectedFolder() {
+      return this.$store.state.wiki.selectedFolder
+    },
+    isExpanded() {
+      return this.$store.state.wiki.folders[this.data.item]?.isExpanded ?? false
+    },
+  },
+  watch: {
+    isExpanded(newValue, oldValue) {
+      // do something with the new and old values of isExpanded
+      console.log('watch', anewValue, oldValue)
+    },
+  },
+
   methods: {
     async getChildren(folderId) {
       const response = await this.$axios
@@ -48,15 +71,25 @@ export default {
           params: { organization: this.activeOrgId },
         })
         .catch(this.showError)
-      this.children = response.data.children
+      this.children = response?.data?.children ?? []
+      console.log('folderId', folderId, this.children)
     },
     handleClick() {
       if (this.data.type === 'Folder') {
+        this.$store.dispatch('wiki/selectFolder', this.data.item)
+
         if (!this.isLoaded) {
-          this.getChildren(this.data._id)
+          console.log('data', this.data)
+          this.getChildren(this.data.item)
         }
-        this.isExpanded = !this.isExpanded
+        this.updateIsExpanded(!this.isExpanded)
       }
+    },
+    updateIsExpanded(value) {
+      this.$store.dispatch('wiki/updateFolderTree', {
+        ...this.data,
+        isExpanded: value,
+      })
     },
   },
 }

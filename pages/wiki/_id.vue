@@ -136,9 +136,7 @@
         ></iframe> -->
 
         <b-list-group>
-          <Folder v-for="folder in folders" :key="folder.id" :data="folder">
-            {{ folder.title }}
-          </Folder>
+          <Folder v-for="folder in folders" :key="folder.id" :data="folder" />
         </b-list-group>
       </b-col>
     </b-row>
@@ -173,6 +171,9 @@ export default {
     parsedMarkdown() {
       return this.$md.render(this.note.content)
     },
+    selectedFolder() {
+      return this.$store.state.wiki.selectedFolder
+    },
   },
   created() {
     this.getFolders()
@@ -197,6 +198,13 @@ export default {
           .post('/api/notes/', { ...this.form, organization: this.activeOrgId })
           .catch(this.showError)
 
+        if (response.data?._id) {
+          this.$store.dispatch('wiki/addFolderChild', {
+            label: response.data.title,
+            type: 'Note',
+            item: response.data._id,
+          })
+        }
         this.$router.push('/wiki/' + response.data.id)
       }
       this.getFolders()
@@ -227,17 +235,34 @@ export default {
       })
 
       // .catch(this.showError)
-      this.folders = response.data
+      this.folders = response.data.map((folder) => ({
+        item: folder._id,
+        label: folder.label,
+        type: 'Folder',
+      }))
       console.log(this.folders)
     },
     async createFolder() {
+      const newFolder = {
+        label: this.newFolderName,
+        organization: this.activeOrgId,
+        // parent
+      }
+      if (!this.selectedFolder) {
+        newFolder.root = true
+      }
       await this.$axios
-        .post('/api/folders', {
-          title: this.newFolderName,
-          organization: this.activeOrgId,
-          // parent
-        })
-        .then(() => {
+        .post('/api/folders', newFolder)
+        .then((response) => {
+          console.log('response', response)
+          if (this.selectedFolder) {
+            this.$store.dispatch('wiki/addFolderChild', {
+              label: this.newFolderName,
+              organization: this.activeOrgId,
+              item: response.data._id,
+              type: 'Folder',
+            })
+          }
           this.$bvModal.hide('newFolder')
           this.getFolders()
         })
@@ -267,7 +292,6 @@ export default {
         tags: [],
       }
     },
-
     toggleEdit() {
       if (this.editing) {
         this.editing = false
