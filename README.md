@@ -5,6 +5,10 @@ Awesome tools that helps you to manage your software development flow
 ## Build Setup
 
 ```bash
+# build and up container
+docker-compose -f docker-compose.development.yml build
+docker-compose -f docker-compose.development.yml up -d
+
 # install dependencies
 $ yarn install
 
