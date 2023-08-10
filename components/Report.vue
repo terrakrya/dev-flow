@@ -2,11 +2,12 @@
   <div class="mb-5">
     <div class="filter-form">
       <label>Status:</label>
-      <select v-model="selectedStatus">
+      <select v-model="selectedStatus" @change="applyFilters">
         <option value="">Todos</option>
-        <option value="ready_to_test">Pronto para Teste</option>
-        <option value="in_progress">Em Progresso</option>
-        <!-- Adicione mais opções de status aqui -->
+        <option value="backlog">Backlog</option>
+        <option value="developing">Desenvolvimento</option>
+        <option value="ready_to_test">Teste</option>
+        <option value="ready_to_prod">Produção</option>
       </select>
 
       <label>Data de Início:</label>
@@ -14,6 +15,10 @@
 
       <label>Data de Fim:</label>
       <input v-model="endDate" type="date" @change="applyFilters" />
+
+      <b-btn variant="dark" class="float-right" @click="exportToCSV">
+        <b-icon-cloud-download /> Exportar
+      </b-btn>
     </div>
 
     <table class="report-table">
@@ -82,6 +87,24 @@ export default {
         return statusMatch && startDateMatch && endDateMatch
       })
     },
+    exportToCSV() {
+      const csvData = this.filteredCards.map((item) => [
+        item.title,
+        item.status,
+        this.formatDate(item.updatedAt),
+      ])
+
+      const csvRows = [['Título', 'Status', 'Data Atualização'], ...csvData]
+      const csvContent = csvRows.map((row) => row.join(',')).join('\n')
+
+      const blob = new Blob([csvContent], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'report.csv'
+      a.click()
+      URL.revokeObjectURL(url)
+    },
   },
 }
 </script>
@@ -102,5 +125,13 @@ export default {
 
 .report-table th {
   font-weight: bold;
+}
+
+.filter-form {
+  margin-bottom: 10px;
+}
+
+.filter-form label {
+  margin-right: 10px;
 }
 </style>
