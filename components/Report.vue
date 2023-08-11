@@ -58,7 +58,7 @@
           <th>Titulo</th>
           <th>Status</th>
           <th>Data Atualização</th>
-          <th>Nota</th>
+          <th>Membros</th>
         </tr>
       </thead>
       <tbody>
@@ -66,7 +66,11 @@
           <td>{{ item.title }}</td>
           <td>{{ item.status }}</td>
           <td>{{ formatDate(item.updatedAt) }}</td>
-          <td>{{ item.note }}</td>
+          <td>
+            <div v-for="memberId in item.members" :key="memberId">
+              {{ findMemberNameById(memberId) }}
+            </div>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -88,6 +92,11 @@ export default {
       endDate: '',
       filteredCards: [],
     }
+  },
+  computed: {
+    members() {
+      return this.$store.state.organization?.members || []
+    },
   },
   watch: {
     cards: {
@@ -120,11 +129,10 @@ export default {
       })
     },
     exportToCSV() {
-      const csvData = this.filteredCards.map((item) => [
-        item.title,
-        item.status,
-        this.formatDate(item.updatedAt),
-      ])
+      const csvData = this.filteredCards.map((item) => {
+        return [item.title, item.status, this.formatDate(item.updatedAt)]
+      })
+
       const csvRows = [['Título', 'Status', 'Data Atualização'], ...csvData]
       const csvContent = csvRows.map((row) => row.join(';')).join('\n')
 
@@ -135,6 +143,10 @@ export default {
       a.download = 'report.csv'
       a.click()
       URL.revokeObjectURL(url)
+    },
+    findMemberNameById(memberId) {
+      const member = this.members.find((m) => m._id === memberId)
+      return member ? member.name : 'Membro não encontrado'
     },
   },
 }
