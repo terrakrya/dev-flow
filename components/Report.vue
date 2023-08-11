@@ -2,13 +2,44 @@
   <div class="mb-5">
     <div class="filter-form">
       <label>Status:</label>
-      <select v-model="selectedStatus" @change="applyFilters">
-        <option value="">Todos</option>
-        <option value="backlog">Backlog</option>
-        <option value="developing">Desenvolvimento</option>
-        <option value="ready_to_test">Teste</option>
-        <option value="ready_to_prod">Produção</option>
-      </select>
+      <div>
+        <label>
+          <input
+            v-model="selectedStatus"
+            type="checkbox"
+            value="backlog"
+            @change="applyFilters"
+          />
+          Backlog
+        </label>
+        <label>
+          <input
+            v-model="selectedStatus"
+            type="checkbox"
+            value="developing"
+            @change="applyFilters"
+          />
+          Desenvolvimento
+        </label>
+        <label>
+          <input
+            v-model="selectedStatus"
+            type="checkbox"
+            value="ready_to_test"
+            @change="applyFilters"
+          />
+          Teste
+        </label>
+        <label>
+          <input
+            v-model="selectedStatus"
+            type="checkbox"
+            value="ready_to_prod"
+            @change="applyFilters"
+          />
+          Produção
+        </label>
+      </div>
 
       <label>Data de Início:</label>
       <input v-model="startDate" type="date" @change="applyFilters" />
@@ -52,7 +83,7 @@ export default {
   },
   data() {
     return {
-      selectedStatus: '',
+      selectedStatus: [],
       startDate: '',
       endDate: '',
       filteredCards: [],
@@ -77,7 +108,8 @@ export default {
     applyFilters() {
       this.filteredCards = this.cards.filter((item) => {
         const statusMatch =
-          this.selectedStatus === '' || item.status === this.selectedStatus
+          this.selectedStatus.length === 0 ||
+          this.selectedStatus.includes(item.status)
         const startDateMatch =
           !this.startDate ||
           new Date(item.updatedAt) >= new Date(this.startDate)
