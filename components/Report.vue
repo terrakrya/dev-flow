@@ -125,9 +125,8 @@ export default {
         item.status,
         this.formatDate(item.updatedAt),
       ])
-
       const csvRows = [['Título', 'Status', 'Data Atualização'], ...csvData]
-      const csvContent = csvRows.map((row) => row.join(',')).join('\n')
+      const csvContent = csvRows.map((row) => row.join(';')).join('\n')
 
       const blob = new Blob([csvContent], { type: 'text/csv' })
       const url = URL.createObjectURL(blob)
