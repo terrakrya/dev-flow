@@ -40,6 +40,18 @@
           Produção
         </label>
       </div>
+      <label>Membros:</label>
+      <div>
+        <label v-for="member in canvasMembers" :key="member._id">
+          <input
+            v-model="selectedMembers"
+            type="checkbox"
+            :value="member"
+            @change="applyFilters"
+          />
+          {{ member.name }}
+        </label>
+      </div>
 
       <label>Data de Início:</label>
       <input v-model="startDate" type="date" @change="applyFilters" />
@@ -51,7 +63,6 @@
         <b-icon-cloud-download /> Exportar
       </b-btn>
     </div>
-
     <table class="report-table">
       <thead>
         <tr>
@@ -90,12 +101,21 @@ export default {
       selectedStatus: [],
       startDate: '',
       endDate: '',
+      selectedMembers: [], // Array to store selected members
       filteredCards: [],
     }
   },
   computed: {
     members() {
       return this.$store.state.organization?.members || []
+    },
+    canvasMembers() {
+      const canvasMemberIds = this.cards.reduce((ids, card) => {
+        return [...ids, ...card.members]
+      }, [])
+      return this.members.filter((member) =>
+        canvasMemberIds.includes(member._id)
+      )
     },
   },
   watch: {
@@ -124,9 +144,18 @@ export default {
           new Date(item.updatedAt) >= new Date(this.startDate)
         const endDateMatch =
           !this.endDate || new Date(item.updatedAt) <= new Date(this.endDate)
+        const membersMatch = this.membersMatch(item.members)
 
-        return statusMatch && startDateMatch && endDateMatch
+        return statusMatch && startDateMatch && endDateMatch && membersMatch
       })
+    },
+    membersMatch(memberIds) {
+      if (this.selectedMembers.length === 0) {
+        return true // No member filter selected, so all members are allowed
+      }
+
+      const selectedMemberIds = this.selectedMembers.map((member) => member._id)
+      return memberIds.some((id) => selectedMemberIds.includes(id))
     },
     exportToCSV() {
       const csvData = this.filteredCards.map((item) => {
