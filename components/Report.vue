@@ -70,6 +70,9 @@
           <th>Status</th>
           <th>Data Atualização</th>
           <th>Membros</th>
+          <th>Data Limite</th>
+          <th>Horas Estimadas</th>
+          <th>Horas Gastas</th>
         </tr>
       </thead>
       <tbody>
@@ -82,6 +85,14 @@
               {{ findMemberNameById(memberId) }}
             </div>
           </td>
+          <td>{{ formatDate(item.due_date) }}</td>
+          <td>{{ item.time_estimate }}</td>
+          <td>{{ item.time_spent }}</td>
+        </tr>
+        <tr>
+          <td colspan="5"></td>
+          <td><strong>Total de Horas Gastas:</strong></td>
+          <td>{{ calculateTotalHours() }}</td>
         </tr>
       </tbody>
     </table>
@@ -128,11 +139,13 @@ export default {
   },
   methods: {
     formatDate(date) {
-      return new Date(date).toLocaleDateString('pt-BR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })
+      if (date) {
+        return new Date(date).toLocaleDateString('pt-BR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      }
     },
     applyFilters() {
       this.filteredCards = this.cards.filter((item) => {
@@ -157,12 +170,43 @@ export default {
       const selectedMemberIds = this.selectedMembers.map((member) => member._id)
       return memberIds.some((id) => selectedMemberIds.includes(id))
     },
+    calculateTotalHours() {
+      let totalHours = 0
+      for (const item of this.filteredCards) {
+        totalHours += item.time_spent ? item.time_spent : 0
+      }
+      return totalHours
+    },
+    getMemberNames(memberIds) {
+      return memberIds
+        .map((memberId) => this.findMemberNameById(memberId))
+        .join(', ')
+    },
     exportToCSV() {
       const csvData = this.filteredCards.map((item) => {
-        return [item.title, item.status, this.formatDate(item.updatedAt)]
+        return [
+          item.title,
+          item.status,
+          this.formatDate(item.updatedAt),
+          this.getMemberNames(item.members),
+          this.formatDate(item.due_date),
+          item.time_estimate,
+          item.time_spent,
+        ]
       })
 
-      const csvRows = [['Título', 'Status', 'Data Atualização'], ...csvData]
+      const csvRows = [
+        [
+          'Título',
+          'Status',
+          'Data Atualização',
+          'Membros',
+          'Data Limite',
+          'Horas Estimadas',
+          'Horas Gastas',
+        ],
+        ...csvData,
+      ]
       const csvContent = csvRows.map((row) => row.join(';')).join('\n')
 
       const blob = new Blob([csvContent], { type: 'text/csv' })
