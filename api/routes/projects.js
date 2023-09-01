@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const router = express.Router()
 const slugify = require('slugify')
+const JsRtf = require('jsrtf')
 const { authenticated } = require('../config/auth')
 const Project = mongoose.model('Project')
 
@@ -72,6 +73,20 @@ router.delete('/:id', authenticated, (req, res) => {
       res.send(project)
     }
   })
+})
+
+router.post('/generatedoc', authenticated, (req, res) => {
+  const htmlContent = req.body.htmlContent
+  const rtf = new JsRtf()
+
+  rtf.writeRaw(htmlContent)
+
+  const rtfContent = rtf.getData()
+
+  res.setHeader('Content-Type', 'application/rtf')
+  res.setHeader('Content-Disposition', 'attachment; filename=relatorio.rtf')
+
+  res.send(rtfContent)
 })
 
 module.exports = router

@@ -60,7 +60,10 @@
       <input v-model="endDate" type="date" @change="applyFilters" />
 
       <b-btn variant="dark" class="float-right" @click="exportToCSV">
-        <b-icon-cloud-download /> Exportar
+        <b-icon-cloud-download /> Exportar CSV
+      </b-btn>
+      <b-btn variant="dark" class="float-right" @click="exportToDoc">
+        <b-icon-file-word /> Exportar DOC
       </b-btn>
     </div>
     <table class="report-table">
@@ -216,6 +219,68 @@ export default {
       a.download = 'report.csv'
       a.click()
       URL.revokeObjectURL(url)
+    },
+    async exportToDoc() {
+      const htmlContent = this.generateTableHtml()
+
+      await this.$axios
+        .$post(
+          '/api/projects/generatedoc',
+          { htmlContent },
+          { responseType: 'blob' }
+        )
+        .then((response) => {
+          const blob = new Blob([response.data], { type: 'application/rtf' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = 'relatorio.rtf'
+          a.click()
+          URL.revokeObjectURL(url)
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error('Erro ao gerar o doc:', error)
+        })
+    },
+    generateTableHtml() {
+      const tableRows = this.filteredCards.map((item) => {
+        return `
+          <tr>
+            <td>${item.title}</td>
+            <td>${item.status}</td>
+            <td>${this.formatDate(item.updatedAt)}</td>
+            <td>${this.getMemberNames(item.members)}</td>
+            <td>${this.formatDate(item.due_date)}</td>
+            <td>${item.time_estimate}</td>
+            <td>${item.time_spent}</td>
+          </tr>
+        `
+      })
+
+      return `
+        <table>
+          <thead>
+            <tr>
+              <th>Título</th>
+              <th>Status</th>
+              <th>Data Atualização</th>
+              <th>Membros</th>
+              <th>Data Limite</th>
+              <th>Horas Estimadas</th>
+              <th>Horas Gastas</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows.join('')}
+            <tr>
+              <td colspan="5"></td>
+              <td><strong>Total de Horas Gastas:</strong></td>
+              <td>${this.calculateTotalHours()}</td>
+            </tr>
+          </tbody>
+        </table>
+      `
     },
     findMemberNameById(memberId) {
       const member = this.members.find((m) => m._id === memberId)
