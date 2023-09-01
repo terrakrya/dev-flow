@@ -67,6 +67,9 @@ const CardSchema = mongoose.Schema(
     time_spent: {
       type: Number, // hours
     },
+    tags: {
+      type: Array, // hours
+    },
   },
   {
     timestamps: true,

@@ -147,6 +147,29 @@
             </b-form-group>
           </b-col>
         </b-row>
+        <div>
+          <b-form-group label="Tags">
+            <input v-model="newTag" placeholder="Adicione tags aqui" />
+            <b-button @click="addTag(newTag)">Adicionar</b-button>
+          </b-form-group>
+          <div>
+            <span
+              v-for="(tag, index) in form.tags"
+              :key="index"
+              class="badge badge-secondary mr-2"
+            >
+              <span>{{ tag }}</span>
+              <button
+                type="button"
+                class="close"
+                aria-label="Close"
+                @click="removeTag(index)"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </span>
+          </div>
+        </div>
         <div v-if="edit" class="text-right text-danger mb-4">
           <small>
             <a @click="archive">
@@ -207,7 +230,9 @@ export default {
         end_date: undefined,
         time_estimate: undefined,
         time_spent: undefined,
+        tags: [],
       },
+      newTag: '',
     }
   },
   computed: {
@@ -282,6 +307,15 @@ export default {
           this.$emit('change', card)
         }
       }
+    },
+    addTag(tag) {
+      if (tag.trim() !== '' && !this.form.tags.includes(tag)) {
+        this.form.tags.push(tag.trim())
+      }
+      this.newTag = ''
+    },
+    removeTag(index) {
+      this.form.tags.splice(index, 1)
     },
   },
 }
