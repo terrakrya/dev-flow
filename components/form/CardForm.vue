@@ -74,12 +74,26 @@
           <FormMembersSelect v-model="form.members" />
         </b-form-group>
         <div class="tempo">
-          <small>Data limite</small>
+          <small>Data Prevista</small>
           <input
             v-model="form.due_date"
             size="sm"
             type="date"
-            placeholder="Data limite"
+            placeholder="Data prevista"
+          />
+          <small>Data Inicio</small>
+          <input
+            v-model="form.start_date"
+            size="sm"
+            type="date"
+            placeholder="Data inicio"
+          />
+          <small>Data de Entrega</small>
+          <input
+            v-model="form.end_date"
+            size="sm"
+            type="date"
+            placeholder="Data end_date"
           />
           <small>Tempo estimado (horas)</small>
 
@@ -189,6 +203,8 @@ export default {
         images: [],
         title: '',
         due_date: undefined,
+        start_date: undefined,
+        end_date: undefined,
         time_estimate: undefined,
         time_spent: undefined,
       },
@@ -220,7 +236,22 @@ export default {
     }
   },
   methods: {
+    currentDate() {
+      const currentDate = new Date()
+
+      const year = currentDate.getFullYear()
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+      const day = String(currentDate.getDate()).padStart(2, '0')
+
+      return `${year}-${month}-${day}`
+    },
     async save() {
+      if (this.form.status === 'developing') {
+        this.form.start_date = this.currentDate()
+      }
+      if (this.form.status === 'published') {
+        this.form.end_date = this.currentDate()
+      }
       const queryData = { ...this.form, organization: this.activeOrganization }
       if (this.edit) {
         const card = await this.$axios
