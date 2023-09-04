@@ -74,44 +74,57 @@
           <FormMembersSelect v-model="form.members" />
         </b-form-group>
         <div class="tempo">
-          <small>Data Prevista</small>
-          <input
-            v-model="form.due_date"
-            size="sm"
-            type="date"
-            placeholder="Data prevista"
-          />
-          <small>Data Inicio</small>
-          <input
-            v-model="form.start_date"
-            size="sm"
-            type="date"
-            placeholder="Data inicio"
-          />
-          <small>Data de Entrega</small>
-          <input
-            v-model="form.end_date"
-            size="sm"
-            type="date"
-            placeholder="Data end_date"
-          />
-          <small>Tempo estimado (horas)</small>
-
-          <input
-            v-model="form.time_estimate"
-            size="sm"
-            type="number"
-            placeholder="Tempo estimado (horas)"
-            append="Horas"
-          />
-          <small>Tempo gasto (horas)</small>
-
-          <input
-            v-model="form.time_spent"
-            size="sm"
-            type="number"
-            placeholder="Tempo gasto (horas)"
-          />
+          <div class="row">
+            <div class="col-md-4">
+              <small>Data Prevista</small>
+              <input
+                v-model="form.due_date"
+                size="sm"
+                type="date"
+                placeholder="Data prevista"
+              />
+            </div>
+            <div class="col-md-4">
+              <small>Data Inicio</small>
+              <input
+                v-model="form.start_date"
+                size="sm"
+                type="date"
+                placeholder="Data inicio"
+              />
+            </div>
+            <div class="col-md-4">
+              <small>Data de Entrega em Produção</small>
+              <input
+                v-model="form.end_date"
+                size="sm"
+                type="date"
+                placeholder="Data end_date"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <small>Tempo estimado (horas)</small>
+              <input
+                v-model="form.time_estimate"
+                size="sm"
+                type="number"
+                placeholder="Tempo estimado (horas)"
+                append="Horas"
+              />
+            </div>
+            <div class="col-md-4">
+              <small>Tempo gasto (horas)</small>
+              <input
+                v-model="form.time_spent"
+                size="sm"
+                type="number"
+                placeholder="Tempo gasto (horas)"
+              />
+            </div>
+            <div class="cold-md-4">&nbsp;</div>
+          </div>
         </div>
         <Upload
           v-model="form.documents"
@@ -271,10 +284,18 @@ export default {
       return `${year}-${month}-${day}`
     },
     async save() {
-      if (this.form.status === 'developing') {
+      // set the start date automatically
+      if (
+        this.form.status === 'developing' &&
+        this.form.start_date === undefined
+      ) {
         this.form.start_date = this.currentDate()
       }
-      if (this.form.status === 'published') {
+      // set the end date automatically
+      if (
+        this.form.status === 'published' &&
+        this.form.end_date === undefined
+      ) {
         this.form.end_date = this.currentDate()
       }
       const queryData = { ...this.form, organization: this.activeOrganization }
@@ -344,7 +365,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-content: flex-start;
-  margin: 10px 0;
+  margin: 20px 0;
   margin-bottom: 14px;
 }
 </style>
