@@ -160,29 +160,31 @@
             </b-form-group>
           </b-col>
         </b-row>
-        <div>
-          <b-form-group label="Tags">
-            <input v-model="newTag" placeholder="Adicione tags aqui" />
-            <b-button @click="addTag(newTag)">Adicionar</b-button>
-          </b-form-group>
-          <div>
-            <span
-              v-for="(tag, index) in form.tags"
-              :key="index"
-              class="badge badge-secondary mr-2"
+        <b-form-group label="Tags">
+          <span
+            v-for="(tag, index) in combinedTags"
+            :key="index"
+            :class="{
+              badge: true,
+              'badge-success': form.tags.includes(tag),
+              'badge-secondary': !form.tags.includes(tag),
+              'mr-3': true,
+            }"
+          >
+            {{ tag }}
+            <button
+              type="button"
+              class="close"
+              aria-label="Close"
+              @click="toggleTag(tag)"
             >
-              <span>{{ tag }}</span>
-              <button
-                type="button"
-                class="close"
-                aria-label="Close"
-                @click="removeTag(index)"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </span>
-          </div>
-        </div>
+              <span v-if="form.tags.includes(tag)" aria-hidden="true">
+                &times;
+              </span>
+              <span v-else aria-hidden="true">+</span>
+            </button>
+          </span>
+        </b-form-group>
         <div v-if="edit" class="text-right text-danger mb-4">
           <small>
             <a @click="archive">
@@ -267,6 +269,10 @@ export default {
       })
       return statusList
     },
+    combinedTags() {
+      const projectTags = this.project ? this.project.tags : []
+      return Array.from(new Set([...projectTags, ...this.form.tags]))
+    },
   },
   created() {
     if (this.edit) {
@@ -333,10 +339,16 @@ export default {
       if (tag.trim() !== '' && !this.form.tags.includes(tag)) {
         this.form.tags.push(tag.trim())
       }
-      this.newTag = ''
     },
     removeTag(index) {
       this.form.tags.splice(index, 1)
+    },
+    toggleTag(tag) {
+      if (this.form.tags.includes(tag)) {
+        this.removeTag(tag)
+      } else {
+        this.addTag(tag)
+      }
     },
   },
 }

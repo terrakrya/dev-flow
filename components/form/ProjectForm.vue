@@ -23,17 +23,38 @@
       <b-form-group label="Cor">
         <b-form-input v-model="form.color" type="color" class="w-25" />
       </b-form-group>
-      <div class="text-right text-danger">
-        <a @click="archive">
-          <b-icon-trash />
-          Arquivar projeto
-        </a>
-        <br />
-        <br />
+      <div>
+        <b-form-group label="Tags">
+          <input v-model="newTag" placeholder="Adicione tags aqui" />
+          <b-button @click="addTag(newTag)">Adicionar</b-button>
+        </b-form-group>
+        <div class="mb-5">
+          <span
+            v-for="(tag, index) in form.tags"
+            :key="index"
+            class="badge badge-secondary mr-2"
+          >
+            <span>{{ tag }}</span>
+            <button
+              type="button"
+              class="close"
+              aria-label="Close"
+              @click="removeTag(index)"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </span>
+        </div>
       </div>
       <b-button type="submit" variant="secondary" block :disabled="invalid">
         Salvar
       </b-button>
+      <div class="text-right text-danger mt-5">
+        <a @click="archive">
+          <b-icon-trash />
+          Arquivar projeto
+        </a>
+      </div>
     </b-form>
   </ValidationObserver>
 </template>
@@ -59,7 +80,9 @@ export default {
         name: '',
         description: '',
         color: '#161b22',
+        tags: [],
       },
+      newTag: '',
     }
   },
   computed: {
@@ -112,6 +135,17 @@ export default {
         this.$toast.success('Projeto arquivado com sucesso!')
         this.$emit('archived', project)
       }
+    },
+    addTag(tag) {
+      if (tag.trim() !== '' && !this.form.tags.includes(tag)) {
+        this.form.tags = [...this.form.tags, tag.trim()]
+      }
+      this.newTag = ''
+    },
+    removeTag(index) {
+      const updatedTags = [...this.form.tags]
+      updatedTags.splice(index, 1)
+      this.form.tags = updatedTags
     },
   },
 }

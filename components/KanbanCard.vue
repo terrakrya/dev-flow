@@ -26,6 +26,13 @@
           <Member v-for="member in members" :id="member" :key="member" />
         </div>
       </div>
+      <div class="d-flex justify-content-end items-center mb-3">
+        <div class="text-left">
+          <span v-for="(tag, index) in card.tags" :key="index">
+            #{{ tag }}
+          </span>
+        </div>
+      </div>
     </div>
     <hr />
     <div class="d-flex justify-content-between align-items-center">
