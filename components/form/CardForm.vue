@@ -94,7 +94,7 @@
               />
             </div>
             <div class="col-md-4">
-              <small>Data de Produção</small>
+              <small>Data Produção</small>
               <input
                 v-model="form.end_date"
                 size="sm"
