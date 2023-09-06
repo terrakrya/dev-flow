@@ -1,37 +1,55 @@
 <template>
   <div class="mb-5">
     <div class="filter-form">
-      <label>Status:</label>
-      <div>
-        <label v-for="status in canvasStatus" :key="status">
-          <input
-            v-model="selectedStatus"
-            type="checkbox"
-            :value="status"
-            @change="applyFilters"
-          />
-          {{ status }}
-        </label>
+      <div class="filter">
+        <label>Status:</label>
+        <div>
+          <label v-for="status in canvasStatus" :key="status">
+            <input
+              v-model="selectedStatus"
+              type="checkbox"
+              :value="status"
+              @change="applyFilters"
+            />
+            {{ status }}
+          </label>
+        </div>
       </div>
-      <label>Membros:</label>
-      <div>
-        <label v-for="member in canvasMembers" :key="member._id">
-          <input
-            v-model="selectedMembers"
-            type="checkbox"
-            :value="member"
-            @change="applyFilters"
-          />
-          {{ member.name }}
-        </label>
+      <div class="filter">
+        <label>Tags:</label>
+        <div>
+          <label v-for="tag in canvasTags" :key="tag">
+            <input
+              v-model="selectedTags"
+              type="checkbox"
+              :value="tag"
+              @change="applyFilters"
+            />
+            {{ tag }}
+          </label>
+        </div>
       </div>
+      <div class="filter">
+        <label>Membros:</label>
+        <div>
+          <label v-for="member in canvasMembers" :key="member._id">
+            <input
+              v-model="selectedMembers"
+              type="checkbox"
+              :value="member"
+              @change="applyFilters"
+            />
+            {{ member.name }}
+          </label>
+        </div>
+      </div>
+      <div class="filter">
+        <label>Data de Início:</label>
+        <input v-model="startDate" type="date" @change="applyFilters" />
 
-      <label>Data de Início:</label>
-      <input v-model="startDate" type="date" @change="applyFilters" />
-
-      <label>Data de Fim:</label>
-      <input v-model="endDate" type="date" @change="applyFilters" />
-
+        <label>Data de Fim:</label>
+        <input v-model="endDate" type="date" @change="applyFilters" />
+      </div>
       <b-btn variant="dark" class="float-right" @click="exportToCSV">
         <b-icon-cloud-download /> Exportar CSV
       </b-btn>
@@ -44,6 +62,7 @@
         <tr>
           <th>Titulo</th>
           <th>Status</th>
+          <th>Tags</th>
           <th>Data Atualização</th>
           <th>Membros</th>
           <th>Data Limite</th>
@@ -55,6 +74,11 @@
         <tr v-for="(item, index) in filteredCards" :key="index">
           <td>{{ item.title }}</td>
           <td>{{ item.status }}</td>
+          <td>
+            <div v-for="tag in item.tags" :key="tag">
+              {{ tag }}
+            </div>
+          </td>
           <td>{{ formatDate(item.updatedAt) }}</td>
           <td>
             <div v-for="memberId in item.members" :key="memberId">
@@ -66,7 +90,7 @@
           <td>{{ item.time_spent }}</td>
         </tr>
         <tr>
-          <td colspan="5"></td>
+          <td colspan="6"></td>
           <td><strong>Total de Horas Gastas:</strong></td>
           <td>{{ calculateTotalHours() }}</td>
         </tr>
@@ -86,6 +110,7 @@ export default {
   data() {
     return {
       selectedStatus: [],
+      selectedTags: [],
       startDate: '',
       endDate: '',
       selectedMembers: [],
@@ -112,6 +137,17 @@ export default {
       })
 
       return [...statusSet]
+    },
+    canvasTags() {
+      const tagSet = new Set()
+
+      this.cards.forEach((card) => {
+        card.tags.forEach((tag) => {
+          tagSet.add(tag)
+        })
+      })
+
+      return [...tagSet]
     },
   },
   watch: {
@@ -143,8 +179,16 @@ export default {
         const endDateMatch =
           !this.endDate || new Date(item.updatedAt) <= new Date(this.endDate)
         const membersMatch = this.membersMatch(item.members)
-
-        return statusMatch && startDateMatch && endDateMatch && membersMatch
+        const tagsMatch =
+          this.selectedTags.length === 0 ||
+          item.tags.some((tag) => this.selectedTags.includes(tag))
+        return (
+          statusMatch &&
+          startDateMatch &&
+          endDateMatch &&
+          membersMatch &&
+          tagsMatch
+        )
       })
     },
     membersMatch(memberIds) {
@@ -172,6 +216,7 @@ export default {
         return [
           item.title,
           item.status,
+          item.tags,
           this.formatDate(item.updatedAt),
           this.getMemberNames(item.members),
           this.formatDate(item.due_date),
@@ -184,6 +229,7 @@ export default {
         [
           'Título',
           'Status',
+          'Tags',
           'Data Atualização',
           'Membros',
           'Data Limite',
@@ -296,5 +342,11 @@ export default {
 
 .filter-form label {
   margin-right: 10px;
+}
+.filter-form .filter {
+  border: 1px solid #161b22;
+  padding: 5px 20px;
+  border-radius: 20px;
+  margin-bottom: 4px;
 }
 </style>
