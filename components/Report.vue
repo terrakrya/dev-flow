@@ -3,41 +3,14 @@
     <div class="filter-form">
       <label>Status:</label>
       <div>
-        <label>
+        <label v-for="status in canvasStatus" :key="status">
           <input
             v-model="selectedStatus"
             type="checkbox"
-            value="backlog"
+            :value="status"
             @change="applyFilters"
           />
-          Backlog
-        </label>
-        <label>
-          <input
-            v-model="selectedStatus"
-            type="checkbox"
-            value="developing"
-            @change="applyFilters"
-          />
-          Desenvolvimento
-        </label>
-        <label>
-          <input
-            v-model="selectedStatus"
-            type="checkbox"
-            value="ready_to_test"
-            @change="applyFilters"
-          />
-          Teste
-        </label>
-        <label>
-          <input
-            v-model="selectedStatus"
-            type="checkbox"
-            value="ready_to_prod"
-            @change="applyFilters"
-          />
-          Produção
+          {{ status }}
         </label>
       </div>
       <label>Membros:</label>
@@ -115,7 +88,7 @@ export default {
       selectedStatus: [],
       startDate: '',
       endDate: '',
-      selectedMembers: [], // Array to store selected members
+      selectedMembers: [],
       filteredCards: [],
     }
   },
@@ -130,6 +103,15 @@ export default {
       return this.members.filter((member) =>
         canvasMemberIds.includes(member._id)
       )
+    },
+    canvasStatus() {
+      const statusSet = new Set()
+
+      this.cards.forEach((card) => {
+        statusSet.add(card.status)
+      })
+
+      return [...statusSet]
     },
   },
   watch: {
