@@ -60,18 +60,37 @@
       >
         <b-icon-file-earmark-pdf-fill /> Exportar PDF
       </b-btn>
-      <b-modal v-model="show_rel_pdf" title="Visualizar Relatório" hide-footer>
-        <h3>Contexto:</h3>
-        <p></p>
-        <h3>Resultado do ciclo:</h3>
-        <div v-for="(item, tag) in groupedCards" :key="tag">
-          <h4>{{ tag }}</h4>
-          <p v-for="line in item" :key="line._id">
-            {{ line.title }}. Entregue {{ formatDate(line.end_date) }}, tendo
-            gasto {{ line.time_spent }} horas.
-          </p>
+      {{ filteredCards }}
+      <b-modal
+        v-model="show_rel_pdf"
+        size="lg"
+        title="Visualizar Relatório"
+        hide-footer
+      >
+        <div>
+          <h4>Contexto</h4>
+          <p></p>
+          <h4>Resultados do ciclo:</h4>
+          <div v-for="(line, tag) in groupedCards.published" :key="tag">
+            <h5>{{ tag }}</h5>
+            <p v-for="card in line" :key="card._id">
+              -
+              {{ card.title }} Entregue em {{ formatDate(card.end_date) }}.
+              Resultando {{ card.time_spent }} horas gastas de trabalho.
+            </p>
+          </div>
+
+          <h4>Previsão das atividades para o próximo ciclo:</h4>
+          <div v-for="(line, tag) in groupedCards.others" :key="tag">
+            <h5>{{ tag }}</h5>
+            <p v-for="card in line" :key="card._id">
+              -
+              {{ card.title }}. Previsão de conclusão
+              {{ formatDate(card.due_date) }}. Previstas
+              {{ card.time_estimate }} horas gastas de trabalho.
+            </p>
+          </div>
         </div>
-        <h3>Previsão das atividades para o próximo ciclo:</h3>
       </b-modal>
     </div>
     <table class="report-table">
@@ -274,21 +293,30 @@ export default {
       URL.revokeObjectURL(url)
     },
     groupCardsByTagsWithBracket(cards) {
-      const groupedCards = {}
+      const groupedCards = {
+        published: {},
+        others: {},
+      }
 
       cards.forEach((card) => {
-        card.tags.forEach((tag) => {
-          if (tag.includes('[')) {
-            if (!groupedCards[tag]) {
-              groupedCards[tag] = []
-            }
-            groupedCards[tag].push(card)
+        const tagWithBracket = card.tags.find((tag) => tag.includes('['))
+
+        if (card.status === 'published') {
+          if (!groupedCards.published[tagWithBracket]) {
+            groupedCards.published[tagWithBracket] = []
           }
-        })
+          groupedCards.published[tagWithBracket].push(card)
+        } else {
+          if (!groupedCards.others[tagWithBracket]) {
+            groupedCards.others[tagWithBracket] = []
+          }
+          groupedCards.others[tagWithBracket].push(card)
+        }
       })
 
       return groupedCards
     },
+
     findMemberNameById(memberId) {
       const member = this.members.find((m) => m._id === memberId)
       return member ? member.name : 'Membro não encontrado'
