@@ -53,9 +53,26 @@
       <b-btn variant="dark" class="float-right" @click="exportToCSV">
         <b-icon-cloud-download /> Exportar CSV
       </b-btn>
-      <b-btn variant="dark" class="float-right" @click="exportToDoc">
-        <b-icon-file-word /> Exportar DOC
+      <b-btn
+        variant="dark"
+        class="float-right"
+        @click="show_rel_pdf = !show_rel_pdf"
+      >
+        <b-icon-file-earmark-pdf-fill /> Exportar PDF
       </b-btn>
+      <b-modal v-model="show_rel_pdf" title="Visualizar Relatório" hide-footer>
+        <h3>Contexto:</h3>
+        <p></p>
+        <h3>Resultado do ciclo:</h3>
+        <div v-for="(item, tag) in groupedCards" :key="tag">
+          <h4>{{ tag }}</h4>
+          <p v-for="line in item" :key="line._id">
+            {{ line.title }}. Entregue {{ formatDate(line.end_date) }}, tendo
+            gasto {{ line.time_spent }} horas.
+          </p>
+        </div>
+        <h3>Previsão das atividades para o próximo ciclo:</h3>
+      </b-modal>
     </div>
     <table class="report-table">
       <thead>
@@ -115,6 +132,8 @@ export default {
       endDate: '',
       selectedMembers: [],
       filteredCards: [],
+      show_rel_pdf: false,
+      groupedCards: {},
     }
   },
   computed: {
@@ -154,6 +173,12 @@ export default {
     cards: {
       handler() {
         this.applyFilters()
+      },
+      deep: true,
+    },
+    filteredCards: {
+      handler() {
+        this.groupedCards = this.groupCardsByTagsWithBracket(this.filteredCards)
       },
       deep: true,
     },
@@ -309,6 +334,22 @@ export default {
           </tbody>
         </table>
       `
+    },
+    groupCardsByTagsWithBracket(cards) {
+      const groupedCards = {}
+
+      cards.forEach((card) => {
+        card.tags.forEach((tag) => {
+          if (tag.includes('[')) {
+            if (!groupedCards[tag]) {
+              groupedCards[tag] = []
+            }
+            groupedCards[tag].push(card)
+          }
+        })
+      })
+
+      return groupedCards
     },
     findMemberNameById(memberId) {
       const member = this.members.find((m) => m._id === memberId)
