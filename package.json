@@ -36,7 +36,6 @@
     "express-jwt": "^6.1.1",
     "express-session": "^1.17.2",
     "jsonwebtoken": "^8.5.1",
-    "jsrtf": "^0.0.3",
     "linkifyjs": "^3.0.0-beta.3",
     "lodash": "^4.17.21",
     "markdown-it-task-lists": "^2.1.1",
