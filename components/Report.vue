@@ -50,47 +50,37 @@
         <label>Data de Fim:</label>
         <input v-model="endDate" type="date" @change="applyFilters" />
       </div>
-      <b-btn variant="dark" class="float-right" @click="exportToCSV">
+      <b-btn variant="dark" class="float-right mt-2 mb-2" @click="exportToCSV">
         <b-icon-cloud-download /> Exportar CSV
       </b-btn>
       <b-btn
         variant="dark"
-        class="float-right"
+        class="float-right mb-2 mt-2"
         @click="show_rel_pdf = !show_rel_pdf"
       >
-        <b-icon-file-earmark-pdf-fill /> Exportar PDF
+        <b-icon-file-earmark-pdf-fill /> Editar PDF
       </b-btn>
-      {{ filteredCards }}
       <b-modal
         v-model="show_rel_pdf"
         size="lg"
-        title="Visualizar Relatório"
+        title="Editar Relatório PDF"
         hide-footer
       >
-        <div>
-          <h4>Contexto</h4>
-          <p></p>
-          <h4>Resultados do ciclo:</h4>
-          <div v-for="(line, tag) in groupedCards.published" :key="tag">
-            <h5>{{ tag }}</h5>
-            <p v-for="card in line" :key="card._id">
-              -
-              {{ card.title }} Entregue em {{ formatDate(card.end_date) }}.
-              Resultando {{ card.time_spent }} horas gastas de trabalho.
-            </p>
-          </div>
-
-          <h4>Previsão das atividades para o próximo ciclo:</h4>
-          <div v-for="(line, tag) in groupedCards.others" :key="tag">
-            <h5>{{ tag }}</h5>
-            <p v-for="card in line" :key="card._id">
-              -
-              {{ card.title }}. Previsão de conclusão
-              {{ formatDate(card.due_date) }}. Previstas
-              {{ card.time_estimate }} horas gastas de trabalho.
-            </p>
-          </div>
-        </div>
+        <b-row>
+          <b-col md="12">
+            <b-btn variant="dark" class="float-right" @click="exportToPDF">
+              <b-icon-cloud-download /> Exportar
+            </b-btn>
+          </b-col>
+          <b-col md="12">
+            <quill-editor
+              ref="quillEdit"
+              v-model="editorPDF"
+              class="mt-4"
+              toolbar="minimal"
+            />
+          </b-col>
+        </b-row>
       </b-modal>
     </div>
     <table class="report-table">
@@ -153,6 +143,7 @@ export default {
       filteredCards: [],
       show_rel_pdf: false,
       groupedCards: {},
+      editorPDF: '',
     }
   },
   computed: {
@@ -198,6 +189,7 @@ export default {
     filteredCards: {
       handler() {
         this.groupedCards = this.groupCardsByTagsWithBracket(this.filteredCards)
+        this.generatePDFContent()
       },
       deep: true,
     },
@@ -292,6 +284,8 @@ export default {
       a.click()
       URL.revokeObjectURL(url)
     },
+
+    exportToPDF() {},
     groupCardsByTagsWithBracket(cards) {
       const groupedCards = {
         published: {},
@@ -315,6 +309,59 @@ export default {
       })
 
       return groupedCards
+    },
+    generatePDFContent() {
+      let htmlContent = `
+        <h1 class="ql-align-center">Relatório de Tarefas realizadas<br /> no periodo de xx/xx a xx/xx Ciclo XX</h1>
+        <hr />
+        <h2>Contexto</h2>
+        <br />
+        <p></p>
+        <hr />
+        <h2>Resultados do ciclo:</h2>
+        <br />
+      `
+
+      for (const [tag, cards] of Object.entries(this.groupedCards.published)) {
+        htmlContent += `
+          <h3>${tag}</h3>
+        `
+
+        for (const card of cards) {
+          htmlContent += `
+            <p>
+              - ${card.title} Entregue em ${this.formatDate(card.end_date)}.
+              Resultando ${card.time_spent} horas gastas de trabalho.
+            </p>
+          `
+        }
+        htmlContent += `<br />`
+      }
+
+      htmlContent += `
+        <hr />
+        <h2>Previsão das atividades para o próximo ciclo:</h2>
+        <br />
+      `
+
+      for (const [tag, cards] of Object.entries(this.groupedCards.others)) {
+        htmlContent += `
+          <h3>${tag}</h3>
+        `
+
+        for (const card of cards) {
+          htmlContent += `
+            <p>
+              - ${card.title}. Previsão de conclusão
+              ${this.formatDate(card.due_date)}. Previstas ${card.time_estimate}
+              horas gastas de trabalho.
+            </p>
+          `
+        }
+        htmlContent += `<br />`
+      }
+
+      this.editorPDF = htmlContent
     },
 
     findMemberNameById(memberId) {
