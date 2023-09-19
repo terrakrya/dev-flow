@@ -30,6 +30,9 @@ const ProjectSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    tags: {
+      type: Array,
+    },
   },
   {
     timestamps: true,

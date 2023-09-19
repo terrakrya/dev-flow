@@ -1,32 +1,32 @@
 <template>
   <b-container fluid>
     <b-row>
-      <b-col md="8">
-        <!-- card components for each members of activeOrganization  -->
-        <b-container class="d-flex justify-content-end">
-          <b-card
+      <b-col md="12">
+        <b-row>
+          <b-col
             v-for="member in activeOrganization.members"
             :key="member.id"
             class="member-card m-2"
+            md="3"
           >
-            <b-card-body>
-              <div
-                class="d-flex flex-column justify-content-center align-items-center"
-              >
-                <Avatar
-                  class="mb-2"
-                  :src="member.avatarUrl"
-                  :name="member.name"
-                />
-                <h3>{{ member.name }}</h3>
-                <p>{{ member.email }}</p>
-                <b-btn variant="outline-primary" size="sm" block>
-                  ver mais
-                </b-btn>
-              </div>
-            </b-card-body>
-          </b-card>
-        </b-container>
+            <b-card>
+              <b-card-body>
+                <div>
+                  <Avatar
+                    class="mb-2"
+                    :src="member.avatarUrl"
+                    :name="member.name"
+                  />
+                  <h3>{{ member.name }}</h3>
+                  <p>{{ member.email }}</p>
+                  <b-btn variant="outline-primary" size="sm" block>
+                    ver mais
+                  </b-btn>
+                </div>
+              </b-card-body>
+            </b-card>
+          </b-col>
+        </b-row>
       </b-col>
       <b-col md="4"> </b-col>
     </b-row>
@@ -46,7 +46,15 @@ export default {
 }
 </script>
 <style>
-.member-card {
-  width: 400px;
+.card {
+  width: 100%;
+  max-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card-body {
+  flex-grow: 1;
 }
 </style>

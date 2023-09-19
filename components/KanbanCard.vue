@@ -23,7 +23,14 @@
       </div>
       <div class="d-flex justify-content-end items-center mb-3">
         <div class="text-right">
-          <Member v-for="member in card.members" :id="member" :key="member" />
+          <Member v-for="member in members" :id="member" :key="member" />
+        </div>
+      </div>
+      <div class="d-flex justify-content-end items-center mb-3">
+        <div class="text-left">
+          <span v-for="(tag, index) in card.tags" :key="index">
+            #{{ tag }}
+          </span>
         </div>
       </div>
     </div>
@@ -165,7 +172,7 @@ export default {
       return this.$route.query.card && this.$route.query.card === this.card.id
     },
     members() {
-      return this.$store.state.members
+      return this.card.members
     },
     statusList() {
       const statusList = []

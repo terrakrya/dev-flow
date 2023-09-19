@@ -1,6 +1,6 @@
 <template>
   <div v-if="project">
-    <b-container fluid>
+    <b-container fluid class="mb-4">
       <b-row>
         <b-col sm="8">
           <h4>
@@ -37,10 +37,27 @@
           </b-modal>
         </b-col>
       </b-row>
+      <b-row>
+        <b-col sm="8">
+          <b-btn variant="dark" class="p-4">
+            <b-icon-info-square /> Informações
+          </b-btn>
+          <b-btn variant="dark" class="p-4" @click="openKanban()">
+            <b-icon-kanban /> Kanban
+          </b-btn>
+          <b-btn variant="dark" class="p-4" @click="openReport()">
+            <b-icon-journal-check /> Relatórios
+          </b-btn>
+          <b-btn variant="dark" class="p-4"><b-icon-card-text /> Notas</b-btn>
+        </b-col>
+      </b-row>
     </b-container>
     <b-container fluid>
-      <div>
+      <div v-if="show_kanban">
         <Kanban :cards="cards" @change="cardSaved" />
+      </div>
+      <div v-if="show_report">
+        <Report :cards="cards" />
       </div>
     </b-container>
   </div>
@@ -52,6 +69,8 @@ export default {
     return {
       show_project_form: false,
       show_card_form: false,
+      show_kanban: false,
+      show_report: false,
       cards: [],
     }
   },
@@ -88,6 +107,14 @@ export default {
     projectArchived() {
       this.projectSaved()
       this.$router.push('/projects')
+    },
+    openKanban() {
+      this.show_kanban = true
+      this.show_report = false
+    },
+    openReport() {
+      this.show_kanban = false
+      this.show_report = true
     },
   },
 }

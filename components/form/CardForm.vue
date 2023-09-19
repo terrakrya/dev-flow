@@ -74,30 +74,57 @@
           <FormMembersSelect v-model="form.members" />
         </b-form-group>
         <div class="tempo">
-          <small>Data limite</small>
-          <input
-            v-model="form.due_date"
-            size="sm"
-            type="date"
-            placeholder="Data limite"
-          />
-          <small>Tempo estimado (horas)</small>
-
-          <input
-            v-model="form.time_estimate"
-            size="sm"
-            type="number"
-            placeholder="Tempo estimado (horas)"
-            append="Horas"
-          />
-          <small>Tempo gasto (horas)</small>
-
-          <input
-            v-model="form.time_spent"
-            size="sm"
-            type="number"
-            placeholder="Tempo gasto (horas)"
-          />
+          <div class="row">
+            <div class="col-md-4">
+              <small>Data Prevista</small>
+              <input
+                v-model="form.due_date"
+                size="sm"
+                type="date"
+                placeholder="Data prevista"
+              />
+            </div>
+            <div class="col-md-4">
+              <small>Data Inicio</small>
+              <input
+                v-model="form.start_date"
+                size="sm"
+                type="date"
+                placeholder="Data inicio"
+              />
+            </div>
+            <div class="col-md-4">
+              <small>Data Produção</small>
+              <input
+                v-model="form.end_date"
+                size="sm"
+                type="date"
+                placeholder="Data end_date"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <small>Tempo estimado (horas)</small>
+              <input
+                v-model="form.time_estimate"
+                size="sm"
+                type="number"
+                placeholder="Tempo estimado (horas)"
+                append="Horas"
+              />
+            </div>
+            <div class="col-md-4">
+              <small>Tempo gasto (horas)</small>
+              <input
+                v-model="form.time_spent"
+                size="sm"
+                type="number"
+                placeholder="Tempo gasto (horas)"
+              />
+            </div>
+            <div class="cold-md-4">&nbsp;</div>
+          </div>
         </div>
         <Upload
           v-model="form.documents"
@@ -133,6 +160,31 @@
             </b-form-group>
           </b-col>
         </b-row>
+        <b-form-group label="Tags">
+          <span
+            v-for="(tag, index) in combinedTags"
+            :key="index"
+            :class="{
+              badge: true,
+              'badge-success': form.tags.includes(tag),
+              'badge-secondary': !form.tags.includes(tag),
+              'mr-3': true,
+            }"
+          >
+            {{ tag }}
+            <button
+              type="button"
+              class="close"
+              aria-label="Close"
+              @click="toggleTag(tag)"
+            >
+              <span v-if="form.tags.includes(tag)" aria-hidden="true">
+                &times;
+              </span>
+              <span v-else aria-hidden="true">+</span>
+            </button>
+          </span>
+        </b-form-group>
         <div v-if="edit" class="text-right text-danger mb-4">
           <small>
             <a @click="archive">
@@ -189,9 +241,13 @@ export default {
         images: [],
         title: '',
         due_date: undefined,
+        start_date: undefined,
+        end_date: undefined,
         time_estimate: undefined,
         time_spent: undefined,
+        tags: [],
       },
+      newTag: '',
     }
   },
   computed: {
@@ -213,6 +269,10 @@ export default {
       })
       return statusList
     },
+    combinedTags() {
+      const projectTags = this.project ? this.project.tags : []
+      return Array.from(new Set([...projectTags, ...this.form.tags]))
+    },
   },
   created() {
     if (this.edit) {
@@ -220,7 +280,30 @@ export default {
     }
   },
   methods: {
+    currentDate() {
+      const currentDate = new Date()
+
+      const year = currentDate.getFullYear()
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0')
+      const day = String(currentDate.getDate()).padStart(2, '0')
+
+      return `${year}-${month}-${day}`
+    },
     async save() {
+      // set the start date automatically
+      if (
+        this.form.status === 'developing' &&
+        this.form.start_date === undefined
+      ) {
+        this.form.start_date = this.currentDate()
+      }
+      // set the end date automatically
+      if (
+        this.form.status === 'published' &&
+        this.form.end_date === undefined
+      ) {
+        this.form.end_date = this.currentDate()
+      }
       const queryData = { ...this.form, organization: this.activeOrganization }
       if (this.edit) {
         const card = await this.$axios
@@ -252,6 +335,21 @@ export default {
         }
       }
     },
+    addTag(tag) {
+      if (tag.trim() !== '' && !this.form.tags.includes(tag)) {
+        this.form.tags.push(tag.trim())
+      }
+    },
+    removeTag(index) {
+      this.form.tags.splice(index, 1)
+    },
+    toggleTag(tag) {
+      if (this.form.tags.includes(tag)) {
+        this.removeTag(tag)
+      } else {
+        this.addTag(tag)
+      }
+    },
   },
 }
 </script>
@@ -279,7 +377,7 @@ export default {
   flex-direction: column;
   justify-content: flex-start;
   align-content: flex-start;
-  margin: 10px 0;
+  margin: 20px 0;
   margin-bottom: 14px;
 }
 </style>

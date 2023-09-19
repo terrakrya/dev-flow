@@ -1,5 +1,5 @@
 <template>
-  <b-avatar :size="size" :src="src" :text="text" :alt="alt"></b-avatar>
+  <b-avatar :size="size" :src="avatarSrc" :text="text" :alt="alt"></b-avatar>
 </template>
 <script>
 export default {
@@ -27,6 +27,12 @@ export default {
     },
     text() {
       return !this.src ? this.alt : null
+    },
+    avatarSrc() {
+      if (!this.src) {
+        return null
+      }
+      return `${process.env.DEFAULT_STORAGE_BUCKET_FULL_URL}${this.src}`
     },
   },
 }

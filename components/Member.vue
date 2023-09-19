@@ -2,7 +2,7 @@
 <template>
   <b-avatar
     v-if="member"
-    :src="member.avatar_url"
+    :src="avatarSrc"
     class="mr-1"
     size="2rem"
     :alt="member.name"
@@ -21,7 +21,13 @@ export default {
       return this.members.find((member) => member.id.toString() === this.id)
     },
     members() {
-      return this.$store.state.members
+      return this.$store.state.organization?.members
+    },
+    avatarSrc() {
+      if (!this.member.avatarUrl) {
+        return null
+      }
+      return `${process.env.DEFAULT_STORAGE_BUCKET_FULL_URL}${this.member.avatarUrl}`
     },
   },
 }
