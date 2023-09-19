@@ -54,14 +54,10 @@ export default {
     },
   },
   created() {
-    this.loadProjects()
     this.loadCards()
   },
 
   methods: {
-    loadProjects() {
-      this.$store.dispatch('loadProjects')
-    },
     async loadCards() {
       this.cards = await this.$axios.$get(
         `/api/cards?organization=${this.activeOrganizationId}`

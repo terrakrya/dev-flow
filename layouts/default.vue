@@ -19,6 +19,10 @@ export default {
     if (this.$auth.loggedIn && !this.$store.state.organization) {
       this.$store.dispatch('activateDefaultOrganization')
     }
+
+    if (this.$auth.loggedIn && this.$store.state.organization) {
+      this.$store.dispatch('loadProjects')
+    }
   },
   methods: {
     logout() {
