@@ -10,24 +10,44 @@ const Report = mongoose.model('Report')
 router.get('/pdf', async (req, res) => {
   const report = await Report.findById(req.query.report)
 
+  const logo = `${process.env.DEFAULT_STORAGE_BUCKET_FULL_URL}api/uploads/images/logo-terrakrya.png`
+  const currentDate = new Date()
+  const day = currentDate.getDate().toString().padStart(2, '0')
+  const month = (currentDate.getMonth() + 1).toString().padStart(2, '0')
+  const year = currentDate.getFullYear()
+
   const html = `<!DOCTYPE html>
   <html>
   <head>
       <title>Relatório de Tarefas</title>
       <style>
-          body {
-              font-family: 'Arial', sans-serif;
-          }
-
-          h1, h2, h3 {
-              font-weight: bold;
-          }
+          body {font-family: 'Arial', sans-serif}
+          h1, h2, h3 {font-weight: bold;}
+          #logo { width: 400px; margin: 0 auto; display:block}
+          #logo-footer { width: 200px }
       </style>
   </head>
-  <body>${report.html}</body></html>`
+  <body>
+    <img src="${logo}" id="logo">
+    ${report.html}
+    <br />
+    <p>Alto Paraíso de Goiás - GO, ${day}/${month}/${year}</p>
+    <img src="${logo}" id="logo-footer">
+  </body></html>`
 
   const file = { content: html }
-  const options = { format: 'A4' }
+  const options = {
+    format: 'A4',
+    margin: {
+      top: '20mm',
+      right: '10mm',
+      bottom: '20mm',
+      left: '10mm',
+    },
+    font: {
+      size: '12px',
+    },
+  }
   htmlToPdf.generatePdf(file, options).then((pdfBuffer) => {
     res.set({
       'Content-Type': 'application/pdf',
