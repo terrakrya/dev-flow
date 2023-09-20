@@ -8,6 +8,10 @@ const ReportSchema = mongoose.Schema(
       ref: 'Project',
       required: true,
     },
+    title: {
+      type: String,
+      required: true,
+    },
     html: {
       type: String,
       required: true,

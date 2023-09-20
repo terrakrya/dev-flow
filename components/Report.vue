@@ -90,9 +90,16 @@
                   </b-btn>
                 </b-col>
                 <b-col md="12">
+                  <b-input
+                    v-model="form.title"
+                    label="Titulo dado para o relatório"
+                    class="m-2"
+                  />
+                </b-col>
+                <b-col md="12">
                   <quill-editor
                     ref="quillEdit"
-                    v-model="editorPDF"
+                    v-model="form.html"
                     class="mt-4"
                     toolbar="minimal"
                   />
@@ -149,15 +156,26 @@
           <thead>
             <tr>
               <th>Titulo</th>
-              <th>Data</th>
+              <th>Data de criação</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in historical" :key="index">
               <td>{{ item.title }}</td>
-              <td>{{ item.date }}</td>
-              <td></td>
+              <td>{{ formatDate(item.createdAt) }}</td>
+              <td>
+                <b-link
+                  variant="dark"
+                  :href="`/api/projects/pdf?${item._id}`"
+                  target="_blank"
+                >
+                  <b-icon-file-earmark-pdf-fill />
+                </b-link>
+                <b-link variant="dark" @click="deleteReport(item.id)">
+                  <b-icon-trash-fill />
+                </b-link>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -190,7 +208,11 @@ export default {
       show_history: false,
       show_rel_pdf: false,
       groupedCards: {},
-      editorPDF: '',
+      form: {
+        title: '',
+        html: '',
+      },
+      historical: [],
     }
   },
   computed: {
@@ -338,9 +360,12 @@ export default {
       const response = await this.$axios.$post(
         `/api/projects/${this.project.id}/report`,
         {
-          html: this.editorPDF,
+          title: this.form.title,
+          html: this.form.html,
         }
       )
+      this.show_rel_pdf = false
+      this.openHistory()
       window.open(this.baseURL + '/api/projects/pdf?report=' + response._id)
     },
     groupCardsByTagsWithBracket(cards) {
@@ -368,9 +393,9 @@ export default {
       return groupedCards
     },
     generatePDFContent() {
+      this.form.title = `${this.project.name} - Relatório de Tarefas realizadas no periodo de xx/xx a xx/xx Ciclo XX`
+
       let htmlContent = `
-        <h1 class="ql-align-center">Relatório de Tarefas realizadas<br /> no periodo de xx/xx a xx/xx Ciclo XX</h1>
-        <hr />
         <h2>Contexto</h2>
         <br />
         <p></p>
@@ -418,7 +443,7 @@ export default {
         htmlContent += `<br />`
       }
 
-      this.editorPDF = htmlContent
+      this.form.html = htmlContent
     },
 
     findMemberNameById(memberId) {
@@ -432,6 +457,18 @@ export default {
     openHistory() {
       this.show_filters = false
       this.show_history = true
+      this.getHistory()
+    },
+    async getHistory() {
+      this.historical = await this.$axios.$get(
+        '/api/projects/reports/' + this.project.id
+      )
+    },
+    async deleteReport(id) {
+      if (window.confirm('Tem certeza de que deseja excluir o relatório?')) {
+        await this.$axios.$delete('/api/projects/delete/' + id)
+        this.getHistory()
+      }
     },
   },
 }
@@ -453,6 +490,14 @@ export default {
 
 .report-table th {
   font-weight: bold;
+}
+
+.report-table a {
+  color: #fff;
+}
+
+.report-table a svg {
+  font-size: 125%;
 }
 
 .filter-form {
