@@ -167,7 +167,7 @@
               <td>
                 <b-link
                   variant="dark"
-                  :href="`/api/projects/pdf?${item._id}`"
+                  :href="`/api/projects/pdf?report=${item._id}`"
                   target="_blank"
                 >
                   <b-icon-file-earmark-pdf-fill />
@@ -411,11 +411,11 @@ export default {
 
         for (const card of cards) {
           htmlContent += `
-            <p>
-              - ${card.title} Entregue em ${this.formatDate(card.end_date)}.
-              Resultando ${card.time_spent} horas gastas de trabalho.
-            </p>
-          `
+            <p>- ${card.title} Entregue em ${this.formatDate(card.end_date)}.`
+          if (card.time_spent) {
+            htmlContent += ` Resultando ${card.time_spent} horas gastas de trabalho.`
+          }
+          htmlContent += `</p>`
         }
         htmlContent += `<br />`
       }
@@ -432,13 +432,18 @@ export default {
         `
 
         for (const card of cards) {
-          htmlContent += `
-            <p>
-              - ${card.title}. Previsão de conclusão
-              ${this.formatDate(card.due_date)}. Previstas ${card.time_estimate}
-              horas gastas de trabalho.
-            </p>
-          `
+          htmlContent += `<p>- ${card.title}.`
+          if (card.due_date) {
+            htmlContent += `Previsão de conclusão ${this.formatDate(
+              card.due_date
+            )}. `
+          }
+          if (card.time_estimate) {
+            htmlContent += `Previstas ${this.formatDate(
+              card.time_estimate
+            )} horas gastas de trabalho.`
+          }
+          htmlContent += `</p>`
         }
         htmlContent += `<br />`
       }
