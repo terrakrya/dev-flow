@@ -39,11 +39,11 @@
       </b-row>
       <b-row>
         <b-col sm="8">
-          <b-btn variant="dark" class="p-4">
-            <b-icon-info-square /> Informações
-          </b-btn>
           <b-btn variant="dark" class="p-4" @click="openKanban()">
             <b-icon-kanban /> Kanban
+          </b-btn>
+          <b-btn variant="dark" class="p-4">
+            <b-icon-info-square /> Informações
           </b-btn>
           <b-btn variant="dark" class="p-4" @click="openReport()">
             <b-icon-journal-check /> Relatórios
@@ -87,8 +87,9 @@ export default {
       return null
     },
   },
-  created() {
-    this.loadCards()
+  async created() {
+    await this.loadCards()
+    this.openKanban()
   },
   methods: {
     async loadCards() {

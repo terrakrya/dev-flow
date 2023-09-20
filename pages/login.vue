@@ -31,6 +31,11 @@ export default {
       password: '',
     }
   },
+  created() {
+    if (this.$auth.loggedIn) {
+      this.$router.push('/admin')
+    }
+  },
   methods: {
     async localLogin() {
       try {
