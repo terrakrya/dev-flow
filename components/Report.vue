@@ -132,6 +132,10 @@ export default {
       type: Array,
       default: () => [],
     },
+    project: {
+      type: Object,
+      required: true,
+    },
   },
   data() {
     return {
@@ -177,6 +181,9 @@ export default {
       })
 
       return [...tagSet]
+    },
+    baseURL() {
+      return process.env.baseUrl
     },
   },
   watch: {
@@ -284,8 +291,15 @@ export default {
       a.click()
       URL.revokeObjectURL(url)
     },
-
-    exportToPDF() {},
+    async exportToPDF() {
+      const response = await this.$axios.$post(
+        `/api/projects/${this.project.id}/report`,
+        {
+          html: this.editorPDF,
+        }
+      )
+      window.open(this.baseURL + '/api/projects/pdf?report=' + response._id)
+    },
     groupCardsByTagsWithBracket(cards) {
       const groupedCards = {
         published: {},

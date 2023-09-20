@@ -6,6 +6,7 @@ import './models/Card'
 import './models/Comment'
 import './models/Profile'
 import './models/Organization'
+import './models/Report'
 
 const isProduction = process.env.NODE_ENV === 'production'
 

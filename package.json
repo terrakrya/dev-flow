@@ -35,6 +35,7 @@
     "express": "^4.17.1",
     "express-jwt": "^6.1.1",
     "express-session": "^1.17.2",
+    "html-pdf-node": "^1.0.8",
     "jsonwebtoken": "^8.5.1",
     "linkifyjs": "^3.0.0-beta.3",
     "lodash": "^4.17.21",
