@@ -1,127 +1,168 @@
 <template>
-  <div class="mb-5">
-    <div class="filter-form">
-      <div class="filter">
-        <label>Status:</label>
-        <div>
-          <label v-for="status in canvasStatus" :key="status">
-            <input
-              v-model="selectedStatus"
-              type="checkbox"
-              :value="status"
-              @change="applyFilters"
-            />
-            {{ status }}
-          </label>
-        </div>
-      </div>
-      <div class="filter">
-        <label>Tags:</label>
-        <div>
-          <label v-for="tag in canvasTags" :key="tag">
-            <input
-              v-model="selectedTags"
-              type="checkbox"
-              :value="tag"
-              @change="applyFilters"
-            />
-            {{ tag }}
-          </label>
-        </div>
-      </div>
-      <div class="filter">
-        <label>Membros:</label>
-        <div>
-          <label v-for="member in canvasMembers" :key="member._id">
-            <input
-              v-model="selectedMembers"
-              type="checkbox"
-              :value="member"
-              @change="applyFilters"
-            />
-            {{ member.name }}
-          </label>
-        </div>
-      </div>
-      <div class="filter">
-        <label>Data de Início:</label>
-        <input v-model="startDate" type="date" @change="applyFilters" />
+  <div>
+    <b-row>
+      <b-col sm="12">
+        <b-btn variant="dark" class="float-right" @click="openHistory()">
+          <b-icon-kanban /> Histórico
+        </b-btn>
+        <b-btn variant="dark" class="float-right" @click="openFilter()">
+          <b-icon-journal-check /> Filtros
+        </b-btn>
+      </b-col>
+    </b-row>
+    <b-row v-if="show_filters">
+      <b-col sm="12">
+        <div class="mb-5">
+          <div class="filter-form">
+            <div class="filter">
+              <label>Status:</label>
+              <div>
+                <label v-for="status in canvasStatus" :key="status">
+                  <input
+                    v-model="selectedStatus"
+                    type="checkbox"
+                    :value="status"
+                    @change="applyFilters"
+                  />
+                  {{ status }}
+                </label>
+              </div>
+            </div>
+            <div class="filter">
+              <label>Tags:</label>
+              <div>
+                <label v-for="tag in canvasTags" :key="tag">
+                  <input
+                    v-model="selectedTags"
+                    type="checkbox"
+                    :value="tag"
+                    @change="applyFilters"
+                  />
+                  {{ tag }}
+                </label>
+              </div>
+            </div>
+            <div class="filter">
+              <label>Membros:</label>
+              <div>
+                <label v-for="member in canvasMembers" :key="member._id">
+                  <input
+                    v-model="selectedMembers"
+                    type="checkbox"
+                    :value="member"
+                    @change="applyFilters"
+                  />
+                  {{ member.name }}
+                </label>
+              </div>
+            </div>
+            <div class="filter hide">
+              <label>Data de Início:</label>
+              <input v-model="startDate" type="date" @change="applyFilters" />
 
-        <label>Data de Fim:</label>
-        <input v-model="endDate" type="date" @change="applyFilters" />
-      </div>
-      <b-btn variant="dark" class="float-right mt-2 mb-2" @click="exportToCSV">
-        <b-icon-cloud-download /> Exportar CSV
-      </b-btn>
-      <b-btn
-        variant="dark"
-        class="float-right mb-2 mt-2"
-        @click="show_rel_pdf = !show_rel_pdf"
-      >
-        <b-icon-file-earmark-pdf-fill /> Editar PDF
-      </b-btn>
-      <b-modal
-        v-model="show_rel_pdf"
-        size="lg"
-        title="Editar Relatório PDF"
-        hide-footer
-      >
-        <b-row>
-          <b-col md="12">
-            <b-btn variant="dark" class="float-right" @click="exportToPDF">
-              <b-icon-cloud-download /> Exportar
+              <label>Data de Fim:</label>
+              <input v-model="endDate" type="date" @change="applyFilters" />
+            </div>
+            <b-btn variant="dark" class="float-right mb-2" @click="exportToCSV">
+              <b-icon-cloud-download /> Exportar CSV
             </b-btn>
-          </b-col>
-          <b-col md="12">
-            <quill-editor
-              ref="quillEdit"
-              v-model="editorPDF"
-              class="mt-4"
-              toolbar="minimal"
-            />
-          </b-col>
-        </b-row>
-      </b-modal>
-    </div>
-    <table class="report-table">
-      <thead>
-        <tr>
-          <th>Titulo</th>
-          <th>Status</th>
-          <th>Tags</th>
-          <th>Data Atualização</th>
-          <th>Membros</th>
-          <th>Data Limite</th>
-          <th>Horas Estimadas</th>
-          <th>Horas Gastas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, index) in filteredCards" :key="index">
-          <td>{{ item.title }}</td>
-          <td>{{ item.status }}</td>
-          <td>
-            <div v-for="tag in item.tags" :key="tag">
-              {{ tag }}
-            </div>
-          </td>
-          <td>{{ formatDate(item.updatedAt) }}</td>
-          <td>
-            <div v-for="memberId in item.members" :key="memberId">
-              {{ findMemberNameById(memberId) }}
-            </div>
-          </td>
-          <td>{{ formatDate(item.due_date) }}</td>
-          <td>{{ item.time_estimate }}</td>
-          <td>{{ item.time_spent }}</td>
-        </tr>
-        <tr>
-          <td colspan="6"></td>
-          <td><strong>Total de Horas Gastas:</strong></td>
-          <td>{{ calculateTotalHours() }}</td>
-        </tr>
-      </tbody>
-    </table>
+            <b-btn
+              variant="dark"
+              class="float-right mb-2"
+              @click="show_rel_pdf = !show_rel_pdf"
+            >
+              <b-icon-file-earmark-pdf-fill /> Editar PDF
+            </b-btn>
+            <b-modal
+              v-model="show_rel_pdf"
+              size="lg"
+              title="Editar Relatório PDF"
+              hide-footer
+            >
+              <b-row>
+                <b-col md="12">
+                  <b-btn
+                    variant="dark"
+                    class="float-right"
+                    @click="exportToPDF"
+                  >
+                    <b-icon-cloud-download /> Exportar
+                  </b-btn>
+                </b-col>
+                <b-col md="12">
+                  <quill-editor
+                    ref="quillEdit"
+                    v-model="editorPDF"
+                    class="mt-4"
+                    toolbar="minimal"
+                  />
+                </b-col>
+              </b-row>
+            </b-modal>
+          </div>
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Titulo</th>
+                <th>Status</th>
+                <th>Tags</th>
+                <th>Data Atualização</th>
+                <th>Membros</th>
+                <th>Data Limite</th>
+                <th>Horas Estimadas</th>
+                <th>Horas Gastas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(item, index) in filteredCards" :key="index">
+                <td>{{ item.title }}</td>
+                <td>{{ item.status }}</td>
+                <td>
+                  <div v-for="tag in item.tags" :key="tag">
+                    {{ tag }}
+                  </div>
+                </td>
+                <td>{{ formatDate(item.updatedAt) }}</td>
+                <td>
+                  <div v-for="memberId in item.members" :key="memberId">
+                    {{ findMemberNameById(memberId) }}
+                  </div>
+                </td>
+                <td>{{ formatDate(item.due_date) }}</td>
+                <td>{{ item.time_estimate }}</td>
+                <td>{{ item.time_spent }}</td>
+              </tr>
+              <tr>
+                <td colspan="6"></td>
+                <td><strong>Total de Horas Gastas:</strong></td>
+                <td>{{ calculateTotalHours() }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </b-col>
+    </b-row>
+    <b-row v-if="show_history">
+      <b-col sm="12">
+        <h5>Historicos de relatórios gerados do projeto</h5>
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Titulo</th>
+              <th>Data</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in historical" :key="index">
+              <td>{{ item.title }}</td>
+              <td>{{ item.date }}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -145,6 +186,8 @@ export default {
       endDate: '',
       selectedMembers: [],
       filteredCards: [],
+      show_filters: true,
+      show_history: false,
       show_rel_pdf: false,
       groupedCards: {},
       editorPDF: '',
@@ -381,6 +424,14 @@ export default {
     findMemberNameById(memberId) {
       const member = this.members.find((m) => m._id === memberId)
       return member ? member.name : 'Membro não encontrado'
+    },
+    openFilter() {
+      this.show_filters = true
+      this.show_history = false
+    },
+    openHistory() {
+      this.show_filters = false
+      this.show_history = true
     },
   },
 }
