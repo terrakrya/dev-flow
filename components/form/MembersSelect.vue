@@ -1,14 +1,21 @@
 <template>
   <div class="members-select">
-    <a v-for="(member, key) in members" :key="key" @click="select(member)">
+    <b-btn
+      v-for="(member, key) in members"
+      :key="key"
+      :class="{ 'btn-success': value.includes(getMemberId(member)) }"
+      class="mb-1"
+      size="sm"
+      @click="select(member)"
+    >
       <Avatar
         :src="member.avatarUrl"
         :name="member.name"
-        class="mr-1"
+        size="20"
         :class="{ inactive: !value.includes(getMemberId(member)) }"
       />
-      {{ member.name || member.email }}
-    </a>
+      <small>{{ member.name || member.email }}</small>
+    </b-btn>
   </div>
 </template>
 

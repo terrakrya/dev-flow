@@ -77,7 +77,7 @@
           <div class="row">
             <div class="col-md-4">
               <small>Data Prevista</small>
-              <input
+              <b-form-input
                 v-model="form.due_date"
                 size="sm"
                 type="date"
@@ -86,7 +86,7 @@
             </div>
             <div class="col-md-4">
               <small>Data Inicio</small>
-              <input
+              <b-form-input
                 v-model="form.start_date"
                 size="sm"
                 type="date"
@@ -95,7 +95,7 @@
             </div>
             <div class="col-md-4">
               <small>Data Produção</small>
-              <input
+              <b-form-input
                 v-model="form.end_date"
                 size="sm"
                 type="date"
@@ -103,7 +103,7 @@
               />
             </div>
           </div>
-          <div class="row">
+          <div class="row pt-3">
             <div class="col-md-4">
               <small>Tempo estimado (horas)</small>
               <input

@@ -8,7 +8,10 @@ const Project = mongoose.model('Project')
 
 router.get('/:id', authenticated, (req, res) => {
   Organization.findById(req.params.id)
-    .populate('members')
+    .populate({
+      path: 'members',
+      sort: { name: 1 },
+    })
     .exec((err, organization) => {
       if (err) {
         res.status(422).send(err.message)
