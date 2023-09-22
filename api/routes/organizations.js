@@ -134,15 +134,15 @@ router.post('/new', authenticated, async (req, res) => {
 })
 
 router.get('/:id/projects', authenticated, (req, res) => {
-  Project.find({ organization: req.params.id, archived: false }).exec(
-    (err, projects) => {
+  Project.find({ organization: req.params.id, archived: false })
+    .sort({ name: 1 })
+    .exec((err, projects) => {
       if (err) {
         res.status(422).send(err.message)
       } else {
         res.json(projects)
       }
-    }
-  )
+    })
 })
 
 // router.get('/:id', authenticated, (req, res) => {
