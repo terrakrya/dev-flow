@@ -26,7 +26,7 @@
         </n-link>
       </div>
       <div v-if="cardTitle" class="text-white mb-2" style="font-size: 16px">
-        <small>{{ cardTitle }}</small>
+        <span>{{ cardTitle }}</span>
       </div>
       <div class="d-flex justify-content-start items-center mb-3">
         <div class="text-left">
@@ -43,9 +43,9 @@
         class="d-flex justify-content-start items-center mb-3"
       >
         <div class="text-left">
-          <span v-for="(tag, index) in card.tags" :key="index">
+          <small v-for="(tag, index) in card.tags" :key="index">
             #{{ tag }}
-          </span>
+          </small>
         </div>
       </div>
       <p v-if="card.time_spent || card.time_estimate">
