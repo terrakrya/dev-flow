@@ -2,7 +2,7 @@
 <template>
   <div :id="card.id" class="rounded p-3 border kanban-card" @dblclick="open()">
     <div class="dateBadge">
-      <h5>
+      <span>
         <b-badge
           v-if="cardDueDate"
           :variant="
@@ -13,17 +13,29 @@
               : ''
           "
         >
-          {{ cardDueDate }}</b-badge
+          <small>{{ cardDueDate }}</small></b-badge
         >
-      </h5>
+      </span>
     </div>
     <div class="pointer" @click="open()">
-      <div v-if="cardTitle" class="text-white mb-2" style="font-size: 16px">
-        {{ cardTitle }}
+      <div v-if="multiple" class="mb-2">
+        <n-link :to="`/projects/${card.project._id}`">
+          <small
+            ><strong>{{ card.project.name }}</strong></small
+          >
+        </n-link>
       </div>
-      <div class="d-flex justify-content-end items-center mb-3">
-        <div class="text-right">
-          <Member v-for="member in members" :id="member" :key="member" />
+      <div v-if="cardTitle" class="text-white mb-2" style="font-size: 16px">
+        <small>{{ cardTitle }}</small>
+      </div>
+      <div class="d-flex justify-content-start items-center mb-3">
+        <div class="text-left">
+          <Member
+            v-for="member in members"
+            :id="member"
+            :key="member"
+            size="28px"
+          />
         </div>
       </div>
       <div class="d-flex justify-content-end items-center mb-3">
@@ -48,15 +60,6 @@
       </div>
 
       <div class="text-right">
-        <div v-if="multiple" class="mb-2">
-          <n-link :to="`/projects/${card.project._id}`">
-            <b-badge
-              variant="secondary"
-              :style="`background-color: ${card.project.color} !important; font-size: 11px`"
-              >{{ card.project.name }}</b-badge
-            >
-          </n-link>
-        </div>
         <div>
           <div v-if="card.status === 'backlog'">
             <div v-if="card.reviewed">
