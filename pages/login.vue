@@ -6,15 +6,17 @@
       <div class="mt-4">
         <b-spinner v-if="authenticating" label="Busy"></b-spinner>
         <div v-else-if="!$auth.loggedIn">
-          <b-input v-model="username" class="m-4" placeholder="Email" />
-          <b-input
-            v-model="password"
-            class="m-4"
-            placeholder="Senha"
-            type="password"
-          />
-          <b-btn class="btn btn-primary" @click="localLogin">Entrar</b-btn>
-          <b-btn to="/register" class="btn btn-primary"> Registrar </b-btn>
+          <b-form title="Entrar" @submit.prevent="localLogin">
+            <b-input v-model="username" class="m-4" placeholder="Email" />
+            <b-input
+              v-model="password"
+              class="m-4"
+              placeholder="Senha"
+              type="password"
+            />
+            <b-btn class="btn btn-primary" type="submit">Entrar</b-btn>
+            <b-btn to="/register" class="btn btn-primary"> Registrar </b-btn>
+          </b-form>
         </div>
       </div>
     </div>

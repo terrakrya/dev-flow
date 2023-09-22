@@ -9,8 +9,7 @@
             variant="dark"
             :to="`/projects/${project._id}`"
             class="mb-1"
-            :style="`background-color: ${project.color} !important`"
-            >{{ project.name }}</b-button
+            ><small>{{ project.name }}</small></b-button
           >
         </template>
         <a

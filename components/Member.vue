@@ -4,7 +4,7 @@
     v-if="member"
     :src="avatarSrc"
     class="mr-1"
-    size="2rem"
+    :size="size"
     :alt="member.name"
   />
 </template>
@@ -14,6 +14,10 @@ export default {
     id: {
       type: String,
       default: null,
+    },
+    size: {
+      type: String,
+      default: '2rem',
     },
   },
   computed: {

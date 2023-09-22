@@ -24,25 +24,36 @@ router.get('/', authenticated, (req, res) => {
     })
 })
 
-router.get('/my', authenticated, (req, res) => {
-  const query = {
-    archived: false,
-    members: [req.user._id],
-    $and: [{ status: { $ne: 'backlog' } }, { status: { $ne: 'published' } }],
-  }
-  if (req.query.organization) {
-    query.organization = req.query.organization
-  }
+router.get('/my', authenticated, async (req, res) => {
+  try {
+    const query = {
+      archived: false,
+      members: [req.user._id],
+      status: { $ne: 'published' },
+    }
+    if (req.query.organization) {
+      query.organization = req.query.organization
+    }
 
-  Card.find(query)
-    .populate('project')
-    .exec((err, cards) => {
-      if (err) {
-        res.status(422).send(err.message)
-      } else {
-        res.json(cards)
-      }
-    })
+    const cards = await Card.find(query).populate('project')
+
+    // backlog, ready_to_dev, developing, ready_to_test, testing, ready_to_prod
+    const myCards = {
+      backlog: cards.filter(
+        (card) => card.status === 'backlog' || card.status === 'ready_to_dev'
+      ),
+      active: cards.filter(
+        (card) =>
+          card.status === 'developing' ||
+          card.status === 'ready_to_test' ||
+          card.status === 'testing' ||
+          card.status === 'ready_to_prod'
+      ),
+    }
+    res.json(myCards)
+  } catch (err) {
+    res.status(422).send(err.message)
+  }
 })
 
 router.get('/:id', authenticated, (req, res) => {
