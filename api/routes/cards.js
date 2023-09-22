@@ -39,16 +39,31 @@ router.get('/my', authenticated, async (req, res) => {
 
     // backlog, ready_to_dev, developing, ready_to_test, testing, ready_to_prod
     const myCards = {
-      backlog: cards.filter(
-        (card) => card.status === 'backlog' || card.status === 'ready_to_dev'
-      ),
-      active: cards.filter(
-        (card) =>
-          card.status === 'developing' ||
-          card.status === 'ready_to_test' ||
-          card.status === 'testing' ||
-          card.status === 'ready_to_prod'
-      ),
+      backlog: cards
+        .filter(
+          (card) => card.status === 'backlog' || card.status === 'ready_to_dev'
+        )
+        .sort((a, b) => (a.status === 'backlog' ? -1 : 1)),
+      active: cards
+        .filter(
+          (card) =>
+            card.status === 'developing' ||
+            card.status === 'ready_to_test' ||
+            card.status === 'testing' ||
+            card.status === 'ready_to_prod'
+        )
+        .sort((a, b) => {
+          if (a.status === 'developing') {
+            return 1
+          } else if (b.status === 'ready_to_test') {
+            return 2
+          } else if (b.status === 'testing') {
+            return 3
+          } else if (b.status === 'ready_to_prod') {
+            return 4
+          }
+          return 5
+        }),
     }
     res.json(myCards)
   } catch (err) {
