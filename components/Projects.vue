@@ -15,13 +15,7 @@
 export default {
   computed: {
     projects() {
-      const projects = [...this.$store.state.projects]
-      if (projects) {
-        return projects.sort((a, b) => {
-          return a.name.localeCompare(b.name)
-        })
-      }
-      return null
+      return this.$store.state.projects
     },
   },
 }
