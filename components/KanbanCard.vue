@@ -38,13 +38,21 @@
           />
         </div>
       </div>
-      <div class="d-flex justify-content-end items-center mb-3">
+      <div
+        v-if="card.tags && card.tags.length"
+        class="d-flex justify-content-start items-center mb-3"
+      >
         <div class="text-left">
           <span v-for="(tag, index) in card.tags" :key="index">
             #{{ tag }}
           </span>
         </div>
       </div>
+      <p v-if="card.time_spent || card.time_estimate">
+        <small
+          ><b-icon-clock /> {{ card.time_spent || card.time_estimate }} h</small
+        >
+      </p>
     </div>
     <hr />
     <div class="d-flex justify-content-between align-items-center">
@@ -123,11 +131,6 @@
         @change="cardChanged"
       />
     </b-modal>
-    <h5 class="estimateBadge">
-      <b-badge v-if="card.time_estimate" variant="info">
-        {{ card.time_estimate }}
-      </b-badge>
-    </h5>
   </div>
 </template>
 <script>
