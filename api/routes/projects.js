@@ -20,7 +20,7 @@ router.get('/pdf', async (req, res) => {
   const html = `<!DOCTYPE html>
   <html>
   <head>
-      <title>Relatório de Tarefas</title>
+      <title>${slug}</title>
       <style>
           body {font-family: 'Arial', sans-serif}
           h1, h2, h3 {font-weight: bold;}
@@ -38,27 +38,7 @@ router.get('/pdf', async (req, res) => {
     <img src="${logo}" id="logo-footer">
   </body></html>`
 
-  const file = { content: html }
-  const options = {
-    format: 'A4',
-    margin: {
-      top: '20mm',
-      right: '10mm',
-      bottom: '20mm',
-      left: '10mm',
-    },
-    font: {
-      size: '12px',
-    },
-  }
-  htmlToPdf.generatePdf(file, options).then((pdfBuffer) => {
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Length': pdfBuffer.length,
-    })
-    res.set({ 'Content-Disposition': `attachment; filename="${slug}.pdf"` })
-    res.send(pdfBuffer)
-  })
+  res.send(html)
 })
 
 router.get('/', authenticated, (req, res) => {

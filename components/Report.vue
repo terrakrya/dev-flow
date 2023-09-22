@@ -10,6 +10,9 @@
         </b-btn>
       </b-col>
     </b-row>
+    <b-row v-if="show_time_table">
+      <b-col sm-12><Timetable :cards="cards" /></b-col>
+    </b-row>
     <b-row v-if="show_filters">
       <b-col sm="12">
         <div class="mb-5">
@@ -107,16 +110,14 @@
               </b-row>
             </b-modal>
           </div>
-          <table class="report-table">
+          <table v-if="filteredCards.length > 0" class="report-table">
             <thead>
               <tr>
                 <th>Titulo</th>
                 <th>Status</th>
                 <th>Tags</th>
-                <th>Data Atualização</th>
                 <th>Membros</th>
                 <th>Data Limite</th>
-                <th>Horas Estimadas</th>
                 <th>Horas Gastas</th>
               </tr>
             </thead>
@@ -129,18 +130,16 @@
                     {{ tag }}
                   </div>
                 </td>
-                <td>{{ formatDate(item.updatedAt) }}</td>
                 <td>
                   <div v-for="memberId in item.members" :key="memberId">
                     {{ findMemberNameById(memberId) }}
                   </div>
                 </td>
                 <td>{{ formatDate(item.due_date) }}</td>
-                <td>{{ item.time_estimate }}</td>
                 <td>{{ item.time_spent }}</td>
               </tr>
               <tr>
-                <td colspan="6"></td>
+                <td colspan="4"></td>
                 <td><strong>Total de Horas Gastas:</strong></td>
                 <td>{{ calculateTotalHours() }}</td>
               </tr>
@@ -207,6 +206,7 @@ export default {
       show_filters: true,
       show_history: false,
       show_rel_pdf: false,
+      show_time_table: false,
       groupedCards: {},
       form: {
         title: '',
@@ -334,16 +334,7 @@ export default {
       })
 
       const csvRows = [
-        [
-          'Título',
-          'Status',
-          'Tags',
-          'Data Atualização',
-          'Membros',
-          'Data Limite',
-          'Horas Estimadas',
-          'Horas Gastas',
-        ],
+        ['Título', 'Status', 'Tags', 'Membros', 'Data Limite', 'Horas Gastas'],
         ...csvData,
       ]
       const csvContent = csvRows.map((row) => row.join(';')).join('\n')
@@ -394,7 +385,8 @@ export default {
     },
     generatePDFContent() {
       this.form.title = `${this.project.name} - Relatório de Tarefas realizadas no periodo de xx/xx a xx/xx Ciclo XX`
-
+      // input chatgpt
+      // Em um paragrafo faça uma sintaxe resumida do que foi feita nesse ciclo de desenvolvimento de software:
       let htmlContent = `
         <h2>Contexto</h2>
         <br />
