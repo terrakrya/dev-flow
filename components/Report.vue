@@ -398,7 +398,7 @@ export default {
 
       for (const [tag, cards] of Object.entries(this.groupedCards.published)) {
         htmlContent += `
-          <h3>${tag}</h3>
+          <h3>${tag} - Entregue ${cards.length} tarefas.</h3>
         `
 
         for (const card of cards) {
@@ -420,7 +420,7 @@ export default {
 
       for (const [tag, cards] of Object.entries(this.groupedCards.others)) {
         htmlContent += `
-          <h3>${tag}</h3>
+          <h3>${tag} - Previstas ${cards.length} tarefas.</h3>
         `
 
         for (const card of cards) {
