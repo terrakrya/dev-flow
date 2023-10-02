@@ -20,6 +20,55 @@
       <b-form-group label="Descrição">
         <b-form-textarea v-model="form.description" />
       </b-form-group>
+      <b-form-group label="N. Total de dias de cada Ciclo *">
+        <validation-provider
+          v-slot="{ errors }"
+          name="numberCycleDays"
+          rules="required"
+        >
+          <b-form-input v-model="form.numberCycleDays" name="numberCycleDays" />
+          <span class="text-danger">{{ errors[0] }}</span>
+        </validation-provider>
+      </b-form-group>
+      <b-form-group label="Dia de inicio do Ciclo *">
+        <validation-provider
+          v-slot="{ errors }"
+          name="startDayEachCycle"
+          rules="required"
+        >
+          <b-form-input
+            v-model="form.startDayEachCycle"
+            name="startDayEachCycle"
+          />
+          <span class="text-danger">{{ errors[0] }}</span>
+        </validation-provider>
+      </b-form-group>
+      <b-form-group label="Link da Documentação *">
+        <validation-provider
+          v-slot="{ errors }"
+          name="documentationLink"
+          rules="required"
+        >
+          <b-form-input
+            v-model="form.documentationLink"
+            name="documentationLink"
+          />
+          <span class="text-danger">{{ errors[0] }}</span>
+        </validation-provider>
+      </b-form-group>
+      <b-form-group label="Link do Repo. Git *">
+        <validation-provider
+          v-slot="{ errors }"
+          name="gitRepositoryLink"
+          rules="required"
+        >
+          <b-form-input
+            v-model="form.gitRepositoryLink"
+            name="gitRepositoryLink"
+          />
+          <span class="text-danger">{{ errors[0] }}</span>
+        </validation-provider>
+      </b-form-group>
       <b-form-group label="Cor">
         <b-form-input v-model="form.color" type="color" class="w-25" />
       </b-form-group>
@@ -81,6 +130,10 @@ export default {
         description: '',
         color: '#161b22',
         tags: [],
+        numberCycleDays: 30,
+        startDayEachCycle: 7,
+        documentationLink: '',
+        gitRepositoryLink: '',
       },
       newTag: '',
     }

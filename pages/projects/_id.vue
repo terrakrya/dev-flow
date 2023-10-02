@@ -42,7 +42,7 @@
           <b-btn variant="dark" class="p-4" @click="openKanban()">
             <b-icon-kanban /> Kanban
           </b-btn>
-          <b-btn variant="dark" class="p-4">
+          <b-btn variant="dark" class="p-4" @click="openInformation()">
             <b-icon-info-square /> Informações
           </b-btn>
           <b-btn variant="dark" class="p-4" @click="openReport()">
@@ -59,6 +59,9 @@
       <div v-if="show_report">
         <Report :cards="cards" :project="project" />
       </div>
+      <div v-if="show_information">
+        <Information :project="project" />
+      </div>
     </b-container>
   </div>
 </template>
@@ -71,6 +74,7 @@ export default {
       show_card_form: false,
       show_kanban: false,
       show_report: false,
+      show_information: false,
       cards: [],
     }
   },
@@ -112,10 +116,17 @@ export default {
     openKanban() {
       this.show_kanban = true
       this.show_report = false
+      this.show_information = false
     },
     openReport() {
       this.show_kanban = false
       this.show_report = true
+      this.show_information = false
+    },
+    openInformation() {
+      this.show_kanban = false
+      this.show_report = false
+      this.show_information = true
     },
   },
 }

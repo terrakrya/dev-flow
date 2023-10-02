@@ -33,6 +33,18 @@ const ProjectSchema = mongoose.Schema(
     tags: {
       type: Array,
     },
+    numberCycleDays: {
+      type: String,
+    },
+    startDayEachCycle: {
+      type: String,
+    },
+    documentationLink: {
+      type: String,
+    },
+    gitRepositoryLink: {
+      type: String,
+    },
   },
   {
     timestamps: true,
