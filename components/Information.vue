@@ -21,6 +21,7 @@
             Como resultado dessa cerimônia, geramos e salvamos um relatório na
             plataforma DevFlow.
           </p>
+          <img class="w-100" src="~/assets/img/process.png" />
         </div>
       </b-col>
       <b-col sm="4">
