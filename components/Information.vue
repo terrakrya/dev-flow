@@ -24,28 +24,58 @@
           <img class="w-100" src="~/assets/img/process.png" />
         </div>
       </b-col>
-      <b-col sm="4">
+      <b-col sm="3">
         <div class="mb-3 bg-dark rounded-lg p-3 mr-1">
           <h4>Links Rápidos:</h4>
           <hr />
-          <p>
-            <a
-              class="btn btn-secondary btn-sm"
-              :href="project.documentationLink"
-              target="_blanck"
-            >
-              Documentação do projeto
-            </a>
-          </p>
-          <p>
-            <a
-              class="btn btn-secondary btn-sm"
-              :href="project.gitRepositoryLink"
-              target="_blanck"
-            >
-              Repositorio do Git
-            </a>
-          </p>
+          <a
+            v-if="project.matrixRoomLink"
+            class="btn btn-secondary btn-sm btns"
+            :href="project.matrixRoomLink"
+            target="_blanck"
+          >
+            <b-icon-messenger />
+            <p>Sala de Chat na Matrix</p>
+          </a>
+          <a
+            v-if="project.linkDocNextclound"
+            class="btn btn-secondary btn-sm btns"
+            :href="project.linkDocNextclound"
+            target="_blanck"
+          >
+            <b-icon-cloud-download />
+            <p>Arquivos na Nuvem</p>
+          </a>
+          <a
+            v-if="project.documentationLink"
+            class="btn btn-secondary btn-sm btns"
+            :href="project.documentationLink"
+            target="_blanck"
+          >
+            <b-icon-file-earmark-font />
+            <p>Documentação</p>
+          </a>
+          <a
+            v-if="project.gitRepositoryLink"
+            class="btn btn-secondary btn-sm btns"
+            :href="project.gitRepositoryLink"
+            target="_blanck"
+          >
+            <b-icon-github />
+            <p>Repositorio Git</p>
+          </a>
+        </div>
+        <div class="mb-3 bg-dark rounded-lg p-3 mr-1">
+          <h4>Tags:</h4>
+          <hr />
+          <b-badge
+            v-for="(tag, index) in project.tags"
+            :key="index"
+            variant="secondary"
+            class="mr-2"
+          >
+            {{ tag }}
+          </b-badge>
         </div>
       </b-col>
     </b-row>
@@ -61,3 +91,15 @@ export default {
   },
 }
 </script>
+
+<style scoped>
+.btns {
+  width: 180px;
+  height: 150px;
+  padding: 45px;
+  margin-bottom: 10px;
+}
+.btns .b-icon {
+  font-size: 30px;
+}
+</style>

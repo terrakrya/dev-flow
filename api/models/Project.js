@@ -45,6 +45,12 @@ const ProjectSchema = mongoose.Schema(
     gitRepositoryLink: {
       type: String,
     },
+    linkDocNextclound: {
+      type: String,
+    },
+    matrixRoomLink: {
+      type: String,
+    },
   },
   {
     timestamps: true,

@@ -1,7 +1,7 @@
 <template>
   <ValidationObserver v-slot="{ validate, invalid }">
     <b-form @submit.prevent="validate().then(save)">
-      <b-form-group label="Repositório">
+      <!-- <b-form-group label="Repositório">
         <b-form-select
           v-model="form.repository"
           :options="repositories"
@@ -10,65 +10,120 @@
           @change="repositorySelected"
         >
         </b-form-select>
-      </b-form-group>
-      <b-form-group label="Nome *">
-        <validation-provider v-slot="{ errors }" name="nome" rules="required">
-          <b-form-input v-model="form.name" name="name" />
-          <span class="text-danger">{{ errors[0] }}</span>
-        </validation-provider>
-      </b-form-group>
-      <b-form-group label="Descrição">
-        <b-form-textarea v-model="form.description" />
-      </b-form-group>
-      <b-form-group label="N. Total de dias de cada Ciclo *">
-        <validation-provider
-          v-slot="{ errors }"
-          name="numberCycleDays"
-          rules="required"
-        >
-          <b-form-input v-model="form.numberCycleDays" name="numberCycleDays" />
-          <span class="text-danger">{{ errors[0] }}</span>
-        </validation-provider>
-      </b-form-group>
-      <b-form-group label="Dia de inicio do Ciclo *">
-        <validation-provider
-          v-slot="{ errors }"
-          name="startDayEachCycle"
-          rules="required"
-        >
-          <b-form-input
-            v-model="form.startDayEachCycle"
-            name="startDayEachCycle"
-          />
-          <span class="text-danger">{{ errors[0] }}</span>
-        </validation-provider>
-      </b-form-group>
-      <b-form-group label="Link da Documentação *">
-        <validation-provider
-          v-slot="{ errors }"
-          name="documentationLink"
-          rules="required"
-        >
-          <b-form-input
-            v-model="form.documentationLink"
-            name="documentationLink"
-          />
-          <span class="text-danger">{{ errors[0] }}</span>
-        </validation-provider>
-      </b-form-group>
-      <b-form-group label="Link do Repo. Git *">
-        <validation-provider
-          v-slot="{ errors }"
-          name="gitRepositoryLink"
-          rules="required"
-        >
-          <b-form-input
-            v-model="form.gitRepositoryLink"
-            name="gitRepositoryLink"
-          />
-          <span class="text-danger">{{ errors[0] }}</span>
-        </validation-provider>
-      </b-form-group>
+      </b-form-group> -->
+      <b-row>
+        <b-col sm="12">
+          <b-form-group label="Nome *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="nome"
+              rules="required"
+            >
+              <b-form-input v-model="form.name" name="name" />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+          <b-form-group label="Descrição">
+            <b-form-textarea v-model="form.description" />
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col sm="6">
+          <b-form-group label="Dias total do ciclo de entrega *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="numberCycleDays"
+              rules="required"
+            >
+              <b-form-input
+                v-model="form.numberCycleDays"
+                name="numberCycleDays"
+              />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+        </b-col>
+        <b-col sm="6">
+          <b-form-group label="Dia de inicio do Ciclo *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="startDayEachCycle"
+              rules="required"
+            >
+              <b-form-input
+                v-model="form.startDayEachCycle"
+                name="startDayEachCycle"
+              />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col sm="6">
+          <b-form-group label="Link do Repo. Git *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="gitRepositoryLink"
+              rules="required"
+            >
+              <b-form-input
+                v-model="form.gitRepositoryLink"
+                name="gitRepositoryLink"
+              />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+        </b-col>
+        <b-col sm="6">
+          <b-form-group label="Link NextClound *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="linkDocNextclound"
+              rules="required"
+            >
+              <b-form-input
+                v-model="form.linkDocNextclound"
+                name="linkDocNextclound"
+              />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+        </b-col>
+      </b-row>
+      <b-row>
+        <b-col sm="6">
+          <b-form-group label="Link Sala Matrix *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="matrixRoomLink"
+              rules="required"
+            >
+              <b-form-input
+                v-model="form.matrixRoomLink"
+                name="matrixRoomLink"
+              />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+        </b-col>
+        <b-col sm="6">
+          <b-form-group label="Link da Documentação *">
+            <validation-provider
+              v-slot="{ errors }"
+              name="documentationLink"
+              rules="required"
+            >
+              <b-form-input
+                v-model="form.documentationLink"
+                name="documentationLink"
+              />
+              <span class="text-danger">{{ errors[0] }}</span>
+            </validation-provider>
+          </b-form-group>
+        </b-col>
+      </b-row>
       <b-form-group label="Cor">
         <b-form-input v-model="form.color" type="color" class="w-25" />
       </b-form-group>
@@ -131,9 +186,11 @@ export default {
         color: '#161b22',
         tags: [],
         numberCycleDays: 30,
-        startDayEachCycle: 7,
+        startDayEachCycle: 5,
         documentationLink: '',
         gitRepositoryLink: '',
+        linkDocNextclound: '',
+        matrixRoomLink: '',
       },
       newTag: '',
     }

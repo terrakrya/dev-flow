@@ -13,6 +13,7 @@
             v-model="show_project_form"
             title="Editar projeto"
             hide-footer
+            size="lg"
           >
             <form-project-form
               :edit="project"
