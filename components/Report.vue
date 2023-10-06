@@ -117,7 +117,7 @@
                 <th>Status</th>
                 <th>Tags</th>
                 <th>Membros</th>
-                <th>Data Limite</th>
+                <th>Data Entregue</th>
                 <th>Horas Gastas</th>
               </tr>
             </thead>
@@ -135,7 +135,7 @@
                     {{ findMemberNameById(memberId) }}
                   </div>
                 </td>
-                <td>{{ formatDate(item.due_date) }}</td>
+                <td>{{ formatDate(item.end_date) }}</td>
                 <td>{{ item.time_spent }}</td>
               </tr>
               <tr>
@@ -431,9 +431,7 @@ export default {
             )}. `
           }
           if (card.time_estimate) {
-            htmlContent += `Previstas ${this.formatDate(
-              card.time_estimate
-            )} horas gastas de trabalho.`
+            htmlContent += `Previstas ${card.time_estimate} horas gastas de trabalho.`
           }
           htmlContent += `</p>`
         }

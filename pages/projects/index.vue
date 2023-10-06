@@ -23,7 +23,12 @@
         <b-btn variant="dark" @click="show_card_form = !show_card_form">
           <b-icon-plus /> Adicionar cartão
         </b-btn>
-        <b-modal v-model="show_card_form" title="Adicionar cartão" hide-footer>
+        <b-modal
+          v-model="show_card_form"
+          title="Adicionar cartão"
+          size="lg"
+          hide-footer
+        >
           <form-card-form @change="cardSaved" />
         </b-modal>
       </b-col>

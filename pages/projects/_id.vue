@@ -32,6 +32,7 @@
           <b-modal
             v-model="show_card_form"
             title="Adicionar cartão"
+            size="lg"
             hide-footer
           >
             <form-card-form :project="project" @change="cardSaved" />
