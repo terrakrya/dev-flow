@@ -48,7 +48,6 @@ export default {
 <style>
 .card {
   width: 100%;
-  max-height: 400px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

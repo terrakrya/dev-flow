@@ -108,7 +108,7 @@ export default {
 }
 </script>
 <style>
-.kanban .column > div {
+/* .kanban .column > div {
   height: 240px;
-}
+} */
 </style>
