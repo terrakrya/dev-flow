@@ -70,6 +70,11 @@
           <accept-markdown />
           <span class="text-danger">{{ errors[0] }}</span>
         </b-form-group>
+        <b-form-group label="Timeline">
+          <b-form-checkbox v-model="form.timeline">
+            Incluir esse card na Timeline do projeto?
+          </b-form-checkbox>
+        </b-form-group>
         <b-form-group label="Membros">
           <FormMembersSelect v-model="form.members" />
         </b-form-group>
@@ -246,6 +251,7 @@ export default {
         time_estimate: undefined,
         time_spent: undefined,
         tags: [],
+        timeline: false,
       },
       newTag: '',
     }

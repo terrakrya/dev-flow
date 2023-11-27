@@ -38,6 +38,10 @@ const CardSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    timeline: {
+      type: Boolean,
+      default: false,
+    },
     documents: {
       type: Array,
     },
