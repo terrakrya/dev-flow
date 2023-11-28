@@ -13,6 +13,7 @@
         <div class="timeline-content">
           <h2>{{ formatDate(card.end_date) }}</h2>
           <h3>{{ card.title }}</h3>
+          <!-- eslint-disable-next-line vue/no-v-html -->
           <p v-html="replaceLinks(card.note)"></p>
         </div>
       </div>
