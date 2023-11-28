@@ -5,6 +5,9 @@
         <b-btn variant="dark" class="float-right" @click="openHistory()">
           <b-icon-kanban /> Histórico
         </b-btn>
+        <b-btn variant="dark" class="float-right" @click="openTimeline()">
+          <b-icon-hourglass-bottom /> Timeline
+        </b-btn>
         <b-btn variant="dark" class="float-right" @click="openFilter()">
           <b-icon-journal-check /> Filtros
         </b-btn>
@@ -180,6 +183,12 @@
         </table>
       </b-col>
     </b-row>
+    <b-row v-if="show_timeline">
+      <b-col sm="12">
+        <h4 class="mb-4">Timeline</h4>
+        <Timeline :cards="cards" />
+      </b-col>
+    </b-row>
   </div>
 </template>
 
@@ -205,6 +214,7 @@ export default {
       filteredCards: [],
       show_filters: true,
       show_history: false,
+      show_timeline: false,
       show_rel_pdf: false,
       show_time_table: false,
       groupedCards: {},
@@ -448,11 +458,18 @@ export default {
     openFilter() {
       this.show_filters = true
       this.show_history = false
+      this.show_timeline = false
     },
     openHistory() {
       this.show_filters = false
       this.show_history = true
+      this.show_timeline = false
       this.getHistory()
+    },
+    openTimeline() {
+      this.show_timeline = true
+      this.show_filters = false
+      this.show_history = false
     },
     async getHistory() {
       this.historical = await this.$axios.$get(
