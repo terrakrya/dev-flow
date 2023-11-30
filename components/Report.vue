@@ -5,6 +5,9 @@
         <b-btn variant="dark" class="float-right" @click="openHistory()">
           <b-icon-kanban /> Histórico
         </b-btn>
+        <b-btn variant="dark" class="float-right" @click="openCalendar()">
+          <b-icon-calendar /> Calendário
+        </b-btn>
         <b-btn variant="dark" class="float-right" @click="openTimeline()">
           <b-icon-hourglass-bottom /> Timeline
         </b-btn>
@@ -15,6 +18,9 @@
     </b-row>
     <b-row v-if="show_time_table">
       <b-col sm-12><Timetable :cards="cards" /></b-col>
+    </b-row>
+    <b-row v-if="show_calendar">
+      <b-col sm-12><Calendar :cards="cards" /></b-col>
     </b-row>
     <b-row v-if="show_filters">
       <b-col sm="12">
@@ -215,6 +221,7 @@ export default {
       show_filters: true,
       show_history: false,
       show_timeline: false,
+      show_calendar: false,
       show_rel_pdf: false,
       show_time_table: false,
       groupedCards: {},
@@ -459,15 +466,24 @@ export default {
       this.show_filters = true
       this.show_history = false
       this.show_timeline = false
+      this.show_calendar = false
     },
     openHistory() {
       this.show_filters = false
       this.show_history = true
       this.show_timeline = false
+      this.show_calendar = false
       this.getHistory()
     },
     openTimeline() {
       this.show_timeline = true
+      this.show_filters = false
+      this.show_history = false
+      this.show_calendar = false
+    },
+    openCalendar() {
+      this.show_calendar = true
+      this.show_timeline = false
       this.show_filters = false
       this.show_history = false
     },
