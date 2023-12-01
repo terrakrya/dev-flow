@@ -71,7 +71,7 @@
           <span class="text-danger">{{ errors[0] }}</span>
         </b-form-group>
         <b-form-group label="Timeline">
-          <b-form-checkbox v-model="form.timeline">
+          <b-form-checkbox v-model="form.timeline" switch>
             Incluir esse card na Timeline do projeto?
           </b-form-checkbox>
         </b-form-group>
