@@ -33,7 +33,7 @@ router.get('/:id', authenticated, (req, res) => {
 
 router.post('/', authenticated, (req, res) => {
   const newComment = new Comment(req.body)
-  newComment.member = req.user.id
+  newComment.member = req.user._id
   newComment.save((err, comment) => {
     if (err) {
       res.status(422).send(err.message)

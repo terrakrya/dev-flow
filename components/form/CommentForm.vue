@@ -32,7 +32,7 @@ export default {
   data() {
     return {
       form: {
-        organization: this.organization,
+        organization: this.$store.state.organization?.id,
         comment: this.comment,
         target: this.target,
         message: null,
