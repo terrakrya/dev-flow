@@ -405,33 +405,47 @@ export default {
       // input chatgpt
       // Em um paragrafo faça uma sintaxe resumida do que foi feita nesse ciclo de desenvolvimento de software:
       let htmlContent = `
-        <h2>Contexto</h2>
+        <h1>Contexto</h1>
         <br />
         <p></p>
-        <hr />
-        <h2>Resultados do ciclo:</h2>
+        <h1>Resultados do ciclo:</h1>
         <br />
       `
+      let htmlDetal = `<hr />
+        <h1>Detalhamento das tarefas entregues:</h1>
+        <br />`
+      let count = 0
 
       for (const [tag, cards] of Object.entries(this.groupedCards.published)) {
         htmlContent += `
           <h3>${tag} - Entregue ${cards.length} tarefas.</h3>
         `
-
         for (const card of cards) {
+          count = count + 1
+
           htmlContent += `
             <p>- ${card.title} Entregue em ${this.formatDate(card.end_date)}.`
           if (card.time_spent) {
             htmlContent += ` Resultando ${card.time_spent} horas gastas de trabalho.`
           }
           htmlContent += `</p>`
+          htmlDetal += `<h2>${count} - ${card.title}</h2>`
+
+          if (card.images) {
+            for (const image of card.images) {
+              htmlDetal += `<img src="/${image.url}" alt="${count}" class="report-image" />`
+            }
+          }
+
+          htmlDetal += `<h4>Descrição da tarefa:</h4><p>${card.note}</p><br />
+          <h4>Instruções de teste:</h4><p>${card.test_instructions}</p>
+          <hr />`
         }
         htmlContent += `<br />`
       }
 
       htmlContent += `
-        <hr />
-        <h2>Previsão das atividades para o próximo ciclo:</h2>
+        <h1>Previsão das atividades para o próximo ciclo:</h1>
         <br />
       `
 
@@ -455,7 +469,7 @@ export default {
         htmlContent += `<br />`
       }
 
-      this.form.html = htmlContent
+      this.form.html = htmlContent + htmlDetal
     },
 
     findMemberNameById(memberId) {

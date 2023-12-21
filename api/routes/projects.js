@@ -20,12 +20,18 @@ router.get('/pdf', async (req, res) => {
   <html>
   <head>
       <title>${slug}</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Dosis&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
       <style>
-          body {font-family: 'Arial', sans-serif}
+          body {font-family: 'Dosis', sans-serif;color: #514741}
           h1, h2, h3 {font-weight: bold;}
           #title { text-align:center; width:100%; display:block; margin-bottom:50px }
-          #logo { width: 400px; margin: 0 auto; display:block}
+          img{width:100%}
+          #logo { width: 600px; margin: 0 auto; display:block}
           #logo-footer { width: 200px }
+          hr { display:block;background:url("/api/uploads/images/line-report.png");
+          background-size:contain;height:50px;width:100%;margin: 40px 0; border:0}
       </style>
   </head>
   <body>
