@@ -28,10 +28,10 @@ router.get('/pdf', async (req, res) => {
           h1, h2, h3 {font-weight: bold;}
           #title { text-align:center; width:100%; display:block; margin-bottom:50px }
           img{width:100%}
-          #logo { width: 600px; margin: 0 auto; display:block}
+          #logo { width: 400px; margin: 0 auto; display:block}
           #logo-footer { width: 200px }
           hr { display:block;background:url("/api/uploads/images/line-report.png");
-          background-size:contain;height:50px;width:100%;margin: 40px 0; border:0}
+          background-size:contain;height:30px;width:100%;margin:30px 0;border:0}
       </style>
   </head>
   <body>

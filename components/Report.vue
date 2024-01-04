@@ -406,14 +406,11 @@ export default {
       // Em um paragrafo faça uma sintaxe resumida do que foi feita nesse ciclo de desenvolvimento de software:
       let htmlContent = `
         <h1>Contexto</h1>
-        <br />
         <p></p>
         <h1>Resultados do ciclo:</h1>
-        <br />
       `
       let htmlDetal = `<hr />
-        <h1>Detalhamento das tarefas entregues:</h1>
-        <br />`
+        <h1>Detalhamento das tarefas entregues:</h1>`
       let count = 0
 
       for (const [tag, cards] of Object.entries(this.groupedCards.published)) {
@@ -424,7 +421,7 @@ export default {
           count = count + 1
 
           htmlContent += `
-            <p>- ${card.title} Entregue em ${this.formatDate(card.end_date)}.`
+            <p>- ${card.title}. Entregue em ${this.formatDate(card.end_date)}.`
           if (card.time_spent) {
             htmlContent += ` Resultando ${card.time_spent} horas gastas de trabalho.`
           }
@@ -433,21 +430,18 @@ export default {
 
           if (card.images) {
             for (const image of card.images) {
-              htmlDetal += `<img src="/${image.url}" alt="${count}" class="report-image" />`
+              htmlDetal += `<img src="/${image.url}" alt="${count}" class="report-image" /><br />`
             }
           }
 
-          htmlDetal += `<h4>Descrição da tarefa:</h4><p>${card.note}</p><br />
+          htmlDetal += `<h4>Descrição da tarefa:</h4><p>${card.note}</p>
           <h4>Instruções de teste:</h4><p>${card.test_instructions}</p>
           <hr />`
         }
-        htmlContent += `<br />`
       }
 
       htmlContent += `
-        <h1>Previsão das atividades para o próximo ciclo:</h1>
-        <br />
-      `
+        <h1>Previsão das atividades para o próximo ciclo:</h1>`
 
       for (const [tag, cards] of Object.entries(this.groupedCards.others)) {
         htmlContent += `
@@ -457,7 +451,7 @@ export default {
         for (const card of cards) {
           htmlContent += `<p>- ${card.title}.`
           if (card.due_date) {
-            htmlContent += `Previsão de conclusão ${this.formatDate(
+            htmlContent += ` Previsão de conclusão ${this.formatDate(
               card.due_date
             )}. `
           }
@@ -466,7 +460,6 @@ export default {
           }
           htmlContent += `</p>`
         }
-        htmlContent += `<br />`
       }
 
       this.form.html = htmlContent + htmlDetal
