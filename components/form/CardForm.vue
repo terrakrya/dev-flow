@@ -42,9 +42,11 @@
             "
             offset="6"
           >
-            <b-form-textarea
+            <quill-editor
+              ref="quillEdit"
               v-model="form.note"
-              rows="5"
+              class="mt-4"
+              toolbar="minimal"
               placeholder="Descrição detalhada"
             />
             <!-- eslint-disable-next-line vue/no-lone-template -->
@@ -66,7 +68,11 @@
           v-if="form.status !== 'backlog'"
           label="Instruções de teste"
         >
-          <b-form-textarea v-model="form.test_instructions" rows="5" />
+          <quill-editor
+            ref="quillEdit"
+            v-model="form.test_instructions"
+            toolbar="minimal"
+          />
           <accept-markdown />
           <span class="text-danger">{{ errors[0] }}</span>
         </b-form-group>
