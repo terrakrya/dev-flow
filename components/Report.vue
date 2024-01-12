@@ -401,13 +401,14 @@ export default {
       return groupedCards
     },
     generatePDFContent() {
+      const pathFile = process.env.DEFAULT_STORAGE_BUCKET_FULL_URL
       this.form.title = `${this.project.name} - Relatório de Tarefas realizadas no periodo de xx/xx a xx/xx Ciclo XX`
       // input chatgpt
       // Em um paragrafo faça uma sintaxe resumida do que foi feita nesse ciclo de desenvolvimento de software:
       let htmlContent = `
         <h1>Contexto</h1>
         <p></p>
-        <h1>Resultados do ciclo:</h1>
+        <h1>Resumo da tarefas realizadas no ciclo:</h1>
       `
       let htmlDetal = `<hr />
         <h1>Detalhamento das tarefas entregues:</h1>`
@@ -418,51 +419,56 @@ export default {
           <h3>${tag} - Entregue ${cards.length} tarefas.</h3>
         `
         for (const card of cards) {
-          count = count + 1
-
           htmlContent += `
             <p>- ${card.title}. Entregue em ${this.formatDate(card.end_date)}.`
           if (card.time_spent) {
             htmlContent += ` Resultando ${card.time_spent} horas gastas de trabalho.`
           }
           htmlContent += `</p>`
-          htmlDetal += `<h2>${count} - ${card.title}</h2>`
 
-          if (card.images) {
-            for (const image of card.images) {
-              htmlDetal += `<img src="/${image.url}" alt="${count}" class="report-image" /><br />`
+          if (card.note || card.test_instructions || card.images.length > 0) {
+            count = count + 1
+
+            htmlDetal += `<h2>${count} - ${card.title}</h2>`
+            if (card.note) {
+              htmlDetal += `<h4>Descrição da tarefa:</h4><p>${card.note}</p>`
             }
-          }
 
-          htmlDetal += `<h4>Descrição da tarefa:</h4><p>${card.note}</p>
-          <h4>Instruções de teste:</h4><p>${card.test_instructions}</p>
-          <hr />`
+            if (card.test_instructions) {
+              htmlDetal += `<h4>Instruções de teste:</h4><p>${card.test_instructions}</p>`
+            }
+
+            for (const image of card.images) {
+              htmlDetal += `<img src="${pathFile}${image.url}" alt="${count}" class="report-image" /><br />`
+            }
+            htmlDetal += `<hr />`
+          }
         }
       }
 
-      htmlContent += `
+      let htmlForecast = `
         <h1>Previsão das atividades para o próximo ciclo:</h1>`
 
       for (const [tag, cards] of Object.entries(this.groupedCards.others)) {
-        htmlContent += `
+        htmlForecast += `
           <h3>${tag} - Previstas ${cards.length} tarefas.</h3>
         `
 
         for (const card of cards) {
-          htmlContent += `<p>- ${card.title}.`
+          htmlForecast += `<p>- ${card.title}.`
           if (card.due_date) {
-            htmlContent += ` Previsão de conclusão ${this.formatDate(
+            htmlForecast += ` Previsão de conclusão ${this.formatDate(
               card.due_date
             )}. `
           }
           if (card.time_estimate) {
-            htmlContent += `Previstas ${card.time_estimate} horas gastas de trabalho.`
+            htmlForecast += `Previstas ${card.time_estimate} horas gastas de trabalho.`
           }
-          htmlContent += `</p>`
+          htmlForecast += `</p>`
         }
       }
 
-      this.form.html = htmlContent + htmlDetal
+      this.form.html = htmlContent + htmlDetal + htmlForecast
     },
 
     findMemberNameById(memberId) {
