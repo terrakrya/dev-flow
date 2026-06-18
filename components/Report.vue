@@ -22,52 +22,116 @@
     <b-row v-if="show_calendar">
       <b-col sm-12><Calendar :cards="cards" /></b-col>
     </b-row>
-    <b-row v-if="show_filters">
+    <b-row v-if="show_filters" class="mt-3">
       <b-col sm="12">
         <div class="mb-5">
-          <div class="filter-form">
-            <div class="filter">
-              <label>Status:</label>
-              <div>
-                <label v-for="status in canvasStatus" :key="status">
-                  <input
-                    v-model="selectedStatus"
-                    type="checkbox"
-                    :value="status"
-                    @change="applyFilters"
-                  />
-                  {{ status }}
-                </label>
-              </div>
-            </div>
-            <div class="filter">
-              <label>Tags:</label>
-              <div>
-                <label v-for="tag in canvasTags" :key="tag">
-                  <input
-                    v-model="selectedTags"
-                    type="checkbox"
-                    :value="tag"
-                    @change="applyFilters"
-                  />
-                  {{ tag }}
-                </label>
-              </div>
-            </div>
-            <div class="filter">
-              <label>Membros:</label>
-              <div>
-                <label v-for="member in canvasMembers" :key="member._id">
-                  <input
-                    v-model="selectedMembers"
-                    type="checkbox"
-                    :value="member"
-                    @change="applyFilters"
-                  />
-                  {{ member.name }}
-                </label>
-              </div>
-            </div>
+          <div class="report-filters bg-dark rounded-lg p-3 mb-4">
+            <b-row>
+              <b-col md="4" class="mb-3 mb-md-0">
+                <h6 class="filter-title">
+                  <b-icon-funnel class="mr-1" /> Status
+                </h6>
+                <div class="filter-options">
+                  <b-btn
+                    v-for="status in statusOptions"
+                    :key="status.id"
+                    size="sm"
+                    :variant="
+                      isStatusSelected(status.id)
+                        ? 'success'
+                        : 'outline-secondary'
+                    "
+                    class="filter-chip mr-1 mb-1"
+                    @click="toggleStatus(status.id)"
+                  >
+                    {{ status.name }}
+                  </b-btn>
+                  <small v-if="!statusOptions.length" class="text-muted">
+                    Nenhum status disponível
+                  </small>
+                </div>
+              </b-col>
+              <b-col md="4" class="mb-3 mb-md-0">
+                <h6 class="filter-title"><b-icon-tags class="mr-1" /> Tags</h6>
+                <div class="filter-options">
+                  <b-btn
+                    v-for="tag in canvasTags"
+                    :key="tag"
+                    size="sm"
+                    :variant="
+                      isTagSelected(tag) ? 'success' : 'outline-secondary'
+                    "
+                    class="filter-chip mr-1 mb-1"
+                    @click="toggleTag(tag)"
+                  >
+                    {{ tag }}
+                  </b-btn>
+                  <small v-if="!canvasTags.length" class="text-muted">
+                    Nenhuma tag disponível
+                  </small>
+                </div>
+              </b-col>
+              <b-col md="4">
+                <h6 class="filter-title">
+                  <b-icon-person class="mr-1" /> Membros
+                </h6>
+                <div class="filter-options">
+                  <b-btn
+                    v-for="member in canvasMembers"
+                    :key="member._id"
+                    size="sm"
+                    :variant="
+                      isMemberSelected(member) ? 'success' : 'outline-secondary'
+                    "
+                    class="filter-chip filter-chip-member mr-1 mb-1"
+                    @click="toggleMember(member)"
+                  >
+                    <Avatar
+                      :src="member.avatarUrl"
+                      :name="member.name"
+                      size="18"
+                      class="mr-1"
+                    />
+                    {{ member.name }}
+                  </b-btn>
+                  <small v-if="!canvasMembers.length" class="text-muted">
+                    Nenhum membro disponível
+                  </small>
+                </div>
+              </b-col>
+            </b-row>
+            <b-row
+              v-if="hasActiveFilters"
+              class="align-items-center mt-2 pt-2 border-top border-secondary"
+            >
+              <b-col>
+                <small class="text-muted">
+                  Exibindo {{ filteredCards.length }} de
+                  {{ cards.length }} cartões
+                </small>
+              </b-col>
+              <b-col class="text-right">
+                <b-btn
+                  variant="outline-secondary"
+                  size="sm"
+                  @click="clearFilters"
+                >
+                  <b-icon-x-circle class="mr-1" /> Limpar filtros
+                </b-btn>
+              </b-col>
+            </b-row>
+          </div>
+          <div class="filter-actions mb-3">
+            <b-btn variant="dark" class="float-right mb-2" @click="exportToCSV">
+              <b-icon-cloud-download /> Exportar CSV
+            </b-btn>
+            <b-btn
+              variant="dark"
+              class="float-right mb-2 mr-2"
+              @click="show_rel_pdf = !show_rel_pdf"
+            >
+              <b-icon-file-earmark-pdf-fill /> Editar PDF
+            </b-btn>
             <div class="filter hide">
               <label>Data de Início:</label>
               <input v-model="startDate" type="date" @change="applyFilters" />
@@ -75,16 +139,6 @@
               <label>Data de Fim:</label>
               <input v-model="endDate" type="date" @change="applyFilters" />
             </div>
-            <b-btn variant="dark" class="float-right mb-2" @click="exportToCSV">
-              <b-icon-cloud-download /> Exportar CSV
-            </b-btn>
-            <b-btn
-              variant="dark"
-              class="float-right mb-2"
-              @click="show_rel_pdf = !show_rel_pdf"
-            >
-              <b-icon-file-earmark-pdf-fill /> Editar PDF
-            </b-btn>
             <b-modal
               v-model="show_rel_pdf"
               size="lg"
@@ -199,6 +253,8 @@
 </template>
 
 <script>
+import columns from '@/content/columns.json'
+
 export default {
   props: {
     cards: {
@@ -253,16 +309,29 @@ export default {
 
       return [...statusSet]
     },
+    statusOptions() {
+      return this.canvasStatus.map((id) => ({
+        id,
+        name: this.getStatusName(id),
+      }))
+    },
+    hasActiveFilters() {
+      return (
+        this.selectedStatus.length > 0 ||
+        this.selectedTags.length > 0 ||
+        this.selectedMembers.length > 0
+      )
+    },
     canvasTags() {
       const tagSet = new Set()
 
       this.cards.forEach((card) => {
-        card.tags.forEach((tag) => {
+        card.tags?.forEach((tag) => {
           tagSet.add(tag)
         })
       })
 
-      return [...tagSet]
+      return [...tagSet].sort()
     },
     baseURL() {
       return process.env.baseUrl
@@ -284,6 +353,57 @@ export default {
     },
   },
   methods: {
+    getStatusName(statusId) {
+      for (const cid of Object.keys(columns)) {
+        const status = columns[cid].status.find((s) => s.id === statusId)
+        if (status) {
+          return status.name
+        }
+      }
+      return statusId
+    },
+    isStatusSelected(statusId) {
+      return this.selectedStatus.includes(statusId)
+    },
+    isTagSelected(tag) {
+      return this.selectedTags.includes(tag)
+    },
+    isMemberSelected(member) {
+      return this.selectedMembers.some((m) => m._id === member._id)
+    },
+    toggleStatus(statusId) {
+      const index = this.selectedStatus.indexOf(statusId)
+      if (index >= 0) {
+        this.selectedStatus.splice(index, 1)
+      } else {
+        this.selectedStatus.push(statusId)
+      }
+      this.applyFilters()
+    },
+    toggleTag(tag) {
+      const index = this.selectedTags.indexOf(tag)
+      if (index >= 0) {
+        this.selectedTags.splice(index, 1)
+      } else {
+        this.selectedTags.push(tag)
+      }
+      this.applyFilters()
+    },
+    toggleMember(member) {
+      const index = this.selectedMembers.findIndex((m) => m._id === member._id)
+      if (index >= 0) {
+        this.selectedMembers.splice(index, 1)
+      } else {
+        this.selectedMembers.push(member)
+      }
+      this.applyFilters()
+    },
+    clearFilters() {
+      this.selectedStatus = []
+      this.selectedTags = []
+      this.selectedMembers = []
+      this.applyFilters()
+    },
     formatDate(date) {
       if (date) {
         return new Date(date).toLocaleDateString('pt-BR', {
@@ -541,17 +661,31 @@ export default {
   font-size: 125%;
 }
 
-.filter-form {
-  margin-bottom: 10px;
+.report-filters .filter-title {
+  color: #8b949e;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
 }
 
-.filter-form label {
-  margin-right: 10px;
+.report-filters .filter-options {
+  display: flex;
+  flex-wrap: wrap;
 }
-.filter-form .filter {
-  border: 1px solid #161b22;
-  padding: 5px 20px;
-  border-radius: 20px;
-  margin-bottom: 4px;
+
+.report-filters .filter-chip {
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+
+.report-filters .filter-chip-member {
+  display: inline-flex;
+  align-items: center;
+}
+
+.report-filters .border-top {
+  border-color: #30363d !important;
 }
 </style>

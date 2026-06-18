@@ -172,29 +172,47 @@
           </b-col>
         </b-row>
         <b-form-group label="Tags">
-          <span
-            v-for="(tag, index) in combinedTags"
-            :key="index"
-            :class="{
-              badge: true,
-              'badge-success': form.tags.includes(tag),
-              'badge-secondary': !form.tags.includes(tag),
-              'mr-3': true,
-            }"
-          >
-            {{ tag }}
-            <button
-              type="button"
-              class="close"
-              aria-label="Close"
-              @click="toggleTag(tag)"
-            >
-              <span v-if="form.tags.includes(tag)" aria-hidden="true">
-                &times;
-              </span>
-              <span v-else aria-hidden="true">+</span>
-            </button>
-          </span>
+          <div class="tags-section">
+            <div v-if="combinedTags.length" class="tags-list">
+              <b-btn
+                v-for="tag in combinedTags"
+                :key="tag"
+                size="sm"
+                type="button"
+                :variant="
+                  form.tags.includes(tag) ? 'success' : 'outline-secondary'
+                "
+                class="tag-chip mr-1 mb-1"
+                @click="toggleTag(tag)"
+              >
+                {{ tag }}
+                <b-icon-check v-if="form.tags.includes(tag)" class="ml-1" />
+                <b-icon-plus v-else class="ml-1" />
+              </b-btn>
+            </div>
+            <small v-else class="text-muted d-block mb-2">
+              Nenhuma tag disponível. Adicione uma abaixo.
+            </small>
+            <b-input-group size="sm" class="tags-input mt-2">
+              <b-input-group-prepend is-text>
+                <b-icon-tags />
+              </b-input-group-prepend>
+              <b-form-input
+                v-model="newTag"
+                placeholder="Nova tag..."
+                @keyup.enter.prevent="addNewTag"
+              />
+              <b-input-group-append>
+                <b-btn
+                  variant="outline-secondary"
+                  :disabled="!newTag.trim()"
+                  @click="addNewTag"
+                >
+                  Adicionar
+                </b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </div>
         </b-form-group>
         <div v-if="edit" class="text-right text-danger mb-4">
           <small>
@@ -282,8 +300,21 @@ export default {
       return statusList
     },
     combinedTags() {
-      const projectTags = this.project ? this.project.tags : []
-      return Array.from(new Set([...projectTags, ...this.form.tags]))
+      const projectTags = this.resolvedProject?.tags || []
+      return Array.from(new Set([...projectTags, ...this.form.tags])).sort()
+    },
+    resolvedProject() {
+      const projectId = this.project
+        ? this.project._id || this.project.id
+        : this.form.project
+      if (!projectId) {
+        return null
+      }
+      return (
+        this.projects?.find((p) => (p._id || p.id) === projectId) ||
+        this.project ||
+        null
+      )
     },
   },
   created() {
@@ -347,17 +378,64 @@ export default {
         }
       }
     },
+    addNewTag() {
+      const tag = this.newTag.trim()
+      if (!tag) {
+        return
+      }
+      this.addTag(tag)
+      this.newTag = ''
+      this.addTagToProject(tag)
+    },
     addTag(tag) {
       if (tag.trim() !== '' && !this.form.tags.includes(tag)) {
         this.form.tags.push(tag.trim())
       }
     },
+    async addTagToProject(tag) {
+      const project = this.resolvedProject
+      if (!project) {
+        return
+      }
+      const projectTags = project.tags || []
+      if (projectTags.includes(tag)) {
+        return
+      }
+      const projectId = project._id || project.id
+      const updatedProject = await this.$axios
+        .$put(`/api/projects/${projectId}`, {
+          name: project.name,
+          description: project.description,
+          color: project.color,
+          repository: project.repository,
+          tags: [...projectTags, tag],
+          numberCycleDays: project.numberCycleDays,
+          startDayEachCycle: project.startDayEachCycle,
+          documentationLink: project.documentationLink,
+          gitRepositoryLink: project.gitRepositoryLink,
+          linkDocNextclound: project.linkDocNextclound,
+          matrixRoomLink: project.matrixRoomLink,
+          organization: project.organization?.id || project.organization,
+        })
+        .catch(this.showError)
+      if (updatedProject) {
+        this.updateProjectInStore(updatedProject)
+      }
+    },
+    updateProjectInStore(updatedProject) {
+      const updatedId = updatedProject._id || updatedProject.id
+      const projects = this.projects.map((p) =>
+        (p._id || p.id) === updatedId ? updatedProject : p
+      )
+      this.$store.commit('setProjects', projects)
+    },
     removeTag(index) {
       this.form.tags.splice(index, 1)
     },
     toggleTag(tag) {
-      if (this.form.tags.includes(tag)) {
-        this.removeTag(tag)
+      const index = this.form.tags.indexOf(tag)
+      if (index >= 0) {
+        this.form.tags.splice(index, 1)
       } else {
         this.addTag(tag)
       }
@@ -391,5 +469,33 @@ export default {
   align-content: flex-start;
   margin: 20px 0;
   margin-bottom: 14px;
+}
+
+.tags-section .tags-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tags-section .tag-chip {
+  border-radius: 999px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.tags-section .tags-input .input-group-text {
+  background-color: #21262d;
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+.tags-section .tags-input .form-control {
+  background-color: #0d1117;
+  border-color: #30363d;
+  color: #c9d1d9;
+}
+
+.tags-section .tags-input .form-control::placeholder {
+  color: #6e7681;
 }
 </style>

@@ -3,14 +3,19 @@
     <b-row>
       <b-col sm="10">
         <template v-if="projects">
-          <b-button
-            v-for="project in projects"
-            :key="project._id"
-            variant="dark"
-            :to="`/projects/${project._id}`"
-            class="mb-1"
-            ><small>{{ project.name }}</small></b-button
-          >
+          <b-row>
+            <b-col v-for="project in projects" :key="project._id" sm="3">
+              <b-button
+                variant="dark"
+                block
+                :to="`/projects/${project._id}`"
+                class="mb-4 d-flex align-items-center justify-content-center"
+                size="lg"
+                style="height: 100px"
+                ><small>{{ project.name }}</small></b-button
+              >
+            </b-col>
+          </b-row>
         </template>
         <a
           class="btn btn-dark mb-1"
@@ -36,7 +41,6 @@
     <b-modal v-model="show_project_form" title="Adicionar projeto" hide-footer>
       <form-project-form @change="projectSaved" />
     </b-modal>
-    <Kanban :cards="cards" multiple @change="loadCards" />
   </b-container>
 </template>
 
@@ -58,7 +62,7 @@ export default {
     },
   },
   created() {
-    this.loadCards()
+    // this.loadCards()
   },
 
   methods: {

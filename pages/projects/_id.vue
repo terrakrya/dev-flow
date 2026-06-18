@@ -40,7 +40,7 @@
         </b-col>
       </b-row>
       <b-row>
-        <b-col sm="8">
+        <b-col>
           <b-btn variant="dark" class="p-4" @click="openKanban()">
             <b-icon-kanban /> Kanban
           </b-btn>
@@ -56,7 +56,7 @@
     </b-container>
     <b-container fluid>
       <div v-if="show_kanban">
-        <Kanban :cards="cards" @change="cardSaved" />
+        <Kanban :cards="cards" :project="project" @change="cardSaved" />
       </div>
       <div v-if="show_report">
         <Report :cards="cards" :project="project" />
