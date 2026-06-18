@@ -185,8 +185,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(item, index) in filteredCards" :key="index">
-                <td>{{ item.title }}</td>
+              <tr v-for="item in filteredCards" :key="item._id || item.id">
+                <td>
+                  <a
+                    href="#"
+                    class="card-title-link text-decoration-none"
+                    @click.prevent="openCard(item)"
+                  >
+                    {{ item.title }}
+                  </a>
+                </td>
                 <td>{{ item.status }}</td>
                 <td>
                   <div v-for="tag in item.tags" :key="tag">
@@ -208,6 +216,20 @@
               </tr>
             </tbody>
           </table>
+          <b-modal
+            v-model="show_card_modal"
+            title="Editar cartão"
+            hide-footer
+            size="lg"
+            @hide="selectedCard = null"
+          >
+            <form-card-form
+              v-if="selectedCard"
+              :project="project"
+              :edit="selectedCard"
+              @change="cardChanged"
+            />
+          </b-modal>
         </div>
       </b-col>
     </b-row>
@@ -280,6 +302,8 @@ export default {
       show_calendar: false,
       show_rel_pdf: false,
       show_time_table: false,
+      show_card_modal: false,
+      selectedCard: null,
       groupedCards: {},
       form: {
         title: '',
@@ -403,6 +427,15 @@ export default {
       this.selectedTags = []
       this.selectedMembers = []
       this.applyFilters()
+    },
+    openCard(card) {
+      this.selectedCard = card
+      this.show_card_modal = true
+    },
+    cardChanged() {
+      this.show_card_modal = false
+      this.selectedCard = null
+      this.$emit('change')
     },
     formatDate(date) {
       if (date) {
@@ -655,6 +688,15 @@ export default {
 
 .report-table a {
   color: #fff;
+}
+
+.report-table a.card-title-link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.report-table a.card-title-link:hover {
+  opacity: 0.85;
 }
 
 .report-table a svg {

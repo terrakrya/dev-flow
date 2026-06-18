@@ -59,7 +59,7 @@
         <Kanban :cards="cards" :project="project" @change="cardSaved" />
       </div>
       <div v-if="show_report">
-        <Report :cards="cards" :project="project" />
+        <Report :cards="cards" :project="project" @change="cardSaved" />
       </div>
       <div v-if="show_information">
         <Information :project="project" />
