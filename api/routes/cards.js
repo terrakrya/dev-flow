@@ -24,6 +24,70 @@ router.get('/', authenticated, (req, res) => {
     })
 })
 
+router.get('/my-reports', authenticated, async (req, res) => {
+  try {
+    const userId = req.user._id
+    const query = {
+      archived: false,
+      members: { $in: [userId, userId.toString()] },
+      time_spent: { $gt: 0 },
+    }
+    if (req.query.organization) {
+      query.organization = req.query.organization
+    }
+
+    const cards = await Card.find(query).populate('project')
+
+    const projectsMap = {}
+    let totalHours = 0
+
+    cards.forEach((card) => {
+      const hours = card.time_spent || 0
+      totalHours += hours
+
+      const projectId = card.project?._id?.toString() || 'unknown'
+      const projectName = card.project?.name || 'Sem projeto'
+
+      if (!projectsMap[projectId]) {
+        projectsMap[projectId] = {
+          id: projectId,
+          name: projectName,
+          hours: 0,
+          cards: 0,
+          tags: {},
+        }
+      }
+      projectsMap[projectId].hours += hours
+      projectsMap[projectId].cards += 1
+
+      const tags = card.tags?.length ? card.tags : ['Sem tag']
+      const hoursPerTag = hours / tags.length
+
+      tags.forEach((tag) => {
+        if (!projectsMap[projectId].tags[tag]) {
+          projectsMap[projectId].tags[tag] = { tag, hours: 0, cards: 0 }
+        }
+        projectsMap[projectId].tags[tag].hours += hoursPerTag
+        projectsMap[projectId].tags[tag].cards += 1
+      })
+    })
+
+    const byProject = Object.values(projectsMap)
+      .map((project) => ({
+        ...project,
+        tags: Object.values(project.tags).sort((a, b) => b.hours - a.hours),
+      }))
+      .sort((a, b) => b.hours - a.hours)
+
+    res.json({
+      totalHours,
+      byProject,
+    })
+  } catch (err) {
+    res.status(422).send(err.message)
+  }
+})
+
 router.get('/my', authenticated, async (req, res) => {
   try {
     const query = {
