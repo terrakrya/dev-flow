@@ -226,10 +226,10 @@
           type="submit"
           variant="secondary"
           block
-          :disabled="invalid"
+          :disabled="invalid || loading_card"
           size="lg"
         >
-          Salvar
+          {{ loading_card ? 'Carregando cartão...' : 'Salvar' }}
         </b-button>
       </div>
     </b-form>
@@ -259,6 +259,7 @@ export default {
   },
   data() {
     return {
+      loading_card: false,
       form: {
         project: this.project ? this.project.id : null,
         note: '',
@@ -317,12 +318,30 @@ export default {
       )
     },
   },
-  created() {
+  async created() {
     if (this.edit) {
       apiDataToForm(this.form, this.edit)
+      await this.loadFullCard()
     }
   },
   methods: {
+    // A listagem nao traz note/test_instructions (o payload passava de 30MB e
+    // derrubava o servidor), entao o cartao completo e buscado ao abrir o
+    // formulario. Enquanto nao chega, salvar fica bloqueado: gravar o form com
+    // o note vazio apagaria a descricao no banco.
+    async loadFullCard() {
+      if (!this.edit || !this.edit._id) {
+        return
+      }
+      this.loading_card = true
+      const card = await this.$axios
+        .$get('/api/cards/' + this.edit._id)
+        .catch(this.showError)
+      if (card) {
+        apiDataToForm(this.form, card)
+        this.loading_card = false
+      }
+    },
     currentDate() {
       const currentDate = new Date()
 

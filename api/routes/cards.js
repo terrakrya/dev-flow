@@ -12,7 +12,12 @@ router.get('/', authenticated, (req, res) => {
   if (req.query.organization) {
     query.organization = req.query.organization
   }
+  // note/test_instructions ficam de fora: o editor grava imagens em base64
+  // dentro do note, e mandar isso na listagem gerava respostas de 30MB+ (111MB
+  // no caso da organizacao inteira), o que estourava a memoria do container.
+  // O conteudo completo vem pela rota GET /:id ao abrir o cartao.
   Card.find(query)
+    .select('-note -test_instructions')
     .populate('project')
     .sort('order')
     .exec((err, cards) => {
@@ -36,7 +41,9 @@ router.get('/my-reports', authenticated, async (req, res) => {
       query.organization = req.query.organization
     }
 
-    const cards = await Card.find(query).populate('project')
+    const cards = await Card.find(query)
+      .select('time_spent tags project')
+      .populate('project')
 
     const projectsMap = {}
     let totalHours = 0
@@ -99,7 +106,9 @@ router.get('/my', authenticated, async (req, res) => {
       query.organization = req.query.organization
     }
 
-    const cards = await Card.find(query).populate('project')
+    const cards = await Card.find(query)
+      .select('-note -test_instructions')
+      .populate('project')
 
     const activeCards = cards.filter(
       (card) =>
