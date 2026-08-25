@@ -148,6 +148,32 @@ router.get('/:id', authenticated, (req, res) => {
   })
 })
 
+// O relatorio precisa de note/test_instructions, que a listagem nao devolve
+// mais (payload de 30MB+ derrubava o container). Aqui os campos vem apenas
+// para os cartoes pedidos, em lotes pequenos, para manter o pico de memoria
+// baixo.
+const DETAILS_MAX_IDS = 100
+
+router.post('/details', authenticated, async (req, res) => {
+  try {
+    const ids = Array.isArray(req.body.ids) ? req.body.ids : []
+    if (!ids.length) {
+      return res.json([])
+    }
+    if (ids.length > DETAILS_MAX_IDS) {
+      return res
+        .status(422)
+        .send(`Envie no maximo ${DETAILS_MAX_IDS} cartoes por requisicao.`)
+    }
+    const cards = await Card.find({ _id: { $in: ids } }).select(
+      '_id note test_instructions'
+    )
+    res.json(cards)
+  } catch (err) {
+    res.status(422).send(err.message)
+  }
+})
+
 router.post('/', authenticated, (req, res) => {
   const newCard = new Card(req.body)
   newCard.save((err, card) => {
@@ -178,26 +204,30 @@ router.put('/reorder', authenticated, async (req, res) => {
   res.json('ok')
 })
 
-router.put('/:id', authenticated, (req, res) => {
-  const params = req.body
-  const query = { _id: req.params.id }
-  Card.findOneAndUpdate(
-    query,
-    {
-      $set: params,
-    },
-    {
-      upsert: true,
-      new: true,
-    },
-    (err, card) => {
-      if (err) {
-        res.status(422).send(err.message)
-      } else {
-        res.send(card)
+router.put('/:id', authenticated, async (req, res) => {
+  try {
+    const params = { ...req.body }
+    const query = { _id: req.params.id }
+
+    // O end_date so era preenchido pelo formulario do cartao; arrastar o cartao
+    // para "Em producao" no kanban mandava apenas o status e o relatorio saia
+    // com "Entregue em undefined". Preenche aqui para cobrir os dois caminhos.
+    if (params.status === 'published' && !params.end_date) {
+      const current = await Card.findOne(query).select('end_date')
+      if (current && !current.end_date) {
+        params.end_date = new Date()
       }
     }
-  )
+
+    const card = await Card.findOneAndUpdate(
+      query,
+      { $set: params },
+      { upsert: true, new: true }
+    )
+    res.send(card)
+  } catch (err) {
+    res.status(422).send(err.message)
+  }
 })
 
 router.delete('/:id', authenticated, (req, res) => {

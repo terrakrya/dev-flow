@@ -128,9 +128,11 @@
             <b-btn
               variant="dark"
               class="float-right mb-2 mr-2"
-              @click="show_rel_pdf = !show_rel_pdf"
+              :disabled="loading_details"
+              @click="openPdfEditor"
             >
-              <b-icon-file-earmark-pdf-fill /> Editar PDF
+              <b-icon-file-earmark-pdf-fill />
+              {{ loading_details ? 'Carregando detalhes...' : 'Editar PDF' }}
             </b-btn>
             <div class="filter hide">
               <label>Data de Início:</label>
@@ -305,6 +307,10 @@ export default {
       show_card_modal: false,
       selectedCard: null,
       groupedCards: {},
+      // note/test_instructions nao vem na listagem de cartoes; sao buscados sob
+      // demanda ao abrir o editor de PDF e guardados aqui por id.
+      cardDetails: {},
+      loading_details: false,
       form: {
         title: '',
         html: '',
@@ -438,13 +444,14 @@ export default {
       this.$emit('change')
     },
     formatDate(date) {
-      if (date) {
-        return new Date(date).toLocaleDateString('pt-BR', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
+      if (!date) {
+        return ''
       }
+      return new Date(date).toLocaleDateString('pt-BR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })
     },
     applyFilters() {
       this.filteredCards = this.cards.filter((item) => {
@@ -553,6 +560,51 @@ export default {
 
       return groupedCards
     },
+    // Busca note/test_instructions dos cartoes entregues em lotes pequenos: a
+    // listagem nao traz mais esses campos (o editor grava imagens em base64
+    // dentro do note e a resposta inteira passava de 30MB).
+    async loadCardDetails() {
+      const ids = Object.values(this.groupedCards.published || {})
+        .flat()
+        .map((card) => card._id)
+        .filter((id) => id && !(id in this.cardDetails))
+
+      if (!ids.length) {
+        return
+      }
+
+      this.loading_details = true
+      try {
+        const chunkSize = 25
+        for (let i = 0; i < ids.length; i += chunkSize) {
+          const chunk = ids.slice(i, i + chunkSize)
+          const cards = await this.$axios.$post('/api/cards/details', {
+            ids: chunk,
+          })
+          for (const card of cards) {
+            this.$set(this.cardDetails, card._id, {
+              note: card.note,
+              test_instructions: card.test_instructions,
+            })
+          }
+          // ids que nao voltaram (cartao removido) nao podem ficar pendentes
+          for (const id of chunk) {
+            if (!(id in this.cardDetails)) {
+              this.$set(this.cardDetails, id, {})
+            }
+          }
+        }
+      } catch (error) {
+        this.showError(error)
+      } finally {
+        this.loading_details = false
+      }
+    },
+    async openPdfEditor() {
+      await this.loadCardDetails()
+      this.generatePDFContent()
+      this.show_rel_pdf = true
+    },
     generatePDFContent() {
       const pathFile = process.env.DEFAULT_STORAGE_BUCKET_FULL_URL
       this.form.title = `${this.project.name} - Relatório de Tarefas realizadas no periodo de xx/xx a xx/xx Ciclo XX`
@@ -572,26 +624,36 @@ export default {
           <h3>${tag} - Entregue ${cards.length} tarefas.</h3>
         `
         for (const card of cards) {
+          const details = this.cardDetails[card._id] || {}
+          const note = card.note || details.note
+          const testInstructions =
+            card.test_instructions || details.test_instructions
+          const endDate = this.formatDate(card.end_date)
+          const images = card.images || []
+
           htmlContent += `
-            <p>- ${card.title}. Entregue em ${this.formatDate(card.end_date)}.`
+            <p>- ${card.title}.`
+          if (endDate) {
+            htmlContent += ` Entregue em ${endDate}.`
+          }
           if (card.time_spent) {
             htmlContent += ` Resultando ${card.time_spent} horas gastas de trabalho.`
           }
           htmlContent += `</p>`
 
-          if (card.note || card.test_instructions || card.images.length > 0) {
+          if (note || testInstructions || images.length > 0) {
             count = count + 1
 
             htmlDetal += `<h2>${count} - ${card.title}</h2>`
-            if (card.note) {
-              htmlDetal += `<h4>Descrição da tarefa:</h4><p>${card.note}</p>`
+            if (note) {
+              htmlDetal += `<h4>Descrição da tarefa:</h4><p>${note}</p>`
             }
 
-            if (card.test_instructions) {
-              htmlDetal += `<h4>Instruções de teste:</h4><p>${card.test_instructions}</p>`
+            if (testInstructions) {
+              htmlDetal += `<h4>Instruções de teste:</h4><p>${testInstructions}</p>`
             }
 
-            for (const image of card.images) {
+            for (const image of images) {
               htmlDetal += `<img src="${pathFile}${image.url}" alt="${count}" class="report-image" /><br />`
             }
             htmlDetal += `<hr />`
