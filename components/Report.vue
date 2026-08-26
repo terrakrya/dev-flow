@@ -152,9 +152,12 @@
                   <b-btn
                     variant="dark"
                     class="float-right"
+                    :disabled="saving_report"
                     @click="exportToPDF"
                   >
-                    <b-icon-cloud-download /> Exportar
+                    <b-spinner v-if="saving_report" small />
+                    <b-icon-cloud-download v-else />
+                    {{ saving_report ? 'Salvando...' : 'Exportar' }}
                   </b-btn>
                 </b-col>
                 <b-col md="12">
@@ -311,6 +314,7 @@ export default {
       // demanda ao abrir o editor de PDF e guardados aqui por id.
       cardDetails: {},
       loading_details: false,
+      saving_report: false,
       form: {
         title: '',
         html: '',
@@ -525,16 +529,25 @@ export default {
       URL.revokeObjectURL(url)
     },
     async exportToPDF() {
-      const response = await this.$axios.$post(
-        `/api/projects/${this.project.id}/report`,
-        {
-          title: this.form.title,
-          html: this.form.html,
-        }
-      )
-      this.show_rel_pdf = false
-      this.openHistory()
-      window.open(this.baseURL + '/api/projects/pdf?report=' + response._id)
+      this.saving_report = true
+      try {
+        const response = await this.$axios.$post(
+          `/api/projects/${this.project.id}/report`,
+          {
+            title: this.form.title,
+            html: this.form.html,
+          }
+        )
+        this.show_rel_pdf = false
+        this.openHistory()
+        window.open(this.baseURL + '/api/projects/pdf?report=' + response._id)
+      } catch (error) {
+        // sem isso a falha de salvamento passava silenciosa: o modal continuava
+        // aberto e parecia que o botao nao tinha feito nada
+        this.showError(error)
+      } finally {
+        this.saving_report = false
+      }
     },
     groupCardsByTagsWithBracket(cards) {
       const groupedCards = {

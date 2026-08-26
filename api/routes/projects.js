@@ -131,7 +131,11 @@ router.post('/:id/report', authenticated, (req, res) => {
 
 router.get('/reports/:id', authenticated, (req, res) => {
   const query = { $or: [{ project: req.params.id }] }
+  // html fica de fora: o relatorio embute o note dos cartoes, que carrega
+  // imagens em base64, entao listar o historico inteiro devolvia dezenas de MB
+  // e estourava o tempo do gateway (504). O html so e lido na rota /pdf.
   Report.find(query)
+    .select('-html')
     .sort({ createdAt: -1 })
     .exec((err, reports) => {
       if (err) {
